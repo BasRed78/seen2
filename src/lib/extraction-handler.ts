@@ -4,8 +4,13 @@
 // This service extracts structured data from completed check-ins
 // and stores it in the extractions/breakthroughs tables
 // 
-// Version: 2.0
+// Version: 2.1
 // Last updated: December 2024
+// 
+// CHANGELOG v2.1:
+// - Added alternative_action extraction storage
+// - Added gap_noticed extraction storage
+// - Added emotions_named_by_user extraction storage
 // ============================================
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -39,6 +44,8 @@ export async function extractFromCheckin(checkinId: string): Promise<{
   success: boolean;
   extractionCount: number;
   breakthroughDetected: boolean;
+  alternativeActionDetected: boolean;
+  gapNoticedDetected: boolean;
   error?: string;
 }> {
   const anthropic = getAnthropic();
@@ -53,12 +60,12 @@ export async function extractFromCheckin(checkinId: string): Promise<{
       .single();
 
     if (checkinError || !checkin) {
-      return { success: false, extractionCount: 0, breakthroughDetected: false, error: 'Check-in not found' };
+      return { success: false, extractionCount: 0, breakthroughDetected: false, alternativeActionDetected: false, gapNoticedDetected: false, error: 'Check-in not found' };
     }
 
     // Skip if already extracted
     if (checkin.extracted) {
-      return { success: true, extractionCount: 0, breakthroughDetected: false, error: 'Already extracted' };
+      return { success: true, extractionCount: 0, breakthroughDetected: false, alternativeActionDetected: false, gapNoticedDetected: false, error: 'Already extracted' };
     }
 
     const { data: messages, error: messagesError } = await supabase
@@ -68,7 +75,7 @@ export async function extractFromCheckin(checkinId: string): Promise<{
       .order('created_at', { ascending: true });
 
     if (messagesError || !messages || messages.length === 0) {
-      return { success: false, extractionCount: 0, breakthroughDetected: false, error: 'No messages found' };
+      return { success: false, extractionCount: 0, breakthroughDetected: false, alternativeActionDetected: false, gapNoticedDetected: false, error: 'No messages found' };
     }
 
     // 2. Format conversation for extraction
@@ -79,7 +86,7 @@ export async function extractFromCheckin(checkinId: string): Promise<{
     // 3. Call Claude for extraction
     const extractionResponse = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
+      max_tokens: 2000,
       system: EXTRACTION_SYSTEM_PROMPT,
       messages: [{
         role: 'user',
@@ -102,7 +109,7 @@ export async function extractFromCheckin(checkinId: string): Promise<{
       extraction = JSON.parse(cleanJson);
     } catch (parseError) {
       console.error('[EXTRACTION] Failed to parse JSON:', rawOutput);
-      return { success: false, extractionCount: 0, breakthroughDetected: false, error: 'JSON parse failed' };
+      return { success: false, extractionCount: 0, breakthroughDetected: false, alternativeActionDetected: false, gapNoticedDetected: false, error: 'JSON parse failed' };
     }
 
     // 5. Store extractions
@@ -114,6 +121,7 @@ export async function extractFromCheckin(checkinId: string): Promise<{
       value: string;
       confidence: number | null;
       extraction_version: string;
+      metadata?: Record<string, unknown>;
     }> = [];
 
     // Stress level
@@ -173,6 +181,47 @@ export async function extractFromCheckin(checkinId: string): Promise<{
       }
     }
 
+    // ========================================
+    // NEW: Alternative action (user-reported)
+    // ========================================
+    let alternativeActionDetected = false;
+    if (extraction.alternative_action?.action) {
+      alternativeActionDetected = true;
+      extractions.push({
+        checkin_id: checkinId,
+        user_id: userId,
+        type: 'alternative_action',
+        value: extraction.alternative_action.action,
+        confidence: extraction.alternative_action.confidence,
+        extraction_version: EXTRACTION_VERSION,
+        metadata: {
+          user_words: extraction.alternative_action.user_words
+        }
+      });
+      console.log(`[EXTRACTION] 🔄 Alternative action detected: ${extraction.alternative_action.action} - "${extraction.alternative_action.user_words}"`);
+    }
+
+    // ========================================
+    // NEW: Gap noticed (awareness of pause)
+    // ========================================
+    let gapNoticedDetected = false;
+    if (extraction.gap_noticed?.detected) {
+      gapNoticedDetected = true;
+      extractions.push({
+        checkin_id: checkinId,
+        user_id: userId,
+        type: 'gap_noticed',
+        value: 'true',
+        confidence: extraction.gap_noticed.confidence,
+        extraction_version: EXTRACTION_VERSION,
+        metadata: {
+          description: extraction.gap_noticed.description,
+          duration_estimate: extraction.gap_noticed.duration_estimate
+        }
+      });
+      console.log(`[EXTRACTION] ⏸️ Gap noticed: ${extraction.gap_noticed.description}`);
+    }
+
     // Triggers
     if (extraction.triggers) {
       for (const trigger of extraction.triggers) {
@@ -182,6 +231,22 @@ export async function extractFromCheckin(checkinId: string): Promise<{
           type: 'trigger',
           value: trigger.value,
           confidence: trigger.confidence,
+          extraction_version: EXTRACTION_VERSION
+        });
+      }
+    }
+
+    // ========================================
+    // NEW: Emotions named by user (affect labeling)
+    // ========================================
+    if (extraction.emotions?.named_by_user) {
+      for (const emotion of extraction.emotions.named_by_user) {
+        extractions.push({
+          checkin_id: checkinId,
+          user_id: userId,
+          type: 'emotion_named',
+          value: emotion.value,
+          confidence: emotion.confidence,
           extraction_version: EXTRACTION_VERSION
         });
       }
@@ -283,7 +348,7 @@ export async function extractFromCheckin(checkinId: string): Promise<{
 
       if (insertError) {
         console.error('[EXTRACTION] Failed to insert extractions:', insertError);
-        return { success: false, extractionCount: 0, breakthroughDetected: false, error: 'Insert failed' };
+        return { success: false, extractionCount: 0, breakthroughDetected: false, alternativeActionDetected, gapNoticedDetected, error: 'Insert failed' };
       }
     }
 
@@ -325,7 +390,9 @@ export async function extractFromCheckin(checkinId: string): Promise<{
     return { 
       success: true, 
       extractionCount: extractions.length,
-      breakthroughDetected
+      breakthroughDetected,
+      alternativeActionDetected,
+      gapNoticedDetected
     };
 
   } catch (error) {
@@ -334,6 +401,8 @@ export async function extractFromCheckin(checkinId: string): Promise<{
       success: false, 
       extractionCount: 0, 
       breakthroughDetected: false,
+      alternativeActionDetected: false,
+      gapNoticedDetected: false,
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
@@ -390,6 +459,7 @@ export async function extractHistoricalCheckins(userId?: string, limit: number =
 
 /**
  * Get extraction summary for a user
+ * Updated to include alternative actions and gap notices
  */
 export async function getExtractionSummary(userId: string, days: number = 30): Promise<{
   total_extractions: number;
@@ -397,6 +467,9 @@ export async function getExtractionSummary(userId: string, days: number = 30): P
   top_triggers: Array<{trigger: string; count: number}>;
   episode_breakdown: Record<string, number>;
   breakthroughs: number;
+  alternative_actions: Array<{action: string; count: number}>;
+  gap_notices: number;
+  emotions_named: Array<{emotion: string; count: number}>;
 }> {
   const supabase = getSupabase();
   const since = new Date();
@@ -413,6 +486,7 @@ export async function getExtractionSummary(userId: string, days: number = 30): P
     byType[row.type] = (byType[row.type] || 0) + 1;
   }
 
+  // Triggers
   const { data: triggerData } = await supabase
     .from('extractions')
     .select('value')
@@ -429,6 +503,7 @@ export async function getExtractionSummary(userId: string, days: number = 30): P
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
+  // Episodes
   const { data: episodeData } = await supabase
     .from('extractions')
     .select('value')
@@ -441,17 +516,61 @@ export async function getExtractionSummary(userId: string, days: number = 30): P
     episodeBreakdown[row.value] = (episodeBreakdown[row.value] || 0) + 1;
   }
 
+  // Breakthroughs
   const { count: breakthroughCount } = await supabase
     .from('breakthroughs')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
     .gte('created_at', since.toISOString());
 
+  // Alternative actions (user-reported)
+  const { data: alternativeData } = await supabase
+    .from('extractions')
+    .select('value')
+    .eq('user_id', userId)
+    .eq('type', 'alternative_action')
+    .gte('created_at', since.toISOString());
+
+  const actionCounts: Record<string, number> = {};
+  for (const row of alternativeData || []) {
+    actionCounts[row.value] = (actionCounts[row.value] || 0) + 1;
+  }
+  const alternativeActions = Object.entries(actionCounts)
+    .map(([action, count]) => ({ action, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Gap notices
+  const { count: gapNoticeCount } = await supabase
+    .from('extractions')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('type', 'gap_noticed')
+    .gte('created_at', since.toISOString());
+
+  // Emotions named by user
+  const { data: emotionNamedData } = await supabase
+    .from('extractions')
+    .select('value')
+    .eq('user_id', userId)
+    .eq('type', 'emotion_named')
+    .gte('created_at', since.toISOString());
+
+  const emotionCounts: Record<string, number> = {};
+  for (const row of emotionNamedData || []) {
+    emotionCounts[row.value] = (emotionCounts[row.value] || 0) + 1;
+  }
+  const emotionsNamed = Object.entries(emotionCounts)
+    .map(([emotion, count]) => ({ emotion, count }))
+    .sort((a, b) => b.count - a.count);
+
   return {
     total_extractions: Object.values(byType).reduce((a, b) => a + b, 0),
     by_type: byType,
     top_triggers: topTriggers,
     episode_breakdown: episodeBreakdown,
-    breakthroughs: breakthroughCount || 0
+    breakthroughs: breakthroughCount || 0,
+    alternative_actions: alternativeActions,
+    gap_notices: gapNoticeCount || 0,
+    emotions_named: emotionsNamed
   };
 }
