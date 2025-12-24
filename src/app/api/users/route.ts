@@ -6,6 +6,21 @@ import { sendWelcomeEmail } from '@/lib/email'
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
+// CORS headers helper
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  })
+}
+
 // POST - Create a new user (for admin/testing)
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +29,7 @@ export async function POST(request: NextRequest) {
     if (!name) {
       return NextResponse.json(
         { error: 'Name is required' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -56,7 +71,7 @@ export async function POST(request: NextRequest) {
       console.error('Error creating user:', error)
       return NextResponse.json(
         { error: 'Failed to create user' },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       )
     }
 
@@ -76,12 +91,12 @@ export async function POST(request: NextRequest) {
       inviteCode,
       emailSent,
       message: `User created! Invite code: ${inviteCode}${emailSent ? ' (welcome email sent)' : ''}`
-    })
+    }, { headers: corsHeaders })
   } catch (error) {
     console.error('Create user error:', error)
     return NextResponse.json(
       { error: 'Failed to create user' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }
@@ -99,16 +114,16 @@ export async function GET() {
     if (error) {
       return NextResponse.json(
         { error: 'Failed to fetch users' },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       )
     }
 
-    return NextResponse.json({ users })
+    return NextResponse.json({ users }, { headers: corsHeaders })
   } catch (error) {
     console.error('Get users error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch users' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }
@@ -121,7 +136,7 @@ export async function DELETE(request: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { error: 'User ID is required' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -157,16 +172,16 @@ export async function DELETE(request: NextRequest) {
       console.error('Error deleting user:', error)
       return NextResponse.json(
         { error: 'Failed to delete user' },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       )
     }
 
-    return NextResponse.json({ success: true, message: 'User deleted' })
+    return NextResponse.json({ success: true, message: 'User deleted' }, { headers: corsHeaders })
   } catch (error) {
     console.error('Delete user error:', error)
     return NextResponse.json(
       { error: 'Failed to delete user' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }

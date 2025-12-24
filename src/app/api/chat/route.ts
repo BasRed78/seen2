@@ -6,6 +6,21 @@ import { buildSystemPrompt, detectCrisis, getCrisisResponse } from '@/lib/prompt
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
+// CORS headers helper
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  })
+}
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
@@ -21,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (!userId || !message) {
       return NextResponse.json(
         { error: 'userId and message are required' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -37,7 +52,7 @@ export async function POST(request: NextRequest) {
     if (userError || !user) {
       return NextResponse.json(
         { error: 'User not found' },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       )
     }
 
@@ -72,7 +87,7 @@ export async function POST(request: NextRequest) {
           console.error('Error creating check-in:', checkinError)
           return NextResponse.json(
             { error: 'Failed to create check-in' },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
           )
         }
         currentCheckinId = newCheckin.id
@@ -194,7 +209,7 @@ export async function POST(request: NextRequest) {
         checkinId: currentCheckinId,
         isComplete: false,
         isCrisis: true,
-      })
+      }, { headers: corsHeaders })
     }
 
     let assistantMessage = ''
@@ -539,7 +554,7 @@ STAGE_REASON: [brief reason OR "n/a" if no change]`
               console.log(`[ANALYSIS] Reason: ${reasonMatch[1]}`)
             }
           }
-}
+        }
       } catch (analysisError) {
         console.error('Failed to extract stress/stage:', analysisError)
       }
@@ -565,12 +580,12 @@ STAGE_REASON: [brief reason OR "n/a" if no change]`
       message: assistantMessage,
       checkinId: currentCheckinId,
       isComplete: isClosing,
-    })
+    }, { headers: corsHeaders })
   } catch (error) {
     console.error('Chat error:', error)
     return NextResponse.json(
       { error: 'Failed to process message' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }
