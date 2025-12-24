@@ -139,6 +139,25 @@ async function getCheckinCount(userId: string, startDate: Date, endDate: Date): 
 
 
 /**
+ * Aggregate alternative actions into {action, count} format
+ * v2.1 helper function
+ */
+function aggregateAlternativeActions(
+  rawActions: Array<{action: string; user_words?: string}>
+): Array<{action: string; count: number}> {
+  const counts: Record<string, number> = {};
+  
+  for (const item of rawActions) {
+    counts[item.action] = (counts[item.action] || 0) + 1;
+  }
+  
+  return Object.entries(counts)
+    .map(([action, count]) => ({ action, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+
+/**
  * Compute statistics from extractions
  * Updated for v2.1: includes gap_notices, alternative_actions, emotions_user_named
  */
@@ -157,7 +176,7 @@ function computeStats(extractions: Array<{type: string; value: string; confidenc
     change_talk_count: 0,
     resistance_attempt_count: 0,
     help_openness_count: 0,
-    alternative_actions: [] as Array<{action: string; user_words?: string}>,  // v2.1: What user did instead
+    alternative_actions_raw: [] as Array<{action: string; user_words?: string}>,  // v2.1: Raw data
   };
 
   for (const ext of extractions) {
@@ -211,7 +230,7 @@ function computeStats(extractions: Array<{type: string; value: string; confidenc
       
       case 'alternative_action':  // v2.1: What user did instead when they resisted
         const metadata = ext.metadata as {user_words?: string} | undefined;
-        stats.alternative_actions.push({
+        stats.alternative_actions_raw.push({
           action: ext.value,
           user_words: metadata?.user_words
         });
@@ -359,6 +378,9 @@ export async function generateWeeklySummary(userId: string): Promise<{
       .slice(0, 5)
       .map(([name]) => name);
 
+    // v2.1: Aggregate alternative actions into {action, count} format
+    const alternativeActionsAggregated = aggregateAlternativeActions(stats.alternative_actions_raw);
+
     // Get themes
     const themes = Object.entries(stats.themes)
       .sort((a, b) => b[1] - a[1])
@@ -407,7 +429,7 @@ export async function generateWeeklySummary(userId: string): Promise<{
         ? Math.round(stats.stress_levels.reduce((a, b) => a + b, 0) / stats.stress_levels.length * 10) / 10
         : null,
       gap_notices: stats.gap_notices,  // v2.1
-      alternative_actions: stats.alternative_actions,  // v2.1
+      alternative_actions: alternativeActionsAggregated,  // v2.1: Now in {action, count} format
       top_triggers: topTriggers,
       emotions_before: emotionsBefore,
       emotions_after: emotionsAfter,
@@ -470,11 +492,12 @@ export async function generateWeeklySummary(userId: string): Promise<{
           most_common_after: emotionsAfter,
           emotions_user_named: emotionsUserNamed  // v2.1
         },
-        alternative_actions_reported: stats.alternative_actions,  // v2.1
+        alternative_actions_reported: alternativeActionsAggregated,  // v2.1: Now properly aggregated
         themes_this_week: themes,
         breakthroughs_this_week: breakthroughs.map(b => ({
           id: b.id,
           description: b.description,
+          category: b.category || 'unknown',
           date: new Date(b.occurred_at).toLocaleDateString()
         })),
         readiness_indicators: {
