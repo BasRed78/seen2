@@ -4,8 +4,9 @@
 // Generates weekly summaries and reflections for users
 // Run this as a cron job every Sunday (or user's preferred day)
 //
-// Version: 2.0
+// Version: 2.1
 // Last updated: December 2024
+// Added: gap_notices, alternative_actions_reported, emotions_user_named
 // ============================================
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -29,7 +30,7 @@ function getSupabase() {
   );
 }
 
-const AGGREGATION_VERSION = '2.0.0';
+const AGGREGATION_VERSION = '2.1.0';
 
 
 /**
@@ -64,16 +65,17 @@ function getLastWeekRange(): { start: Date; end: Date } {
 
 /**
  * Fetch all extractions for a user within a date range
+ * Now includes metadata for v2.1 fields
  */
 async function getExtractionsForPeriod(
   userId: string, 
   startDate: Date, 
   endDate: Date
-): Promise<Array<{type: string; value: string; confidence: number; created_at: string}>> {
+): Promise<Array<{type: string; value: string; confidence: number; created_at: string; metadata?: Record<string, unknown>}>> {
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from('extractions')
-    .select('type, value, confidence, created_at')
+    .select('type, value, confidence, created_at, metadata')
     .eq('user_id', userId)
     .gte('created_at', startDate.toISOString())
     .lte('created_at', endDate.toISOString())
@@ -138,20 +140,24 @@ async function getCheckinCount(userId: string, startDate: Date, endDate: Date): 
 
 /**
  * Compute statistics from extractions
+ * Updated for v2.1: includes gap_notices, alternative_actions, emotions_user_named
  */
-function computeStats(extractions: Array<{type: string; value: string; confidence: number}>) {
+function computeStats(extractions: Array<{type: string; value: string; confidence: number; metadata?: Record<string, unknown>}>) {
   const stats = {
     episodes_occurred: 0,
     episodes_resisted: 0,
     episodes_almost: 0,
+    gap_notices: 0,  // v2.1: Count of gap_noticed extractions
     stress_levels: [] as number[],
     triggers: {} as Record<string, number>,
     emotions_before: {} as Record<string, number>,
     emotions_after: {} as Record<string, number>,
+    emotions_user_named: {} as Record<string, number>,  // v2.1: Emotions explicitly named by user
     themes: {} as Record<string, number>,
     change_talk_count: 0,
     resistance_attempt_count: 0,
     help_openness_count: 0,
+    alternative_actions: [] as Array<{action: string; user_words?: string}>,  // v2.1: What user did instead
   };
 
   for (const ext of extractions) {
@@ -179,6 +185,10 @@ function computeStats(extractions: Array<{type: string; value: string; confidenc
         stats.emotions_after[ext.value] = (stats.emotions_after[ext.value] || 0) + 1;
         break;
       
+      case 'emotion_named':  // v2.1: User explicitly named this emotion
+        stats.emotions_user_named[ext.value] = (stats.emotions_user_named[ext.value] || 0) + 1;
+        break;
+      
       case 'theme':
         stats.themes[ext.value] = (stats.themes[ext.value] || 0) + 1;
         break;
@@ -193,6 +203,18 @@ function computeStats(extractions: Array<{type: string; value: string; confidenc
       
       case 'help_openness':
         if (ext.value === 'true') stats.help_openness_count++;
+        break;
+      
+      case 'gap_noticed':  // v2.1: User noticed the pause between urge and action
+        if (ext.value === 'true') stats.gap_notices++;
+        break;
+      
+      case 'alternative_action':  // v2.1: What user did instead when they resisted
+        const metadata = ext.metadata as {user_words?: string} | undefined;
+        stats.alternative_actions.push({
+          action: ext.value,
+          user_words: metadata?.user_words
+        });
         break;
     }
   }
@@ -331,6 +353,12 @@ export async function generateWeeklySummary(userId: string): Promise<{
       .slice(0, 3)
       .map(([name]) => name);
 
+    // v2.1: Get emotions user explicitly named
+    const emotionsUserNamed = Object.entries(stats.emotions_user_named)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name]) => name);
+
     // Get themes
     const themes = Object.entries(stats.themes)
       .sort((a, b) => b[1] - a[1])
@@ -378,9 +406,12 @@ export async function generateWeeklySummary(userId: string): Promise<{
       avg_stress: stats.stress_levels.length > 0 
         ? Math.round(stats.stress_levels.reduce((a, b) => a + b, 0) / stats.stress_levels.length * 10) / 10
         : null,
+      gap_notices: stats.gap_notices,  // v2.1
+      alternative_actions: stats.alternative_actions,  // v2.1
       top_triggers: topTriggers,
       emotions_before: emotionsBefore,
       emotions_after: emotionsAfter,
+      emotions_user_named: emotionsUserNamed,  // v2.1
       themes,
       breakthroughs: breakthroughs.map(b => ({
         description: b.description,
@@ -430,13 +461,16 @@ export async function generateWeeklySummary(userId: string): Promise<{
           episodes_occurred: stats.episodes_occurred,
           episodes_resisted: stats.episodes_resisted,
           episodes_almost: stats.episodes_almost,
-          avg_stress: weekData.avg_stress || 0
+          avg_stress: weekData.avg_stress || 0,
+          gap_notices: stats.gap_notices  // v2.1
         },
         top_triggers: topTriggers,
         emotion_patterns: {
           most_common_before: emotionsBefore,
-          most_common_after: emotionsAfter
+          most_common_after: emotionsAfter,
+          emotions_user_named: emotionsUserNamed  // v2.1
         },
+        alternative_actions_reported: stats.alternative_actions,  // v2.1
         themes_this_week: themes,
         breakthroughs_this_week: breakthroughs.map(b => ({
           id: b.id,
