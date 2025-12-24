@@ -161,7 +161,7 @@ export default function QuizPage() {
     }
   ];
 
-  // PATTERNS - Updated with behavior-focused naming from briefing
+  // PATTERNS - Updated with neuroscience-informed notes
   const patterns: Record<string, {
     title: string;
     subtitle: string;
@@ -177,7 +177,7 @@ export default function QuizPage() {
       subtitle: "You reach for connection, romance, or intensity when stressed",
       description: "When stress hits, you reach for connection — people, attention, the feeling of being wanted. This might look like texting someone you shouldn't, seeking validation, or craving intensity when what you actually need is stability.",
       mechanism: "Your nervous system learned that connection means safety. It's trying to help — it just hasn't figured out how to choose connections that actually soothe rather than spike your stress.",
-      note: "This isn't who you are. It's what your brain learned to do. And what's learned can be understood.",
+      note: "Your nervous system learned that connection equals survival. That's not broken — it's adaptive. The work now is teaching it the difference between connections that soothe and connections that spike. Recognition is where that starts.",
       icon: <Heart className="w-12 h-12" />,
       color: colors.coral,
       citation: "Kafka, 2010; Kraus et al., 2018; Lewczuk et al., 2022"
@@ -187,7 +187,7 @@ export default function QuizPage() {
       subtitle: "You use substances to manage difficult emotions",
       description: "When things get hard, you reach for something to change how you feel — alcohol, food, cannabis, or other substances. It works in the moment, which is exactly why your brain keeps suggesting it.",
       mechanism: "Your brain discovered a reliable way to shift your internal state. It's not broken — it's just using a tool that creates new problems while solving the immediate one.",
-      note: "This is one of the most common patterns. Your brain is trying to help — it just needs better tools.",
+      note: "Your brain found something that works — fast. The problem is the cost. Research shows that when you can name what you're actually feeling underneath the urge, it loses some of its grip. That's not willpower. That's how the brain works.",
       icon: <Wine className="w-12 h-12" />,
       color: colors.coral,
       citation: "Khantzian, 1997; Koob & Volkow, 2016; Sinha, 2008"
@@ -197,7 +197,7 @@ export default function QuizPage() {
       subtitle: "You spend money to manage stress",
       description: "When everything feels chaotic, you reach for the control and excitement of spending. The anticipation, the decision, the purchase — it's a complete distraction from what's actually bothering you.",
       mechanism: "Shopping activates your brain's reward system and gives a sense of control. The problem comes later, when the temporary high fades and consequences arrive.",
-      note: "Spending often increases during uncertainty — it's a way of asserting control when everything else feels out of your hands.",
+      note: "Spending often increases during uncertainty — it's a way of asserting control when everything else feels out of your hands. Naming that need for control is the first step toward meeting it differently.",
       icon: <ShoppingBag className="w-12 h-12" />,
       color: colors.cyan,
       citation: "Dittmar, 2005; McElroy et al., 1994; Müller et al., 2019"
@@ -207,7 +207,7 @@ export default function QuizPage() {
       subtitle: "You work harder when you should rest",
       description: "When stress hits, you do more — work harder, stay busier, prove yourself. Productivity becomes a hiding place. As long as you're accomplishing things, you don't have to feel what's underneath.",
       mechanism: "Your brain learned that achievement equals safety and worth. But exhaustion catches up, and the things you're avoiding stay right where you left them.",
-      note: "Society often rewards this pattern, making it harder to recognize as a stress response rather than a strength.",
+      note: "Society rewards this one, which makes it harder to see as a stress response. But productivity-as-hiding still has a cost. The feelings you're outrunning don't disappear — they wait. Recognizing the pattern is the first crack in the armor.",
       icon: <Briefcase className="w-12 h-12" />,
       color: colors.cyan,
       citation: "Schaufeli et al., 2009; Andreassen et al., 2012; Killinger, 2006"
@@ -217,7 +217,7 @@ export default function QuizPage() {
       subtitle: "You seek approval and external validation",
       description: "When you're stressed, you look outward for reassurance — Am I okay? Am I doing enough? Do people still like me? This constant checking can exhaust both you and your relationships.",
       mechanism: "Your sense of self gets outsourced to others when stress depletes your internal resources. The need for validation often masks deeper questions about self-worth.",
-      note: "External approval can never quite provide the lasting peace you're looking for — that has to come from somewhere else.",
+      note: "External approval can never quite provide the lasting peace you're looking for — that has to come from somewhere else. But recognizing the pattern is how you start building that internal ground.",
       icon: <Users className="w-12 h-12" />,
       color: colors.cyan,
       citation: "Crocker & Park, 2004; Joiner et al., 1999; Leary & Baumeister, 2000"
@@ -227,7 +227,7 @@ export default function QuizPage() {
       subtitle: "You retreat into comfort and avoidance",
       description: "When stress hits, you withdraw — more sleep, more food, more screens, less everything else. It feels like self-care but functions more like hiding.",
       mechanism: "Your nervous system is trying to conserve energy and avoid further threat. But avoidance disguised as rest doesn't actually restore you — it just delays the reckoning.",
-      note: "Rest is essential. But there's a difference between rest that restores and avoidance that compounds.",
+      note: "Rest is essential. But there's a difference between rest that restores and avoidance that compounds. Naming what you're actually avoiding is often more restorative than the hiding itself.",
       icon: <Coffee className="w-12 h-12" />,
       color: colors.coral,
       citation: "Carver et al., 1989; Hayes et al., 1996; Nolen-Hoeksema et al., 2008"
@@ -237,19 +237,20 @@ export default function QuizPage() {
       subtitle: "You use multiple strategies depending on the situation",
       description: "Your stress responses don't fit neatly into one category — you might reach for connection one day and isolation the next, or cycle through several patterns in a single stressful week.",
       mechanism: "Having multiple coping mechanisms isn't unusual. Many people developed layered strategies over time, each serving a different function or emerging in different contexts.",
-      note: "Focus on identifying which pattern causes the most distress. Understanding one deeply often illuminates the others.",
+      note: "Having multiple patterns isn't unusual — it often means your brain is creative in finding relief. Focus on identifying which pattern causes the most distress. Understanding one deeply often illuminates the others.",
       icon: <Brain className="w-12 h-12" />,
       color: colors.cyan,
       citation: "Folkman & Moskowitz, 2004"
     }
   };
 
-  // Research sources - Updated with new pattern keys
+  // Research sources - Updated with Lieberman citation
   const generalSources = [
     { authors: "Gross, J. J., & John, O. P.", year: "2003", title: "Individual differences in two emotion regulation processes", journal: "Journal of Personality and Social Psychology", url: "https://doi.org/10.1037/0022-3514.85.2.348" },
     { authors: "Lazarus, R. S., & Folkman, S.", year: "1984", title: "Stress, Appraisal, and Coping", journal: "Springer Publishing", url: "https://books.google.com/books/about/Stress_Appraisal_and_Coping.html" },
     { authors: "Carver, C. S., Scheier, M. F., & Weintraub, J. K.", year: "1989", title: "Assessing coping strategies", journal: "Journal of Personality and Social Psychology", url: "https://doi.org/10.1037/0022-3514.56.2.267" },
     { authors: "Aldao, A., Nolen-Hoeksema, S., & Schweizer, S.", year: "2010", title: "Emotion-regulation strategies across psychopathology", journal: "Clinical Psychology Review", url: "https://doi.org/10.1016/j.cpr.2009.11.004" },
+    { authors: "Lieberman, M. D., Eisenberger, N. I., Crockett, M. J., et al.", year: "2007", title: "Putting feelings into words: Affect labeling disrupts amygdala activity in response to affective stimuli", journal: "Psychological Science", url: "https://doi.org/10.1111/j.1467-9280.2007.01916.x" },
   ];
 
   // Updated pattern sources with new keys and citations
@@ -294,18 +295,19 @@ export default function QuizPage() {
     return patternSources[patternKey] || patternSources.complex_mixed;
   };
 
+  // UPDATED: Preamble with neuroscience-informed language
   const preambleSteps = [
     {
       title: "Your brain has a go-to move when things get hard.",
-      content: "It's automatic. You probably don't even think about it. When stress hits, your brain says 'do this' — and you do it. Everyone has a pattern."
+      content: "It's automatic. You probably don't even think about it. When stress hits, your brain says 'do this' — and you do it. This isn't weakness. It's a pathway your brain learned to follow."
     },
     {
-      title: "This isn't about good or bad.",
-      content: "Your brain is trying to cope the best way it knows how. These patterns made sense at some point — they helped you survive difficult moments. The question is whether they're still serving you."
+      title: "Everyone has a pattern.",
+      content: "For some people, it's reaching out to someone from the past. For others, it's shutting everyone out. Some people spend money, some stop eating, some pick fights, some work themselves to exhaustion. The behavior varies. The mechanism is the same."
     },
     {
-      title: "This quiz helps you see your pattern.",
-      content: "Not to shame it, just to name it. Because you can't work with what you can't see. The deal: you be honest, we'll be honest back. Not the version you wish was true — the version that actually is."
+      title: "Naming it changes something.",
+      content: "Research shows that simply identifying what you're feeling — putting words to it — quiets the brain's alarm system. This quiz helps you name your pattern. Not to shame it. Just to see it clearly."
     }
   ];
 
@@ -640,6 +642,22 @@ export default function QuizPage() {
 
               <p className="text-xs mt-6" style={{ color: colors.cream, opacity: 0.4 }}>
                 Research: {patternData.citation}
+              </p>
+            </div>
+          </div>
+
+          {/* NEW: Why Awareness Matters callout */}
+          <div 
+            className="rounded-xl p-5 mb-8 flex items-start gap-3 border"
+            style={{ backgroundColor: `${colors.cyan}10`, borderColor: `${colors.cyan}30` }}
+          >
+            <Brain size={20} className="flex-shrink-0 mt-0.5" style={{ color: colors.cyan }} />
+            <div>
+              <p className="font-semibold mb-1" style={{ color: colors.cream }}>
+                Why seeing this matters
+              </p>
+              <p className="text-sm" style={{ color: colors.cream, opacity: 0.8 }}>
+                You just did something your brain resists: you looked directly at a pattern you usually run on autopilot. Research shows this kind of self-observation activates the prefrontal cortex — the part of your brain that can choose, not just react. The more you practice seeing, the wider the gap becomes between trigger and behavior.
               </p>
             </div>
           </div>
