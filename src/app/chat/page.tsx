@@ -43,7 +43,7 @@ export default function ChatPage() {
 
     const storedUser = localStorage.getItem('seen_user')
     if (!storedUser) {
-      router.push('/')
+      router.push('/login')
       return
     }
     
@@ -213,10 +213,10 @@ export default function ChatPage() {
           <div className="text-center py-4">
             <p className="text-cream/60 mb-4">Check-in complete. See you tomorrow! ✨</p>
             <button
-              onClick={handleLogout}
+              onClick={() => router.push('/home')}
               className="px-6 py-2 rounded-lg bg-white/5 text-cream/80 hover:bg-white/10 transition-colors"
             >
-              Done
+              Back to Home
             </button>
           </div>
         ) : (
