@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
 
 // Icons as simple SVG components
@@ -1012,7 +1010,7 @@ export default function PitchDeck() {
       
       {/* Slide indicator */}
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full" style={{ backgroundColor: ds.surface }}>
-        <p style={{ color: ds.muted, fontSize: '0.7rem' }}>{slideNames[slide]} ({slide + 1}/{totalSlides})</p>
+
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 p-4" style={{ backgroundColor: ds.bg }}>
