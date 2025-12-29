@@ -4,9 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   ArrowRight, 
-  Brain, 
-  MessageCircle, 
-  TrendingUp, 
   Shield,
   ChevronRight,
   ChevronDown,
@@ -18,16 +15,18 @@ import {
 } from 'lucide-react';
 
 const colors = {
-  coral: '#C25441',
-  coralLight: '#E07A5F',
-  coralDark: '#A13D2D',
+  coral: '#ff6b5b',
+  coralLight: '#ff8a7a',
+  coralDark: '#e85a4f',
+  bg: '#0f0f1a',
   dark: '#1a1a2e',
-  darkLight: '#252540',
-  navy: '#205179',
-  cream: '#FAF8F5',
+  darkLight: '#252542',
+  cream: '#faf8f5',
   lightCream: '#F5F0E8',
   cyan: '#5B8F8F',
   cyanLight: '#7ab5b5',
+  muted: 'rgba(250,248,245,0.4)',
+  subtle: 'rgba(250,248,245,0.12)',
 };
 
 const StarIcon = ({ size = 24, className = "", style = {} }: { size?: number; className?: string; style?: React.CSSProperties }) => (
@@ -289,257 +288,228 @@ const CycleDiagram = ({ className = "" }: { className?: string }) => {
   );
 };
 
-const QuizMockup = () => (
-  <div 
-    className="rounded-2xl p-6 max-w-md mx-auto border"
-    style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.1)' }}
-  >
-    <div className="mb-6">
-      <div className="flex justify-between text-sm mb-3" style={{ color: colors.cream, opacity: 0.5 }}>
-        <span>Question 1 of 14</span>
-        <span style={{ color: colors.cyan }}>7%</span>
-      </div>
-      <div className="h-2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
-        <div className="h-2 rounded-full transition-all" style={{ width: '7.14%', backgroundColor: colors.coral }} />
-      </div>
-    </div>
-    <p className="text-xl md:text-2xl font-medium mb-6 leading-snug" style={{ color: colors.cream }}>
-      When you&apos;re stressed or overwhelmed, are you usually aware of it in the moment?
-    </p>
-    <div className="space-y-3">
-      {["Yes, I notice right away", "Sometimes, depends", "Not really — I realize later", "I'm not sure"].map((opt, idx) => (
-        <div 
-          key={idx}
-          className="p-4 rounded-xl text-base transition-all"
-          style={{ 
-            backgroundColor: idx === 2 ? colors.coral : 'rgba(255,255,255,0.03)',
-            border: `2px solid ${idx === 2 ? colors.coral : 'rgba(255,255,255,0.08)'}`,
-            color: colors.cream,
-            fontWeight: idx === 2 ? 600 : 400
-          }}
-        >
-          {opt}
-        </div>
-      ))}
+// Chat message for iPhone animation
+const ChatMessage = ({ msg, isAi }: { msg: string; isAi: boolean }) => (
+  <div className={isAi ? '' : 'flex justify-end'}>
+    <div 
+      className={`px-3 py-2 rounded-xl ${isAi ? 'rounded-tl-sm' : 'rounded-tr-sm'}`}
+      style={{ 
+        backgroundColor: isAi ? colors.dark : colors.coral, 
+        maxWidth: isAi ? '90%' : '85%',
+        color: colors.cream,
+        fontSize: '0.75rem',
+        lineHeight: 1.4
+      }}
+    >
+      {msg}
     </div>
   </div>
 );
 
-const ChatDemo = () => {
-  const [visibleMessages, setVisibleMessages] = useState(0);
-  const [showCallout, setShowCallout] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+// Hook for in-view detection
+function useInView(threshold = 0.3) {
   const ref = useRef<HTMLDivElement>(null);
-
-  const messages = [
-    { text: "How are you feeling this morning?", isUser: false },
-    { text: "Honestly? Pretty stressed. Big presentation on Friday.", isUser: true },
-    { text: "I notice you mentioned feeling overwhelmed last Tuesday too. Do you see a connection?", isUser: false },
-    { text: "Yeah... I guess I do feel this way a lot lately.", isUser: true },
-  ];
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    const currentRef = ref.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasStarted) {
-          setHasStarted(true);
-        }
+        if (entry.isIntersecting) setInView(true);
       },
-      { threshold: 0.3 }
+      { threshold }
     );
-    if (currentRef) observer.observe(currentRef);
+    if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [hasStarted]);
+  }, [threshold]);
 
-  useEffect(() => {
-    if (!hasStarted) return;
-    const interval = setInterval(() => {
-      setVisibleMessages(prev => {
-        if (prev < messages.length) return prev + 1;
-        clearInterval(interval);
-        return prev;
-      });
-    }, 800);
-    return () => clearInterval(interval);
-  }, [hasStarted, messages.length]);
+  return { ref, inView };
+}
 
-  useEffect(() => {
-    if (visibleMessages >= messages.length) {
-      const timer = setTimeout(() => setShowCallout(true), 600);
-      return () => clearTimeout(timer);
-    }
-  }, [visibleMessages, messages.length]);
+// iPhone Check-in Animation Component
+const HowItWorksPreview = () => {
+  const { ref, inView } = useInView(0.2);
+  const [step, setStep] = useState(0);
+  const chatRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <div ref={ref} className="max-w-md mx-auto">
-      <div className="p-5 rounded-2xl border" style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.1)' }}>
-        <div className="flex items-center justify-between mb-4 pb-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: colors.coral }} />
-            <span className="text-sm font-medium" style={{ color: colors.cream }}>Daily Check-in</span>
-          </div>
-          <span className="text-xs" style={{ color: colors.cream, opacity: 0.4 }}>Day 12</span>
-        </div>
-        <div className="space-y-3 min-h-[200px]">
-          {messages.map((msg, idx) => (
-            <div 
-              key={idx}
-              className={`flex gap-2 ${msg.isUser ? 'justify-end' : ''}`}
-              style={{
-                opacity: idx < visibleMessages ? 1 : 0,
-                transform: idx < visibleMessages ? 'translateY(0)' : 'translateY(15px)',
-                transition: 'all 0.4s ease-out'
-              }}
-            >
-              {!msg.isUser && (
-                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: colors.cyan }}>
-                  <StarIcon size={10} style={{ color: colors.cream }} />
-                </div>
-              )}
-              <div 
-                className={`py-2 px-3 rounded-xl text-sm max-w-[80%] ${msg.isUser ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
-                style={{ backgroundColor: msg.isUser ? colors.coral : 'rgba(255,255,255,0.06)', color: colors.cream }}
-              >
-                {msg.text}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="mt-4" style={{ opacity: showCallout ? 1 : 0, transform: showCallout ? 'translateY(0)' : 'translateY(15px)', transition: 'all 0.5s ease-out' }}>
-        <div className="flex items-center gap-3 p-4 rounded-xl" style={{ backgroundColor: `${colors.cyan}15`, border: `1px solid ${colors.cyan}30` }}>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: colors.cyan }}>
-            <TrendingUp size={18} style={{ color: colors.cream }} />
-          </div>
-          <div>
-            <p className="font-bold text-sm" style={{ color: colors.cream }}>Seen remembers your journey</p>
-            <p className="text-xs mt-0.5" style={{ color: colors.cream, opacity: 0.7 }}>Patterns emerge. Progress becomes visible.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const TimelineDemo = () => {
-  const [visibleBars, setVisibleBars] = useState(0);
-  const [activeBar, setActiveBar] = useState<number | null>(null);
-  const [showInsight, setShowInsight] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const data = [
-    { day: 1, stress: 40, mood: 'okay', color: colors.cream, summary: "First check-in. Feeling neutral." },
-    { day: 3, stress: 65, mood: 'rough', color: colors.coral, summary: "Work pressure building." },
-    { day: 5, stress: 80, mood: 'rough', color: colors.coral, summary: "Overwhelmed. Reached for phone." },
-    { day: 7, stress: 55, mood: 'okay', color: colors.cream, summary: "Weekend helped reset." },
-    { day: 11, stress: 45, mood: 'good', color: colors.cyan, summary: "Chose walk instead of scrolling." },
-    { day: 14, stress: 35, mood: 'good', color: colors.cyan, summary: "Pattern is clearer now." },
+  const conversation = [
+    { type: 'ai', text: 'Hey, how are you feeling today?' },
+    { type: 'user', text: 'Tired. Didn\'t sleep well.' },
+    { type: 'ai', text: 'What kept you up?' },
+    { type: 'user', text: 'Just my mind racing. Work stuff mostly.' },
+    { type: 'ai', text: 'When your mind races like that, what do you usually do?' },
+    { type: 'user', text: 'Scroll my phone. Or text people I shouldn\'t.' },
   ];
 
-  useEffect(() => {
-    const currentRef = ref.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasStarted) {
-          setHasStarted(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-    if (currentRef) observer.observe(currentRef);
-    return () => observer.disconnect();
-  }, [hasStarted]);
+  const closing = "Doesn't sound stupid. Sounds like you're looking for something.";
 
   useEffect(() => {
-    if (!hasStarted) return;
-    const interval = setInterval(() => {
-      setVisibleBars(prev => {
-        if (prev < data.length) return prev + 1;
-        clearInterval(interval);
-        return prev;
-      });
-    }, 300);
-    return () => clearInterval(interval);
-  }, [hasStarted, data.length]);
-
-  useEffect(() => {
-    if (visibleBars >= data.length) {
-      setActiveBar(data.length - 1);
-      const timer = setTimeout(() => setShowInsight(true), 500);
-      return () => clearTimeout(timer);
+    if (!inView) return;
+    
+    const timers: NodeJS.Timeout[] = [];
+    timers.push(setTimeout(() => setStep(1), 400));
+    for (let i = 2; i <= 7; i++) {
+      timers.push(setTimeout(() => setStep(i), 400 + (i - 1) * 1200));
     }
-  }, [visibleBars, data.length]);
+    timers.push(setTimeout(() => setStep(8), 9000));
+    timers.push(setTimeout(() => setStep(9), 10500));
+
+    return () => timers.forEach(t => clearTimeout(t));
+  }, [inView]);
+
+  useEffect(() => {
+    if (chatRef.current && step > 1) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
+  }, [step]);
 
   return (
-    <div ref={ref} className="max-w-lg mx-auto">
-      <div className="p-5 rounded-2xl border" style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.1)' }}>
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-xs font-semibold" style={{ color: colors.cyan }}>Your journey — 14 days</p>
-          <div className="flex gap-3 text-[10px]" style={{ color: colors.cream, opacity: 0.5 }}>
-            <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.cyan }} /> Good</span>
-            <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.cream }} /> Okay</span>
-            <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.coral }} /> Rough</span>
-          </div>
-        </div>
-        <div className="flex items-end justify-between gap-2 h-32 mb-4 px-1">
-          {data.map((item, idx) => (
-            <div key={idx} className="flex-1 flex flex-col items-center cursor-pointer h-full" onClick={() => setActiveBar(idx)}>
-              <div className="flex-1 w-full flex items-end">
-                <div 
-                  className="w-full rounded-t-lg transition-all duration-500"
-                  style={{ 
-                    height: idx < visibleBars ? `${item.stress}%` : '0%',
-                    minHeight: idx < visibleBars ? '4px' : '0',
-                    backgroundColor: item.color,
-                    boxShadow: activeBar === idx ? '0 0 0 2px white' : 'none',
-                    transitionDelay: `${idx * 0.1}s`
-                  }}
-                />
-              </div>
-              <span className="text-[10px] mt-2 font-medium transition-opacity" style={{ color: colors.cream, opacity: idx < visibleBars ? (activeBar === idx ? 1 : 0.4) : 0 }}>
-                {item.day}
-              </span>
-            </div>
-          ))}
-        </div>
-        {activeBar !== null && (
-          <div className="p-3 rounded-xl mb-3" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
-            <div className="flex justify-between items-center mb-1">
-              <span className="font-semibold text-sm" style={{ color: colors.cream }}>Day {data[activeBar].day}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs" style={{ color: colors.cream, opacity: 0.5 }}>Stress: {data[activeBar].stress}%</span>
-                <span className="text-xs px-2 py-0.5 rounded-full capitalize" style={{ backgroundColor: `${data[activeBar].color}20`, color: data[activeBar].color }}>
-                  {data[activeBar].mood}
-                </span>
-              </div>
-            </div>
-            <p className="text-xs" style={{ color: colors.cream, opacity: 0.7 }}>{data[activeBar].summary}</p>
-          </div>
-        )}
+    <section 
+      ref={ref}
+      className="relative z-30 py-24 px-6 rounded-t-[2rem]"
+      style={{ 
+        backgroundColor: colors.darkLight,
+        boxShadow: '0 -20px 60px rgba(0,0,0,0.5)',
+      }}
+    >
+      {/* Gradient orb */}
+      <GradientBlur color={colors.coral} className="top-1/2 right-0 -translate-y-1/2" opacity={0.12} size={500} />
+
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
         <div 
-          className="p-3 rounded-xl"
+          className="text-center mb-16"
           style={{ 
-            backgroundColor: `${colors.coral}15`,
-            border: `1px solid ${colors.coral}30`,
-            opacity: showInsight ? 1 : 0,
-            transform: showInsight ? 'translateY(0)' : 'translateY(10px)',
-            transition: 'all 0.5s ease-out'
+            opacity: step >= 1 ? 1 : 0, 
+            transform: step >= 1 ? 'translateY(0)' : 'translateY(30px)', 
+            transition: 'all 0.6s ease' 
           }}
         >
-          <div className="flex items-start gap-2">
-            <TrendingUp size={16} className="mt-0.5 flex-shrink-0" style={{ color: colors.coral }} />
-            <div>
-              <p className="text-xs font-semibold" style={{ color: colors.coral }}>Pattern detected</p>
-              <p className="text-xs mt-0.5" style={{ color: colors.cream, opacity: 0.7 }}>
-                Work stress leads to phone scrolling. You&apos;re most in control after consciously interrupting.
-              </p>
+          <p 
+            className="text-sm font-bold uppercase tracking-widest mb-4"
+            style={{ color: colors.coral }}
+          >
+            How it works
+          </p>
+          <h2 
+            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+            style={{ color: colors.cream }}
+          >
+            Seen checks in
+          </h2>
+          <p 
+            className="text-lg md:text-xl max-w-xl mx-auto"
+            style={{ color: colors.cream, opacity: 0.6 }}
+          >
+            Daily conversations that help you see what you&apos;d miss on your own
+          </p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-12 items-center justify-center">
+          {/* iPhone Frame */}
+          <div 
+            style={{ 
+              backgroundColor: '#1c1c1e', 
+              borderRadius: 36, 
+              padding: 10,
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+              opacity: step >= 1 ? 1 : 0, 
+              transform: step >= 1 ? 'translateY(0)' : 'translateY(40px)', 
+              transition: 'all 0.8s ease'
+            }}
+          >
+            <div 
+              className="flex flex-col overflow-hidden" 
+              style={{ 
+                backgroundColor: colors.dark, 
+                borderRadius: 28,
+                width: 260,
+                height: 440,
+              }}
+            >
+              {/* Dynamic Island */}
+              <div className="flex justify-center pt-2 pb-1">
+                <div style={{ backgroundColor: '#000', width: 80, height: 24, borderRadius: 16 }} />
+              </div>
+              
+              {/* Header */}
+              <div 
+                className="flex items-center justify-between px-3 pb-2 flex-shrink-0" 
+                style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
+              >
+                <div className="flex items-center gap-2">
+                  <StarIcon size={12} style={{ color: colors.coral }} />
+                  <span style={{ color: colors.cream, fontSize: '0.7rem', fontWeight: 600 }}>Daily Check-in</span>
+                </div>
+                <span style={{ color: colors.cream, fontSize: '0.6rem', opacity: 0.5 }}>Day 3</span>
+              </div>
+              
+              {/* Messages */}
+              <div 
+                ref={chatRef}
+                className="px-3 py-2 flex-1 space-y-2" 
+                style={{ overflowY: 'auto', scrollbarWidth: 'none' }}
+              >
+                {conversation.map((msg, i) => (
+                  step >= i + 1 ? (
+                    <div 
+                      key={i}
+                      style={{
+                        opacity: step >= i + 1 ? 1 : 0,
+                        transform: step >= i + 1 ? 'translateY(0)' : 'translateY(10px)',
+                        transition: 'all 0.4s ease'
+                      }}
+                    >
+                      <ChatMessage msg={msg.text} isAi={msg.type === 'ai'} />
+                    </div>
+                  ) : null
+                ))}
+                {step >= 8 && (
+                  <div style={{ opacity: 1, transition: 'all 0.4s ease' }}>
+                    <ChatMessage msg={closing} isAi={true} />
+                  </div>
+                )}
+              </div>
+              
+              {/* Home bar */}
+              <div className="flex justify-center py-2">
+                <div style={{ backgroundColor: 'rgba(255,255,255,0.3)', width: 80, height: 4, borderRadius: 2 }} />
+              </div>
             </div>
+          </div>
+
+          {/* Right side: narrative + CTA */}
+          <div 
+            className="text-center lg:text-left max-w-md"
+            style={{ 
+              opacity: step >= 9 ? 1 : 0, 
+              transform: step >= 9 ? 'translateY(0)' : 'translateY(30px)', 
+              transition: 'all 0.8s ease' 
+            }}
+          >
+            <p 
+              className="text-xl md:text-2xl font-medium mb-4"
+              style={{ color: colors.cream, lineHeight: 1.5 }}
+            >
+              Lives on your phone. Checks in daily — you don&apos;t have to remember.
+            </p>
+            <p 
+              className="text-lg mb-8"
+              style={{ color: colors.cream, opacity: 0.6, lineHeight: 1.5 }}
+            >
+              Every conversation builds. Patterns surface. Progress you can see.
+            </p>
+            
+            <Link 
+              href="/how-it-works"
+              className="inline-flex items-center gap-2 text-lg font-semibold transition-all hover:gap-4"
+              style={{ color: colors.coral }}
+            >
+              See how it builds <ArrowRight size={20} />
+            </Link>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
@@ -573,13 +543,13 @@ export default function SeenLandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.dark, overflowX: 'clip' }}>
+    <div className="min-h-screen" style={{ backgroundColor: colors.bg, overflowX: 'clip' }}>
       <Navigation scrolled={scrolled} scrollProgress={scrollProgress} />
 
       {/* Hero Section - STICKY so other sections slide over it */}
       <section className="min-h-screen flex items-center relative px-6 sticky top-0 z-0" style={{ backgroundColor: colors.dark }}>
         <GradientBlur color={colors.coral} className="-top-40 -right-40" opacity={0.5} blur={100} size={500} />
-        <GradientBlur color={colors.navy} className="bottom-0 -left-40" opacity={0.4} blur={80} size={400} />
+        <GradientBlur color={colors.cyan} className="bottom-0 -left-40" opacity={0.3} blur={80} size={400} />
         <div className="max-w-6xl mx-auto w-full pt-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -674,91 +644,8 @@ export default function SeenLandingPage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section 
-        className="relative z-30 rounded-t-[2rem]" 
-        style={{ 
-          backgroundColor: colors.darkLight,
-          boxShadow: '0 -20px 60px rgba(0,0,0,0.5)',
-        }}
-      >
-        <div className="pt-20 pb-20 px-6">
-          <div className="max-w-6xl mx-auto w-full">
-            <FadeIn className="text-center mb-12">
-              <p className="text-lg md:text-xl font-bold uppercase tracking-widest mb-4" style={{ color: colors.coral }}>How it works</p>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold" style={{ color: colors.cream }}>From blind spot to clarity</h2>
-            </FadeIn>
-
-            <div className="relative">
-              <div 
-                className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory"
-                style={{ 
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                }}
-              >
-                <div className="flex-shrink-0 w-[320px] md:w-[450px] snap-center">
-                  <div className="bg-[#1a1a2e] rounded-2xl p-8 h-full border border-white/10">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${colors.coral}20` }}>
-                        <span className="font-bold text-2xl" style={{ color: colors.coral }}>1</span>
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold" style={{ color: colors.cream }}>See your pattern</h3>
-                        <p className="text-sm" style={{ color: colors.cream, opacity: 0.5 }}>2 minutes • 14 questions</p>
-                      </div>
-                    </div>
-                    <p className="text-lg mb-6" style={{ color: colors.cream, opacity: 0.7 }}>
-                      Find out what drives your behavior when life gets hard. Not to judge it — just to name it.
-                    </p>
-                    <QuizMockup />
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 w-[320px] md:w-[450px] snap-center">
-                  <div className="bg-[#1a1a2e] rounded-2xl p-8 h-full border border-white/10">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${colors.coral}20` }}>
-                        <span className="font-bold text-2xl" style={{ color: colors.coral }}>2</span>
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold" style={{ color: colors.cream }}>Seen checks in</h3>
-                        <p className="text-sm" style={{ color: colors.cream, opacity: 0.5 }}>Daily • Remembers everything</p>
-                      </div>
-                    </div>
-                    <p className="text-lg mb-6" style={{ color: colors.cream, opacity: 0.7 }}>
-                      Daily check-ins that remember what you said last week and notice what&apos;s building.
-                    </p>
-                    <ChatDemo />
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 w-[320px] md:w-[450px] snap-center">
-                  <div className="bg-[#1a1a2e] rounded-2xl p-8 h-full border border-white/10">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${colors.coral}20` }}>
-                        <span className="font-bold text-2xl" style={{ color: colors.coral }}>3</span>
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold" style={{ color: colors.cream }}>See what you couldn&apos;t before</h3>
-                        <p className="text-sm" style={{ color: colors.cream, opacity: 0.5 }}>Connections • Triggers • Progress</p>
-                      </div>
-                    </div>
-                    <p className="text-lg mb-6" style={{ color: colors.cream, opacity: 0.7 }}>
-                      Patterns emerge. Triggers become clear. You start to understand what&apos;s actually going on.
-                    </p>
-                    <TimelineDemo />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-2 mt-4">
-                <span className="text-sm" style={{ color: colors.cream, opacity: 0.4 }}>← Swipe to explore →</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* How It Works Section - NEW SIMPLIFIED VERSION */}
+      <HowItWorksPreview />
 
       {/* Founder Section - with subtle staggered quote animation */}
       <section 
@@ -912,6 +799,7 @@ export default function SeenLandingPage() {
           <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
             <Link href="/story" className="hover:opacity-100 cursor-pointer transition-opacity">Story</Link>
             <Link href="/faq" className="hover:opacity-100 cursor-pointer transition-opacity">FAQ</Link>
+            <Link href="/how-it-works" className="hover:opacity-100 cursor-pointer transition-opacity">How it works</Link>
             <span>© 2025</span>
           </div>
         </div>
