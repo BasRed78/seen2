@@ -767,27 +767,23 @@ export default function SeenLandingPage() {
         </div>
       </section>
 
- {/* Footer */}
-      <footer className="relative z-[80] py-8 px-6 border-t" style={{ backgroundColor: colors.dark, borderColor: 'rgba(255,255,255,0.1)' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <StarIcon size={18} style={{ color: colors.coral }} />
-              <span className="font-bold" style={{ color: colors.cream }}>Seen</span>
-            </div>
-            <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
-              <Link href="/story" className="hover:opacity-100 transition-opacity">Story</Link>
-              <Link href="/faq" className="hover:opacity-100 transition-opacity">FAQ</Link>
-              <Link href="/how-it-works" className="hover:opacity-100 transition-opacity">How it works</Link>
-            </div>
+{/* Footer */}
+      <footer className="relative z-[80] py-6 px-6 border-t" style={{ backgroundColor: colors.dark, borderColor: 'rgba(255,255,255,0.1)' }}>
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <StarIcon size={16} style={{ color: colors.coral }} />
+            <span className="font-bold text-sm" style={{ color: colors.cream }}>Seen</span>
           </div>
-          <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-            <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.3 }}>
-              <Link href="/terms" className="hover:opacity-100 transition-opacity">Terms</Link>
-              <Link href="/privacy" className="hover:opacity-100 transition-opacity">Privacy</Link>
-              <Link href="/cookies" className="hover:opacity-100 transition-opacity">Cookies</Link>
-            </div>
-            <span className="text-xs" style={{ color: colors.cream, opacity: 0.3 }}>© 2025 Seen</span>
+          <div className="flex items-center gap-4 text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
+            <Link href="/story" className="hover:opacity-100 transition-opacity">Story</Link>
+            <Link href="/how-it-works" className="hover:opacity-100 transition-opacity">How it works</Link>
+            <Link href="/faq" className="hover:opacity-100 transition-opacity">FAQ</Link>
+            <span style={{ opacity: 0.3 }}>·</span>
+            <Link href="/terms" className="hover:opacity-100 transition-opacity">Terms</Link>
+            <Link href="/privacy" className="hover:opacity-100 transition-opacity">Privacy</Link>
+            <Link href="/cookies" className="hover:opacity-100 transition-opacity">Cookies</Link>
+            <span style={{ opacity: 0.3 }}>·</span>
+            <span>© 2025</span>
           </div>
         </div>
       </footer>
