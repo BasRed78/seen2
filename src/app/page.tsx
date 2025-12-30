@@ -332,7 +332,7 @@ const HowItWorksPreview = () => {
   const chatRef = useRef<HTMLDivElement>(null);
 
   const conversation = [
-    { type: 'ai', text: 'Hey, how are you feeling today?' },
+    { type: 'ai', text: 'Hey Alex, how are you feeling today?' },
     { type: 'user', text: 'Tired. Didn\'t sleep well.' },
     { type: 'ai', text: 'What kept you up?' },
     { type: 'user', text: 'Just my mind racing. Work stuff mostly.' },
@@ -340,7 +340,7 @@ const HowItWorksPreview = () => {
     { type: 'user', text: 'Scroll my phone. Or text people I shouldn\'t.' },
   ];
 
-  const closing = "Doesn't sound stupid. Sounds like you're looking for something.";
+  const closing = "Doesn't sound stupid. Sounds like you're looking for something when your mind won't quiet down. Thanks for sharing that today, we'll explore more tomorrow. Take care.";
 
   useEffect(() => {
     if (!inView) return;
@@ -351,7 +351,7 @@ const HowItWorksPreview = () => {
       timers.push(setTimeout(() => setStep(i), 400 + (i - 1) * 1200));
     }
     timers.push(setTimeout(() => setStep(8), 9000));
-    timers.push(setTimeout(() => setStep(9), 10500));
+    timers.push(setTimeout(() => setStep(9), 9500));
 
     return () => timers.forEach(t => clearTimeout(t));
   }, [inView]);
@@ -423,7 +423,7 @@ const HowItWorksPreview = () => {
                 backgroundColor: colors.dark, 
                 borderRadius: 28,
                 width: 260,
-                height: 440,
+                height: 520,
               }}
             >
               {/* Dynamic Island */}
