@@ -331,30 +331,32 @@ const HowItWorksPreview = () => {
   const [step, setStep] = useState(0);
   const chatRef = useRef<HTMLDivElement>(null);
 
-  const conversation = [
-    { type: 'ai', text: 'Hey Alex, how are you feeling today?' },
-    { type: 'user', text: 'Tired. Didn\'t sleep well.' },
-    { type: 'ai', text: 'What kept you up?' },
-    { type: 'user', text: 'Just my mind racing. Work stuff mostly.' },
-    { type: 'ai', text: 'When your mind races like that, what do you usually do?' },
-    { type: 'user', text: 'Scroll my phone. Or text people I shouldn\'t.' },
-  ];
+const conversation = [
+  { type: 'ai', text: 'Hey Alex, how are you feeling today?' },
+  { type: 'user', text: 'Tired. Didn\'t sleep well.' },
+  { type: 'ai', text: 'What kept you up?' },
+  { type: 'user', text: 'Just my mind racing. Work stuff mostly. Sunday nights.' },
+  { type: 'ai', text: 'When your mind races like that, what do you usually do?' },
+  { type: 'user', text: 'Scroll my phone. Or text people I shouldn\'t.' },
+  { type: 'ai', text: 'People you shouldn\'t?' },
+  { type: 'user', text: 'Yeah. Exes. People from my past. It\'s stupid.' },
+];
 
-  const closing = "Doesn't sound stupid. Sounds like you're looking for something when your mind won't quiet down. Thanks for sharing that today, we'll explore more tomorrow. Take care.";
+const closing = "Doesn't sound stupid. Sounds like you're looking for something when your mind won't quiet down. Thanks for sharing that, Alex. I'll remember this — we can pick it up tomorrow. Take care.";
 
   useEffect(() => {
-    if (!inView) return;
-    
-    const timers: NodeJS.Timeout[] = [];
-    timers.push(setTimeout(() => setStep(1), 400));
-    for (let i = 2; i <= 7; i++) {
-      timers.push(setTimeout(() => setStep(i), 400 + (i - 1) * 1200));
-    }
-    timers.push(setTimeout(() => setStep(8), 9000));
-    timers.push(setTimeout(() => setStep(9), 9500));
+  if (!inView) return;
+  
+  const timers: NodeJS.Timeout[] = [];
+  timers.push(setTimeout(() => setStep(1), 400));
+  for (let i = 2; i <= 9; i++) {
+    timers.push(setTimeout(() => setStep(i), 400 + (i - 1) * 1200));
+  }
+  timers.push(setTimeout(() => setStep(10), 11000));
+  timers.push(setTimeout(() => setStep(11), 12500));
 
-    return () => timers.forEach(t => clearTimeout(t));
-  }, [inView]);
+  return () => timers.forEach(t => clearTimeout(t));
+}, [inView]);
 
   useEffect(() => {
     if (chatRef.current && step > 1) {
@@ -463,7 +465,7 @@ const HowItWorksPreview = () => {
                     </div>
                   ) : null
                 ))}
-                {step >= 8 && (
+                {step >= 10 && (
                   <div style={{ opacity: 1, transition: 'all 0.4s ease' }}>
                     <ChatMessage msg={closing} isAi={true} />
                   </div>
@@ -481,7 +483,7 @@ const HowItWorksPreview = () => {
           <div 
             className="text-center lg:text-left max-w-md"
             style={{ 
-              opacity: step >= 9 ? 1 : 0, 
+              opacity: step >= 11 ? 1 : 0, 
               transform: step >= 9 ? 'translateY(0)' : 'translateY(30px)', 
               transition: 'all 0.8s ease' 
             }}
