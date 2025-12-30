@@ -694,20 +694,27 @@ export default function HowItWorksPage() {
         </Link>
       </section>
 
-      {/* Footer */}
+{/* Footer */}
       <footer className="px-6 py-8 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <StarIcon size={18} />
-            <span className="font-bold" style={{ color: colors.cream }}>Seen</span>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <StarIcon size={18} style={{ color: colors.coral }} />
+              <span className="font-bold" style={{ color: colors.cream }}>Seen</span>
+            </div>
+            <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
+              <Link href="/story" className="hover:opacity-100 transition-opacity">Story</Link>
+              <Link href="/faq" className="hover:opacity-100 transition-opacity">FAQ</Link>
+              <Link href="/" className="hover:opacity-100 transition-opacity">Home</Link>
+            </div>
           </div>
-          <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
-            <Link href="/story" className="hover:opacity-100 transition-opacity">Story</Link>
-            <Link href="/faq" className="hover:opacity-100 transition-opacity">FAQ</Link>
-            <span>© 2025</span>
+          <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+            <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.3 }}>
+              <Link href="/terms" className="hover:opacity-100 transition-opacity">Terms</Link>
+              <Link href="/privacy" className="hover:opacity-100 transition-opacity">Privacy</Link>
+              <Link href="/cookies" className="hover:opacity-100 transition-opacity">Cookies</Link>
+            </div>
+            <span className="text-xs" style={{ color: colors.cream, opacity: 0.3 }}>© 2025 Seen</span>
           </div>
         </div>
       </footer>
-    </div>
-  );
-}

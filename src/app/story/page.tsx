@@ -90,6 +90,33 @@ export default function StoryPage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="px-6 py-8 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="#C25441">
+                <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" />
+              </svg>
+              <span className="font-bold" style={{ color: '#FAF8F5' }}>Seen</span>
+            </div>
+            <div className="flex items-center gap-6 text-xs" style={{ color: '#FAF8F5', opacity: 0.4 }}>
+              <Link href="/" className="hover:opacity-100 transition-opacity">Home</Link>
+              <Link href="/faq" className="hover:opacity-100 transition-opacity">FAQ</Link>
+              <Link href="/how-it-works" className="hover:opacity-100 transition-opacity">How it works</Link>
+            </div>
+          </div>
+          <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+            <div className="flex items-center gap-6 text-xs" style={{ color: '#FAF8F5', opacity: 0.3 }}>
+              <Link href="/terms" className="hover:opacity-100 transition-opacity">Terms</Link>
+              <Link href="/privacy" className="hover:opacity-100 transition-opacity">Privacy</Link>
+              <Link href="/cookies" className="hover:opacity-100 transition-opacity">Cookies</Link>
+            </div>
+            <span className="text-xs" style={{ color: '#FAF8F5', opacity: 0.3 }}>© 2025 Seen</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
