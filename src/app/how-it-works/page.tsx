@@ -718,3 +718,6 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}

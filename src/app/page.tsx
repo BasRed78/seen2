@@ -791,3 +791,6 @@ export default function SeenLandingPage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
