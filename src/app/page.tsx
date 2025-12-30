@@ -767,43 +767,27 @@ export default function SeenLandingPage() {
         </div>
       </section>
 
-      {/* Footer CTA */}
-      <section className="relative z-[70] py-20 px-6" style={{ backgroundColor: colors.coral }}>
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: colors.cream }}>Ready to see your pattern?</h2>
-          <p className="text-xl md:text-2xl mb-10" style={{ color: colors.cream, opacity: 0.85 }}>Take the free quiz. 2 minutes. Completely private.</p>
-          <Link href="/quiz" className="px-10 py-5 rounded-full font-bold text-lg inline-flex items-center gap-3 transition-all hover:scale-105" style={{ backgroundColor: colors.cream, color: colors.coral }}>
-            Take the Quiz <ArrowRight size={22} />
-          </Link>
-          <div className="mt-10 pt-8 border-t" style={{ borderColor: 'rgba(255,255,255,0.2)' }}>
-            <Link 
-              href="/faq" 
-              className="inline-flex items-center gap-2 text-lg font-medium transition-all hover:gap-3"
-              style={{ color: colors.cream, opacity: 0.9 }}
-            >
-              <HelpCircle size={20} />
-              Questions? Check our FAQ
-              <ChevronRight size={18} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
+ {/* Footer */}
       <footer className="relative z-[80] py-8 px-6 border-t" style={{ backgroundColor: colors.dark, borderColor: 'rgba(255,255,255,0.1)' }}>
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <StarIcon size={18} style={{ color: colors.coral }} />
-            <span className="font-bold" style={{ color: colors.cream }}>Seen</span>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <StarIcon size={18} style={{ color: colors.coral }} />
+              <span className="font-bold" style={{ color: colors.cream }}>Seen</span>
+            </div>
+            <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
+              <Link href="/story" className="hover:opacity-100 transition-opacity">Story</Link>
+              <Link href="/faq" className="hover:opacity-100 transition-opacity">FAQ</Link>
+              <Link href="/how-it-works" className="hover:opacity-100 transition-opacity">How it works</Link>
+            </div>
           </div>
-          <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
-            <Link href="/story" className="hover:opacity-100 cursor-pointer transition-opacity">Story</Link>
-            <Link href="/faq" className="hover:opacity-100 cursor-pointer transition-opacity">FAQ</Link>
-            <Link href="/how-it-works" className="hover:opacity-100 cursor-pointer transition-opacity">How it works</Link>
-            <span>© 2025</span>
+          <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+            <div className="flex items-center gap-6 text-xs" style={{ color: colors.cream, opacity: 0.3 }}>
+              <Link href="/terms" className="hover:opacity-100 transition-opacity">Terms</Link>
+              <Link href="/privacy" className="hover:opacity-100 transition-opacity">Privacy</Link>
+              <Link href="/cookies" className="hover:opacity-100 transition-opacity">Cookies</Link>
+            </div>
+            <span className="text-xs" style={{ color: colors.cream, opacity: 0.3 }}>© 2025 Seen</span>
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
