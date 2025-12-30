@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import AntiCookieBanner from '@/components/AntiCookieBanner'
+import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: 'Seen - Daily Check-ins',
@@ -32,8 +34,12 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="min-h-screen bg-dark text-cream">
-        {children}
+      <body className="min-h-screen bg-dark text-cream flex flex-col">
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
+        <AntiCookieBanner />
       </body>
     </html>
   )
