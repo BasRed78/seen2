@@ -86,31 +86,34 @@ function CheckInSection() {
   const [step, setStep] = useState(0);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
+  // Exact conversation from pitch deck
   const conversation = [
-    { type: 'ai', text: 'Hey, how are you feeling today?' },
+    { type: 'ai', text: 'Hey Alex, how are you feeling today?' },
     { type: 'user', text: 'Tired. Didn\'t sleep well.' },
     { type: 'ai', text: 'What kept you up?' },
-    { type: 'user', text: 'Just my mind racing. Work stuff mostly.' },
-    { type: 'ai', text: 'That sounds exhausting. Does that happen a lot?' },
-    { type: 'user', text: 'More than I\'d like. Especially Sunday nights.' },
+    { type: 'user', text: 'Just my mind racing. Work stuff mostly. Sunday nights.' },
     { type: 'ai', text: 'When your mind races like that, what do you usually do?' },
     { type: 'user', text: 'Scroll my phone. Or text people I shouldn\'t.' },
     { type: 'ai', text: 'People you shouldn\'t?' },
     { type: 'user', text: 'Yeah. Exes. People from my past. It\'s stupid.' },
   ];
 
-  const closing = "Doesn't sound stupid. Sounds like you're looking for something when your mind won't quiet down.";
+  // Exact closing from pitch deck
+  const closing = "Doesn't sound stupid. Sounds like you're looking for something when your mind won't quiet down. Thanks for sharing that, Alex. I'll remember this — we can pick it up tomorrow. Take care.";
 
   useEffect(() => {
     if (!inView) return;
     
     const timers: NodeJS.Timeout[] = [];
     timers.push(setTimeout(() => setStep(1), 300));
-    for (let i = 2; i <= 11; i++) {
-      timers.push(setTimeout(() => setStep(i), 300 + (i - 1) * 1400));
+    // 8 messages
+    for (let i = 2; i <= 9; i++) {
+      timers.push(setTimeout(() => setStep(i), 300 + (i - 1) * 1200));
     }
-    timers.push(setTimeout(() => setStep(12), 15000));
-    timers.push(setTimeout(() => setStep(13), 17000));
+    // Closing message
+    timers.push(setTimeout(() => setStep(10), 11000));
+    // Caption appears
+    timers.push(setTimeout(() => setStep(11), 12500));
 
     return () => timers.forEach(t => clearTimeout(t));
   }, [inView]);
@@ -124,14 +127,14 @@ function CheckInSection() {
   return (
     <section 
       ref={ref}
-      className="min-h-screen flex items-center py-20 px-6 relative overflow-hidden"
+      className="py-16 px-6 relative overflow-hidden"
       style={{ backgroundColor: colors.dark }}
     >
       <Orb size={500} className="-top-40 -right-40" />
       
       <div className="max-w-5xl mx-auto w-full">
         <div 
-          className="text-center mb-12"
+          className="text-center mb-10"
           style={{ 
             opacity: step >= 1 ? 1 : 0, 
             transform: step >= 1 ? 'translateY(0)' : 'translateY(30px)', 
@@ -139,20 +142,20 @@ function CheckInSection() {
           }}
         >
           <p 
-            className="text-sm font-bold uppercase tracking-widest mb-4"
+            className="text-sm font-bold uppercase tracking-widest mb-3"
             style={{ color: colors.coral }}
           >
-            Step 1
+            What Seen is
           </p>
           <h2 
             className="text-3xl md:text-4xl font-bold"
             style={{ color: colors.cream }}
           >
-            Seen checks in
+            An app that reaches out
           </h2>
         </div>
         
-        <div className="flex flex-col lg:flex-row gap-12 items-center justify-center">
+        <div className="flex flex-col lg:flex-row gap-10 items-center justify-center">
           {/* iPhone Frame */}
           <div 
             style={{ 
@@ -171,7 +174,7 @@ function CheckInSection() {
                 backgroundColor: colors.darkLight, 
                 borderRadius: 32,
                 width: 280,
-                height: 520,
+                height: 540,
               }}
             >
               {/* Dynamic Island */}
@@ -211,7 +214,7 @@ function CheckInSection() {
                     </div>
                   ) : null
                 ))}
-                {step >= 12 && (
+                {step >= 10 && (
                   <div style={{ opacity: 1, transition: 'all 0.4s ease' }}>
                     <ChatMessage msg={closing} isAi={true} />
                   </div>
@@ -229,8 +232,8 @@ function CheckInSection() {
           <div 
             className="text-center lg:text-left max-w-sm"
             style={{ 
-              opacity: step >= 13 ? 1 : 0, 
-              transform: step >= 13 ? 'translateY(0)' : 'translateY(30px)', 
+              opacity: step >= 11 ? 1 : 0, 
+              transform: step >= 11 ? 'translateY(0)' : 'translateY(30px)', 
               transition: 'all 0.8s ease' 
             }}
           >
@@ -274,14 +277,14 @@ function TrackingSection() {
   return (
     <section 
       ref={ref}
-      className="min-h-screen flex items-center py-20 px-6 relative overflow-hidden"
+      className="py-16 px-6 relative overflow-hidden"
       style={{ backgroundColor: colors.darkLight }}
     >
       <Orb size={400} color={colors.cyan} className="-bottom-40 -left-40" />
       
       <div className="max-w-5xl mx-auto w-full">
         <div 
-          className="text-center mb-12"
+          className="text-center mb-10"
           style={{ 
             opacity: step >= 1 ? 1 : 0, 
             transform: step >= 1 ? 'translateY(0)' : 'translateY(30px)', 
@@ -289,10 +292,10 @@ function TrackingSection() {
           }}
         >
           <p 
-            className="text-sm font-bold uppercase tracking-widest mb-4"
+            className="text-sm font-bold uppercase tracking-widest mb-3"
             style={{ color: colors.cyan }}
           >
-            Step 2
+            What happens next
           </p>
           <h2 
             className="text-3xl md:text-4xl font-bold"
@@ -302,7 +305,7 @@ function TrackingSection() {
           </h2>
         </div>
         
-        <div className="flex flex-col lg:flex-row gap-12 items-center justify-center">
+        <div className="flex flex-col lg:flex-row gap-10 items-center justify-center">
           {/* Visuals */}
           <div className="space-y-4" style={{ width: 340, maxWidth: '100%' }}>
             {/* Week tracker */}
@@ -438,14 +441,14 @@ function InsightsSection() {
   return (
     <section 
       ref={ref}
-      className="min-h-screen flex items-center py-20 px-6 relative overflow-hidden"
+      className="py-16 px-6 relative overflow-hidden"
       style={{ backgroundColor: colors.dark }}
     >
       <Orb size={400} className="-top-20 -right-40" />
       
       <div className="max-w-5xl mx-auto w-full">
         <div 
-          className="text-center mb-12"
+          className="text-center mb-10"
           style={{ 
             opacity: step >= 1 ? 1 : 0, 
             transform: step >= 1 ? 'translateY(0)' : 'translateY(30px)', 
@@ -453,10 +456,10 @@ function InsightsSection() {
           }}
         >
           <p 
-            className="text-sm font-bold uppercase tracking-widest mb-4"
+            className="text-sm font-bold uppercase tracking-widest mb-3"
             style={{ color: colors.coral }}
           >
-            Step 3
+            What you'll see
           </p>
           <h2 
             className="text-3xl md:text-4xl font-bold"
@@ -466,7 +469,7 @@ function InsightsSection() {
           </h2>
         </div>
         
-        <div className="flex flex-col lg:flex-row gap-12 items-center justify-center">
+        <div className="flex flex-col lg:flex-row gap-10 items-center justify-center">
           {/* Insight Card */}
           <div 
             className="rounded-2xl overflow-hidden" 
@@ -645,15 +648,15 @@ export default function HowItWorksPage() {
       </header>
 
       {/* Hero */}
-      <section className="pt-32 pb-16 px-6 text-center">
+      <section className="pt-28 pb-8 px-6 text-center">
         <p 
-          className="text-lg font-bold uppercase tracking-widest mb-4"
+          className="text-lg font-bold uppercase tracking-widest mb-3"
           style={{ color: colors.coral }}
         >
           How it works
         </p>
         <h1 
-          className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+          className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
           style={{ color: colors.cream }}
         >
           From blind spot to clarity
@@ -672,7 +675,7 @@ export default function HowItWorksPage() {
       <InsightsSection />
 
       {/* CTA Section */}
-      <section className="py-24 px-6 text-center" style={{ backgroundColor: colors.coral }}>
+      <section className="py-16 px-6 text-center" style={{ backgroundColor: colors.coral }}>
         <h2 
           className="text-3xl md:text-4xl font-bold mb-4"
           style={{ color: colors.cream }}
@@ -680,7 +683,7 @@ export default function HowItWorksPage() {
           Ready to see your pattern?
         </h2>
         <p 
-          className="text-xl mb-10"
+          className="text-xl mb-8"
           style={{ color: colors.cream, opacity: 0.85 }}
         >
           Take the free quiz. 2 minutes. Completely private.
@@ -694,8 +697,8 @@ export default function HowItWorksPage() {
         </Link>
       </section>
 
-{/* Footer */}
-      <footer className="relative z-[80] py-6 px-6 border-t" style={{ backgroundColor: colors.dark, borderColor: 'rgba(255,255,255,0.1)' }}>
+      {/* Footer */}
+      <footer className="py-6 px-6 border-t" style={{ backgroundColor: colors.dark, borderColor: 'rgba(255,255,255,0.1)' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <StarIcon size={16} style={{ color: colors.coral }} />
@@ -703,7 +706,7 @@ export default function HowItWorksPage() {
           </div>
           <div className="flex items-center gap-4 text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
             <Link href="/story" className="hover:opacity-100 transition-opacity">Story</Link>
-            <Link href="/how-it-works" className="hover:opacity-100 transition-opacity">How it works</Link>
+            <Link href="/" className="hover:opacity-100 transition-opacity">Home</Link>
             <Link href="/faq" className="hover:opacity-100 transition-opacity">FAQ</Link>
             <span style={{ opacity: 0.3 }}>·</span>
             <Link href="/terms" className="hover:opacity-100 transition-opacity">Terms</Link>
