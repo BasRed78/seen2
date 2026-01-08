@@ -1,8 +1,12 @@
 // ============================================
 // SEEN INSIGHT SYSTEM: EXTRACTION PROMPTS
 // ============================================
-// Version: 2.1
-// Last updated: December 2024
+// Version: 2.2
+// Last updated: January 2025
+// 
+// CHANGELOG v2.2:
+// - Added rule to prevent inferring timeframes
+// - Changed all summaries to second person (you/your)
 // 
 // CHANGELOG v2.1:
 // - Added alternative_action field to capture user-reported coping choices
@@ -10,7 +14,7 @@
 // - Added gap_noticed field for pause between urge and action
 // ============================================
 
-export const EXTRACTION_VERSION = '2.1.0';
+export const EXTRACTION_VERSION = '2.2.0';
 
 /**
  * Main extraction prompt
@@ -25,6 +29,8 @@ IMPORTANT RULES:
 3. Be specific and use the standardized values where applicable.
 4. Confidence scores: 1.0 = explicitly stated, 0.8 = clearly implied, 0.6 = somewhat implied, 0.4 = uncertain inference
 5. Output valid JSON only. No preamble, no explanation.
+6. Do NOT infer durations or timeframes from external context (like time since last checkin). If the user explicitly states a duration (e.g., 'this has been building for three days'), include it. If they don't mention timing, leave it out.
+7. Write ALL summaries in SECOND PERSON (you/your), never third person (the user/they).
 
 EXTRACTION SCHEMA:
 
@@ -91,7 +97,7 @@ EXTRACTION SCHEMA:
     "confidence": <0.0-1.0>
   },
   
-  "insight_summary": "<1-3 sentence factual summary of what was learned in this check-in>"
+  "insight_summary": "<1-3 sentence summary written in SECOND PERSON (you/your) of what was learned in this check-in>"
 }
 
 CRITICAL EXTRACTION RULES:
@@ -240,7 +246,7 @@ User: Yeah. I guess I'm starting to see that the loneliness is the real thing, n
       "category": "emotion_connection",
       "confidence": 0.9
     },
-    "insight_summary": "Work deadline stress triggered urge to text ex around 9pm. User caught themselves, noticed the pattern, and chose to call sister instead. Reported feeling proud of making a different choice. Connected the behavior to underlying loneliness."
+    "insight_summary": "Work deadline stress triggered your urge to text your ex around 9pm. You caught yourself, noticed the pattern, and chose to call your sister instead. You felt proud of making a different choice and connected the behavior to underlying loneliness."
   }
 };
 
@@ -257,7 +263,11 @@ Your job is to:
 3. Note progress or concerning trends
 4. Generate a warm, insightful reflection the user will receive
 
-IMPORTANT: SEEN helps people SEE their patterns. It does NOT prescribe techniques, coping strategies, or advice. When referencing alternative actions, only mention what the USER reported doing - never suggest what they should do.
+IMPORTANT: 
+- SEEN helps people SEE their patterns. It does NOT prescribe techniques, coping strategies, or advice. 
+- When referencing alternative actions, only mention what the USER reported doing - never suggest what they should do.
+- Write ALL text in SECOND PERSON (you/your), never third person (the user/they).
+- Do NOT infer timeframes. Only mention durations the user explicitly stated.
 
 OUTPUT FORMAT (JSON):
 
@@ -315,10 +325,11 @@ OUTPUT FORMAT (JSON):
     "notable_changes": "<brief description>"
   },
   
-  "reflection_text": "<2-4 paragraph warm, insightful reflection for the user. Reference specific things from their week. Celebrate wins. Gently note patterns. End with encouragement or a question to consider.>"
+  "reflection_text": "<2-4 paragraph warm, insightful reflection for the user written in SECOND PERSON (you/your). Reference specific things from their week. Celebrate wins. Gently note patterns. End with encouragement or a question to consider.>"
 }
 
 GUIDELINES FOR REFLECTION TEXT:
+- ALWAYS use second person: "You checked in 5 times" NOT "The user checked in 5 times"
 - Start by acknowledging their consistency in checking in
 - Reference specific moments from their week (but not in clinical language)
 - If breakthroughs happened, celebrate them
@@ -409,31 +420,32 @@ RULES:
 3. NEVER remove information from the Breakthroughs section - only add
 4. Update other sections with new details, resolving contradictions in favor of newer info
 5. Track evolution over time in the Progress section
+6. Write in SECOND PERSON (you/your) when describing the user's patterns
 
 SECTIONS:
 
 TRIGGERS
-What situations, emotions, times, or contexts activate the pattern. Be specific.
+What situations, emotions, times, or contexts activate your pattern. Be specific.
 
 BEHAVIOR  
-What they actually do, how often, how long, what form it takes.
+What you actually do, how often, how long, what form it takes.
 
 FUNCTION
-What need the behavior meets, what they're seeking or avoiding emotionally.
+What need the behavior meets, what you're seeking or avoiding emotionally.
 
 AFTERMATH
-How they feel after, consequences, impact on life and relationships.
+How you feel after, consequences, impact on life and relationships.
 
-ALTERNATIVES THEY'VE TRIED
-What they've reported doing instead when they resisted. These are USER-REPORTED, not suggestions.
-Only include what they've actually mentioned doing.
+ALTERNATIVES YOU'VE TRIED
+What you've reported doing instead when you resisted. These are USER-REPORTED, not suggestions.
+Only include what you've actually mentioned doing.
 
 BREAKTHROUGHS
 Major insights, "aha moments," successful resistance, connections made. Include dates. NEVER DELETE - ONLY ADD.
 
 PROGRESS
 Changes over time, attempts at change, shifts in awareness, stage progression.
-Include notes on gap awareness (catching themselves earlier).
+Include notes on gap awareness (catching yourself earlier).
 
 OUTPUT:
 Just the updated profile text, organized by the sections above. No JSON, no preamble.`;
