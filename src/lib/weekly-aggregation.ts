@@ -30,7 +30,7 @@ function getSupabase() {
   );
 }
 
-const AGGREGATION_VERSION = '2.1.0';
+const AGGREGATION_VERSION = '2.2.0';
 
 
 /**
