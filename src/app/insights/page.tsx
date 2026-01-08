@@ -4,532 +4,667 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { 
-  ArrowLeft,
+  ChevronDown, 
+  ChevronUp, 
+  ChevronRight,
   ArrowRight,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  Target,
-  Heart,
-  Award,
-  Brain,
-  Eye,
-  CheckCircle,
-  MessageCircle,
+  ArrowLeft,
   Flame,
-  Layers,
-  Unlock,
+  Zap,
+  Heart,
+  MessageCircle,
   TrendingUp,
-  BarChart3
+  AlertTriangle,
+  BarChart3,
+  Home
 } from 'lucide-react'
 
+// Brand colors - SEEN dark theme (updated Dec 2024)
 const colors = {
-  coral: '#FF6B5B',
-  dark: '#1a1a2e',
-  darkLight: '#252540',
-  darkLighter: '#2f2f4a',
-  cream: '#FAF8F5',
-  cyan: '#4ECDC4',
-  gold: '#FFD93D',
-  purple: '#9D8DF1',
+  coral: '#ff6b5b',
+  coralLight: '#ff8a7a',
+  coralDark: '#e85a4f',
+  dark: '#0f0f1a',
+  darkCard: '#1a1a2e',
+  darkCardHover: '#252542',
+  cream: '#faf8f5',
+  creamMuted: 'rgba(250, 248, 245, 0.6)',
+  cyan: '#5B8F8F',
+  cyanLight: '#7ab5b5',
 }
 
-const StarIcon = ({ size = 24, style = {}, className = "" }: { size?: number; style?: React.CSSProperties; className?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={style} className={className}>
+// Custom Star Icon
+const StarIcon = ({ size = 24, style = {} }: { size?: number; style?: React.CSSProperties }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={style}>
     <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" />
   </svg>
 )
 
-interface User {
+// Gradient blur decoration
+const GradientBlur = ({ color, className = "", opacity = 0.15, size = 300 }: { 
+  color: string; 
+  className?: string; 
+  opacity?: number; 
+  size?: number 
+}) => (
+  <div 
+    className={`absolute rounded-full pointer-events-none ${className}`}
+    style={{
+      width: size,
+      height: size,
+      background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+      filter: 'blur(80px)',
+      opacity
+    }}
+  />
+)
+
+// Format date range
+const formatDateRange = (start: string, end: string) => {
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' }
+  return `${startDate.toLocaleDateString('en-US', options)} – ${endDate.toLocaleDateString('en-US', options)}`
+}
+
+// Types
+interface Aggregation {
   id: string
-  name: string
-}
-
-// Sample data structure - this would come from API
-interface DashboardData {
-  practice: {
-    currentStreak: number
-    checkinsThisWeek: number
-    checkinsTotal: number
-    weeksActive: number
-  }
-  depth: {
-    current: number
-    weekOne: number
-    weeklyDepth: number[]
-    currentLevel: string
-    previousLevel: string
-    indicators: {
-      emotionsNamed: { current: number; weekOne: number }
-      patternsRecognized: { current: number; weekOne: number }
-      hardThingsShared: { current: number; weekOne: number }
+  user_id: string
+  type: string
+  period_start: string
+  period_end: string
+  summary_text: string
+  data: {
+    stats: {
+      avg_stress: number | null
+      gap_notices: number
+      checkin_count: number
+      episodes_almost: number
+      episodes_occurred: number
+      episodes_resisted: number
+    }
+    top_triggers: Array<{ name: string; count: number }>
+    trigger_chains: Array<{ pattern: string; frequency: number }>
+    emotion_patterns: {
+      emotions_user_named: string[]
+      most_common_before?: string[]
+      most_common_after?: string[]
+    }
+    breakthroughs_this_week: Array<{
+      id: string
+      date: string
+      category: string
+      description: string
+    }>
+    alternative_actions_reported: Array<{ action: string; count: number }>
+    readiness_indicators: {
+      overall_readiness: string
+      resistance_attempts: number
+      change_talk_instances: number
     }
   }
-  thisWeek: Array<{
-    day: string
-    checkedIn: boolean
-    depth: number
-    highlight?: string
-  }>
-  insight?: {
-    title: string
-    body: string
-  }
-  emotions: Array<{ word: string; count: number }>
-  moments: Array<{ date: string; text: string; type: string }>
-  reflection?: string
-}
-
-// Sample data for demo
-const sampleData: DashboardData = {
-  practice: {
-    currentStreak: 5,
-    checkinsThisWeek: 5,
-    checkinsTotal: 23,
-    weeksActive: 4,
-  },
-  depth: {
-    current: 7.1,
-    weekOne: 4.2,
-    weeklyDepth: [4.2, 5.1, 6.3, 7.1],
-    currentLevel: 'Opening up',
-    previousLevel: 'Surface level',
-    indicators: {
-      emotionsNamed: { current: 29, weekOne: 8 },
-      patternsRecognized: { current: 12, weekOne: 2 },
-      hardThingsShared: { current: 7, weekOne: 1 },
-    }
-  },
-  thisWeek: [
-    { day: 'Mon', checkedIn: true, depth: 6 },
-    { day: 'Tue', checkedIn: true, depth: 8, highlight: 'Named a hard emotion' },
-    { day: 'Wed', checkedIn: true, depth: 7 },
-    { day: 'Thu', checkedIn: true, depth: 7, highlight: 'Connected a pattern' },
-    { day: 'Fri', checkedIn: true, depth: 8, highlight: 'Shared something difficult' },
-    { day: 'Sat', checkedIn: false, depth: 0 },
-    { day: 'Sun', checkedIn: false, depth: 0 },
-  ],
-  insight: {
-    title: "You're seeing more clearly",
-    body: "This week you named loneliness three times — something you hadn't mentioned at all in Week 1. That's not a problem getting worse. That's awareness getting sharper.",
-  },
-  emotions: [
-    { word: 'anxious', count: 8 },
-    { word: 'lonely', count: 6 },
-    { word: 'stuck', count: 5 },
-    { word: 'restless', count: 4 },
-    { word: 'hopeful', count: 3 },
-  ],
-  moments: [
-    { date: 'Dec 19', text: 'Named "loneliness" for the first time unprompted', type: 'honesty' },
-    { date: 'Dec 17', text: 'Connected work deadline stress to evening patterns', type: 'pattern' },
-    { date: 'Dec 14', text: "Shared something you said you'd never tell anyone", type: 'vulnerability' },
-  ],
-  reflection: `Four weeks of showing up to yourself.
-
-What's changed isn't what you're doing — it's what you're seeing. Week 1, you described feeling "fine" or "stressed" and left it there. Now you're naming loneliness, recognizing when work pressure spills into your evenings, noticing the pull before it pulls.
-
-That's not small. Naming something is the first step to choosing what to do with it.
-
-Your conversations are going deeper. You're being more honest — with the questions, and with yourself. That takes courage, even when no one else is watching.`
 }
 
 export default function InsightsPage() {
-  const [user, setUser] = useState<User | null>(null)
-  const [data, setData] = useState<DashboardData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [expandedSection, setExpandedSection] = useState<string | null>(null)
   const router = useRouter()
+  const [aggregation, setAggregation] = useState<Aggregation | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [expandedSections, setExpandedSections] = useState({
+    reflection: true,
+    emotions: false,
+    triggers: false,
+    breakthroughs: true
+  })
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('seen_user')
-    if (!storedUser) {
-      router.push('/login')
-      return
+    async function fetchInsights() {
+      try {
+        // Get current user from localStorage
+        const userStr = localStorage.getItem('seen_user')
+        if (!userStr) {
+          router.push('/login')
+          return
+        }
+        
+        const user = JSON.parse(userStr)
+        const userId = user.id
+
+        // Fetch insights via API route
+        const response = await fetch(`/api/insights?userId=${userId}`)
+        const result = await response.json()
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to fetch insights')
+        }
+
+        if (result.aggregation) {
+          setAggregation(result.aggregation)
+        } else {
+          setAggregation(null)
+        }
+      } catch (err) {
+        console.error('Error fetching insights:', err)
+        setError('Failed to load insights')
+      } finally {
+        setLoading(false)
+      }
     }
-    
-    const parsedUser = JSON.parse(storedUser)
-    setUser(parsedUser)
-    fetchDashboardData(parsedUser.id)
+
+    fetchInsights()
   }, [router])
 
-  const fetchDashboardData = async (userId: string) => {
-    try {
-      const response = await fetch(`/api/user/insights?userId=${userId}&full=true`)
-      if (response.ok) {
-        const apiData = await response.json()
-        // Merge API data with sample structure
-        setData({ ...sampleData, ...apiData })
-      } else {
-        // Use sample data for demo
-        setData(sampleData)
-      }
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error)
-      setData(sampleData)
-    } finally {
-      setLoading(false)
-    }
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }))
   }
 
-  const Section = ({ id, title, icon, children }: { 
-    id: string; 
-    title: string; 
-    icon: React.ReactNode; 
-    children: React.ReactNode 
+  // Collapsible section component
+  const Section = ({ 
+    id, 
+    title, 
+    icon, 
+    children, 
+    accentColor = colors.coral 
+  }: { 
+    id: keyof typeof expandedSections
+    title: string
+    icon: React.ReactNode
+    children: React.ReactNode
+    accentColor?: string
   }) => {
-    const isOpen = expandedSection === id
+    const isOpen = expandedSections[id]
+    
     return (
       <div 
-        className="rounded-2xl overflow-hidden"
-        style={{ backgroundColor: colors.darkLight, border: '1px solid rgba(255,255,255,0.05)' }}
+        className="rounded-2xl overflow-hidden mb-4"
+        style={{ backgroundColor: colors.darkCard }}
       >
         <button
-          onClick={() => setExpandedSection(isOpen ? null : id)}
-          className="w-full p-4 flex items-center justify-between"
+          onClick={() => toggleSection(id)}
+          className="w-full p-5 flex items-center justify-between text-left transition-colors"
+          style={{ 
+            borderBottom: isOpen ? `1px solid rgba(250, 248, 245, 0.1)` : 'none'
+          }}
         >
           <div className="flex items-center gap-3">
             <div 
-              className="w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${colors.coral}15` }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: `${accentColor}20` }}
             >
               {icon}
             </div>
-            <span className="font-semibold" style={{ color: colors.cream }}>{title}</span>
+            <span className="text-lg font-semibold" style={{ color: colors.cream }}>
+              {title}
+            </span>
           </div>
           {isOpen ? (
-            <ChevronUp size={18} style={{ color: colors.cream, opacity: 0.4 }} />
+            <ChevronUp size={20} style={{ color: colors.creamMuted }} />
           ) : (
-            <ChevronDown size={18} style={{ color: colors.cream, opacity: 0.4 }} />
+            <ChevronDown size={20} style={{ color: colors.creamMuted }} />
           )}
         </button>
-        {isOpen && <div className="px-4 pb-4">{children}</div>}
+        
+        {isOpen && (
+          <div className="p-5 pt-4">
+            {children}
+          </div>
+        )}
       </div>
     )
   }
 
-  if (loading || !user || !data) {
+  // Loading state
+  if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
         <div className="text-center">
-          <StarIcon size={40} style={{ color: colors.coral }} className="animate-pulse mx-auto mb-4" />
-          <p style={{ color: colors.cream, opacity: 0.6 }}>Loading insights...</p>
+          <StarIcon size={32} style={{ color: colors.coral, animation: 'pulse 2s infinite' }} />
+          <p className="mt-4" style={{ color: colors.creamMuted }}>Loading insights...</p>
         </div>
-      </main>
+      </div>
     )
   }
 
-  return (
-    <main className="min-h-screen pb-24" style={{ backgroundColor: colors.dark }}>
-      {/* Background gradient */}
-      <div 
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at 70% 20%, ${colors.purple}10 0%, transparent 40%)`,
-        }}
-      />
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: colors.dark }}>
+        <div className="text-center">
+          <p style={{ color: colors.coral }}>{error}</p>
+          <button 
+            onClick={() => router.push('/home')}
+            className="mt-4 px-4 py-2 rounded-lg"
+            style={{ backgroundColor: colors.darkCard, color: colors.cream }}
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    )
+  }
 
-      <div className="relative z-10 max-w-lg mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <Link 
-            href="/home"
-            className="flex items-center gap-2 text-sm"
-            style={{ color: colors.cream, opacity: 0.6 }}
+  // No data state
+  if (!aggregation) {
+    return (
+      <div className="min-h-screen p-6" style={{ backgroundColor: colors.dark }}>
+        <div className="max-w-lg mx-auto">
+          <button 
+            onClick={() => router.push('/home')}
+            className="flex items-center gap-2 text-sm mb-8"
+            style={{ color: colors.creamMuted }}
           >
             <ArrowLeft size={18} /> Back
-          </Link>
-          <div className="flex items-center gap-2">
+          </button>
+          
+          <div className="text-center py-16">
+            <StarIcon size={48} style={{ color: colors.coral, opacity: 0.5 }} />
+            <h2 className="text-xl font-bold mt-6 mb-2" style={{ color: colors.cream }}>
+              No insights yet
+            </h2>
+            <p className="mb-8" style={{ color: colors.creamMuted }}>
+              Complete a few check-ins and your weekly insights will appear here.
+            </p>
+            <button
+              onClick={() => router.push('/chat')}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold"
+              style={{ backgroundColor: colors.coral, color: colors.cream }}
+            >
+              Start Check-in <ArrowRight size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Main render with data
+  const { data, summary_text, period_start, period_end } = aggregation
+  const { stats, top_triggers, trigger_chains, emotion_patterns, breakthroughs_this_week, alternative_actions_reported } = data
+
+  return (
+    <div className="min-h-screen pb-24" style={{ backgroundColor: colors.dark }}>
+      {/* Header */}
+      <div className="relative overflow-hidden px-6 pt-8 pb-6">
+        <GradientBlur color={colors.coral} className="-top-40 -right-40" opacity={0.12} size={350} />
+        <GradientBlur color={colors.cyan} className="-bottom-32 -left-32" opacity={0.08} size={250} />
+        
+        <div className="max-w-lg mx-auto relative">
+          {/* Back button */}
+          <button 
+            onClick={() => router.push('/home')}
+            className="flex items-center gap-2 text-sm mb-6 transition-opacity hover:opacity-100"
+            style={{ color: colors.creamMuted }}
+          >
+            <ArrowLeft size={18} /> Back
+          </button>
+
+          {/* Title */}
+          <div className="flex items-center gap-2 mb-2">
             <StarIcon size={14} style={{ color: colors.coral }} />
-            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: colors.coral }}>
-              Week {data.practice.weeksActive}
+            <span 
+              className="text-xs font-bold uppercase tracking-widest"
+              style={{ color: colors.coral }}
+            >
+              Your Insights
             </span>
           </div>
-        </div>
-
-        <h1 className="text-2xl font-bold mb-6" style={{ color: colors.cream }}>
-          Your Practice
-        </h1>
-
-        {/* This Week Strip */}
-        <div 
-          className="rounded-2xl p-5 mb-4"
-          style={{ backgroundColor: colors.darkLight, border: '1px solid rgba(255,255,255,0.08)' }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-semibold" style={{ color: colors.cream }}>This Week</span>
-            <div className="flex items-center gap-1">
-              <Flame size={16} style={{ color: colors.gold }} />
-              <span className="text-sm font-bold" style={{ color: colors.cream }}>
-                {data.practice.currentStreak} days
-              </span>
-            </div>
-          </div>
           
-          <div className="flex gap-1.5">
-            {data.thisWeek.map((day, idx) => (
-              <div key={idx} className="flex-1 text-center">
-                <div 
-                  className="h-12 rounded-xl flex items-center justify-center relative"
-                  style={{ 
-                    backgroundColor: day.checkedIn ? colors.darkLighter : colors.dark,
-                    border: day.checkedIn ? `1px solid ${colors.cyan}30` : '1px solid transparent',
-                    opacity: idx >= 5 ? 0.4 : 1
-                  }}
-                >
-                  {day.checkedIn && <CheckCircle size={16} style={{ color: colors.cyan }} />}
-                  {day.highlight && (
-                    <div 
-                      className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full"
-                      style={{ backgroundColor: colors.gold }}
-                    />
-                  )}
-                </div>
-                <span className="text-xs mt-1 block" style={{ color: colors.cream, opacity: 0.4 }}>
-                  {day.day}
-                </span>
-              </div>
+          <h1 
+            className="text-2xl font-bold mb-1"
+            style={{ color: colors.cream }}
+          >
+            {formatDateRange(period_start, period_end)}
+          </h1>
+          
+          <p className="text-sm" style={{ color: colors.creamMuted }}>
+            {stats.checkin_count} check-in{stats.checkin_count !== 1 ? 's' : ''} this week
+          </p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-lg mx-auto px-6">
+        
+        {/* Weekly Reflection - Primary */}
+        <Section 
+          id="reflection" 
+          title="This Week" 
+          icon={<MessageCircle size={20} style={{ color: colors.coral }} />}
+        >
+          <div 
+            className="rounded-xl p-5"
+            style={{ 
+              backgroundColor: colors.dark,
+              borderLeft: `3px solid ${colors.coral}`
+            }}
+          >
+            {summary_text.split('\n\n').map((paragraph, idx) => (
+              <p 
+                key={idx} 
+                className={`text-base leading-relaxed ${idx > 0 ? 'mt-4' : ''}`}
+                style={{ color: colors.cream, opacity: 0.9 }}
+              >
+                {paragraph}
+              </p>
             ))}
           </div>
+        </Section>
 
-          {/* Highlights */}
-          {data.thisWeek.filter(d => d.highlight).length > 0 && (
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-              <p className="text-xs uppercase tracking-wide opacity-40 mb-2" style={{ color: colors.cream }}>
-                This week's moments
-              </p>
-              <div className="space-y-1.5">
-                {data.thisWeek.filter(d => d.highlight).map((d, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <div 
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: colors.gold }}
-                    />
-                    <span className="text-sm" style={{ color: colors.cream, opacity: 0.7 }}>
-                      {d.highlight}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Depth Score */}
-        <div 
-          className="rounded-2xl p-5 mb-4 relative overflow-hidden"
-          style={{ backgroundColor: colors.darkLight, border: '1px solid rgba(255,255,255,0.08)' }}
-        >
-          <div 
-            className="absolute top-0 right-0 w-40 h-40 rounded-full pointer-events-none"
-            style={{ 
-              background: `radial-gradient(circle, ${colors.purple}20 0%, transparent 70%)`,
-              filter: 'blur(30px)'
-            }}
-          />
-          
-          <div className="flex items-center justify-between relative">
-            <div>
-              <p className="text-xs uppercase tracking-wide opacity-40 mb-1" style={{ color: colors.cream }}>
-                Conversation depth
-              </p>
-              <p className="text-3xl font-black" style={{ color: colors.cream }}>
-                {data.depth.current}
-              </p>
-              <p className="text-sm mt-1" style={{ color: colors.cream, opacity: 0.5 }}>
-                {data.depth.currentLevel}
-              </p>
-              <div 
-                className="flex items-center gap-1 mt-2 px-2 py-1 rounded-full w-fit"
-                style={{ backgroundColor: `${colors.purple}15` }}
-              >
-                <TrendingUp size={12} style={{ color: colors.purple }} />
-                <span className="text-xs font-semibold" style={{ color: colors.purple }}>
-                  +{Math.round(((data.depth.current - data.depth.weekOne) / data.depth.weekOne) * 100)}% since Week 1
-                </span>
-              </div>
-            </div>
-            
-            {/* Mini chart */}
-            <div className="flex items-end gap-1.5 h-16">
-              {data.depth.weeklyDepth.map((d, idx) => (
-                <div 
+        {/* Emotions Named */}
+        {emotion_patterns?.emotions_user_named?.length > 0 && (
+          <Section 
+            id="emotions" 
+            title="Emotions You Named" 
+            icon={<Heart size={20} style={{ color: colors.coralLight }} />}
+            accentColor={colors.coralLight}
+          >
+            <div className="flex flex-wrap gap-2 mb-4">
+              {emotion_patterns.emotions_user_named.map((emotion, idx) => (
+                <span 
                   key={idx}
-                  className="w-4 rounded-t"
+                  className="px-4 py-2 rounded-full text-sm font-medium"
                   style={{ 
-                    height: `${(d / 10) * 100}%`,
-                    backgroundColor: colors.purple,
-                    opacity: 0.4 + (idx / 4) * 0.6
+                    backgroundColor: `${colors.coral}20`,
+                    color: colors.coralLight
                   }}
-                />
+                >
+                  {emotion}
+                </span>
               ))}
             </div>
-          </div>
-        </div>
+            <p className="text-sm" style={{ color: colors.creamMuted }}>
+              Naming emotions activates your prefrontal cortex, reducing their intensity.
+            </p>
+          </Section>
+        )}
 
-        {/* Insight */}
-        {data.insight && (
-          <div 
-            className="rounded-2xl p-5 mb-4"
-            style={{ backgroundColor: `${colors.cyan}08`, border: `1px solid ${colors.cyan}20` }}
+        {/* Triggers & Patterns */}
+        {(top_triggers?.length > 0 || trigger_chains?.length > 0) && (
+          <Section 
+            id="triggers" 
+            title="What Triggered You" 
+            icon={<AlertTriangle size={20} style={{ color: colors.cyan }} />}
+            accentColor={colors.cyan}
           >
-            <div className="flex items-start gap-3">
-              <Eye size={20} style={{ color: colors.cyan }} />
-              <div>
-                <p className="font-semibold mb-1" style={{ color: colors.cream }}>
-                  {data.insight.title}
+            {/* Top Triggers */}
+            {top_triggers?.length > 0 && (
+              <div className="mb-6">
+                <p 
+                  className="text-xs font-semibold uppercase tracking-wide mb-3"
+                  style={{ color: colors.creamMuted }}
+                >
+                  Top Triggers
                 </p>
-                <p className="text-sm leading-relaxed" style={{ color: colors.cream, opacity: 0.7 }}>
-                  {data.insight.body}
+                <div className="space-y-3">
+                  {top_triggers.map((trigger, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span 
+                            className="text-sm font-medium capitalize"
+                            style={{ color: colors.cream }}
+                          >
+                            {trigger.name.replace(/_/g, ' ')}
+                          </span>
+                          <span 
+                            className="text-xs font-bold"
+                            style={{ color: colors.cyan }}
+                          >
+                            {trigger.count}×
+                          </span>
+                        </div>
+                        <div 
+                          className="h-2 rounded-full overflow-hidden"
+                          style={{ backgroundColor: `${colors.cyan}20` }}
+                        >
+                          <div 
+                            className="h-full rounded-full transition-all"
+                            style={{ 
+                              width: `${Math.min((trigger.count / 3) * 100, 100)}%`,
+                              backgroundColor: colors.cyan
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Trigger Chains */}
+            {trigger_chains?.length > 0 && (
+              <div>
+                <p 
+                  className="text-xs font-semibold uppercase tracking-wide mb-3"
+                  style={{ color: colors.creamMuted }}
+                >
+                  The Pattern You Followed
+                </p>
+                <div className="space-y-3">
+                  {trigger_chains.map((chain, idx) => (
+                    <div 
+                      key={idx}
+                      className="rounded-xl p-4"
+                      style={{ backgroundColor: colors.dark }}
+                    >
+                      <div className="flex items-center flex-wrap gap-2">
+                        {chain.pattern.split(' → ').map((step, stepIdx, arr) => (
+                          <span key={stepIdx} className="flex items-center gap-2">
+                            <span 
+                              className="px-3 py-1.5 rounded-lg text-sm font-medium"
+                              style={{
+                                backgroundColor: stepIdx === 0 
+                                  ? colors.cyan 
+                                  : stepIdx === arr.length - 1 
+                                    ? colors.coral 
+                                    : colors.darkCardHover,
+                                color: stepIdx === 0 || stepIdx === arr.length - 1 
+                                  ? colors.dark 
+                                  : colors.cream
+                              }}
+                            >
+                              {step}
+                            </span>
+                            {stepIdx < arr.length - 1 && (
+                              <ChevronRight size={16} style={{ color: colors.creamMuted }} />
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                      {chain.frequency > 1 && (
+                        <p className="text-xs mt-3" style={{ color: colors.creamMuted }}>
+                          This happened {chain.frequency} times
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm mt-4" style={{ color: colors.creamMuted }}>
+                  Seeing the chain is the first step to breaking it.
                 </p>
               </div>
+            )}
+          </Section>
+        )}
+
+        {/* Breakthroughs */}
+        {breakthroughs_this_week?.length > 0 && (
+          <Section 
+            id="breakthroughs" 
+            title="Breakthroughs" 
+            icon={<Flame size={20} style={{ color: colors.coral }} />}
+          >
+            <div className="space-y-3">
+              {breakthroughs_this_week.map((breakthrough, idx) => (
+                <div 
+                  key={idx}
+                  className="rounded-xl p-4"
+                  style={{ 
+                    backgroundColor: `${colors.cyan}10`,
+                    borderLeft: `3px solid ${colors.cyan}`
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap size={14} style={{ color: colors.cyan }} />
+                    <span 
+                      className="text-xs font-semibold uppercase tracking-wide"
+                      style={{ color: colors.cyan }}
+                    >
+                      {breakthrough.category?.replace(/_/g, ' ') || 'Moment'}
+                    </span>
+                  </div>
+                  <p className="text-sm leading-relaxed" style={{ color: colors.cream }}>
+                    {breakthrough.description}
+                  </p>
+                  <p className="text-xs mt-3" style={{ color: colors.creamMuted }}>
+                    {breakthrough.date}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {/* What You Did Instead */}
+        {alternative_actions_reported?.length > 0 && (
+          <div 
+            className="rounded-2xl p-5 mb-4"
+            style={{ backgroundColor: colors.darkCard }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div 
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: `${colors.cyan}20` }}
+              >
+                <TrendingUp size={20} style={{ color: colors.cyan }} />
+              </div>
+              <span className="text-lg font-semibold" style={{ color: colors.cream }}>
+                What You Did Instead
+              </span>
+            </div>
+            <div className="space-y-2">
+              {alternative_actions_reported.map((action, idx) => (
+                <div 
+                  key={idx}
+                  className="flex items-center justify-between p-3 rounded-xl"
+                  style={{ backgroundColor: colors.dark }}
+                >
+                  <span className="text-sm capitalize" style={{ color: colors.cream }}>
+                    {action.action.replace(/_/g, ' ')}
+                  </span>
+                  <span 
+                    className="text-xs font-bold px-2 py-1 rounded-full"
+                    style={{ backgroundColor: `${colors.cyan}20`, color: colors.cyan }}
+                  >
+                    {action.count}×
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Building Honesty */}
-        <div 
-          className="rounded-2xl p-5 mb-4"
-          style={{ backgroundColor: colors.darkLight, border: '1px solid rgba(255,255,255,0.05)' }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <Unlock size={16} style={{ color: colors.coral }} />
-            <span className="font-semibold" style={{ color: colors.cream }}>Building Honesty</span>
-          </div>
-          
+        {/* Simple Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
           {[
-            { label: 'Emotions named', ...data.depth.indicators.emotionsNamed, icon: Heart },
-            { label: 'Patterns recognized', ...data.depth.indicators.patternsRecognized, icon: Layers },
-            { label: 'Hard things shared', ...data.depth.indicators.hardThingsShared, icon: MessageCircle },
-          ].map((item, idx) => {
-            const growth = Math.round(((item.current - item.weekOne) / item.weekOne) * 100)
-            return (
-              <div 
-                key={idx}
-                className="flex items-center justify-between py-3"
-                style={{ borderBottom: idx < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
+            { 
+              label: 'Avg Stress', 
+              value: stats.avg_stress ?? '—', 
+              subtext: 'of 10',
+              good: stats.avg_stress !== null && stats.avg_stress < 5
+            },
+            { 
+              label: 'Episodes', 
+              value: stats.episodes_occurred ?? 0, 
+              subtext: 'occurred',
+              good: stats.episodes_occurred === 0
+            },
+            { 
+              label: 'Resisted', 
+              value: stats.episodes_resisted ?? 0, 
+              subtext: stats.episodes_resisted === 1 ? 'time' : 'times',
+              good: (stats.episodes_resisted ?? 0) > 0
+            },
+          ].map((stat, idx) => (
+            <div 
+              key={idx} 
+              className="rounded-2xl p-4 text-center"
+              style={{ backgroundColor: colors.darkCard }}
+            >
+              <p 
+                className="text-xs uppercase tracking-wide mb-2"
+                style={{ color: colors.creamMuted }}
               >
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: `${colors.cyan}15` }}
-                  >
-                    <item.icon size={16} style={{ color: colors.cyan }} />
-                  </div>
-                  <span className="text-sm" style={{ color: colors.cream }}>{item.label}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold" style={{ color: colors.cream }}>{item.current}</span>
-                  <span 
-                    className="text-xs px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: `${colors.cyan}15`, color: colors.cyan }}
-                  >
-                    {growth > 100 ? `${Math.round(item.current/item.weekOne)}×` : `+${growth}%`}
-                  </span>
-                </div>
-              </div>
-            )
-          })}
-          
-          <p className="text-xs mt-3 text-center" style={{ color: colors.cream, opacity: 0.4 }}>
-            Compared to your first week
-          </p>
-        </div>
-
-        {/* Expandable Sections */}
-        <div className="space-y-3">
-          <Section id="emotions" title="Emotions Named" icon={<Heart size={18} style={{ color: colors.coral }} />}>
-            <div className="flex flex-wrap gap-2">
-              {data.emotions.map((e, idx) => (
-                <span 
-                  key={idx}
-                  className="px-3 py-1.5 rounded-full text-sm"
-                  style={{ 
-                    backgroundColor: idx < 2 ? `${colors.coral}15` : `${colors.cream}08`,
-                    color: idx < 2 ? colors.coral : colors.cream,
-                    opacity: idx < 2 ? 1 : 0.6
-                  }}
-                >
-                  {e.word} <span style={{ opacity: 0.5 }}>×{e.count}</span>
-                </span>
-              ))}
+                {stat.label}
+              </p>
+              <p 
+                className="text-3xl font-bold mb-1"
+                style={{ color: colors.cream }}
+              >
+                {stat.value}
+              </p>
+              <p 
+                className="text-xs font-medium"
+                style={{ color: stat.good ? colors.cyan : colors.creamMuted }}
+              >
+                {stat.subtext}
+              </p>
             </div>
-            <p className="text-xs mt-4" style={{ color: colors.cream, opacity: 0.4 }}>
-              Naming emotions activates your prefrontal cortex, reducing their intensity.
-            </p>
-          </Section>
-
-          <Section id="moments" title="Moments" icon={<Award size={18} style={{ color: colors.coral }} />}>
-            {data.moments.map((m, idx) => (
-              <div 
-                key={idx}
-                className={`flex items-start gap-3 ${idx < data.moments.length - 1 ? 'mb-3 pb-3' : ''}`}
-                style={{ borderBottom: idx < data.moments.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
-              >
-                <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: `${colors.cyan}15` }}
-                >
-                  {m.type === 'honesty' && <MessageCircle size={14} style={{ color: colors.cyan }} />}
-                  {m.type === 'pattern' && <Layers size={14} style={{ color: colors.cyan }} />}
-                  {m.type === 'vulnerability' && <Unlock size={14} style={{ color: colors.cyan }} />}
-                </div>
-                <div>
-                  <p className="text-sm" style={{ color: colors.cream }}>{m.text}</p>
-                  <p className="text-xs mt-1" style={{ color: colors.cream, opacity: 0.3 }}>{m.date}</p>
-                </div>
-              </div>
-            ))}
-          </Section>
-
-          {data.reflection && (
-            <Section id="reflection" title="Your Reflection" icon={<Brain size={18} style={{ color: colors.coral }} />}>
-              <div 
-                className="rounded-xl p-4"
-                style={{ backgroundColor: colors.dark, borderLeft: `3px solid ${colors.coral}` }}
-              >
-                {data.reflection.split('\n\n').map((p, idx) => (
-                  <p 
-                    key={idx}
-                    className={`text-sm leading-relaxed ${idx > 0 ? 'mt-3' : ''}`}
-                    style={{ color: colors.cream, opacity: 0.8 }}
-                  >
-                    {p}
-                  </p>
-                ))}
-              </div>
-            </Section>
-          )}
+          ))}
         </div>
 
         {/* CTA */}
         <div 
-          className="rounded-2xl p-6 mt-6 text-center relative overflow-hidden"
+          className="rounded-2xl p-6 text-center relative overflow-hidden"
           style={{ backgroundColor: colors.coral }}
         >
-          <p className="text-lg font-bold mb-1" style={{ color: colors.cream }}>
-            Keep showing up
+          <div 
+            className="absolute rounded-full pointer-events-none -top-10 -right-10"
+            style={{
+              width: 120,
+              height: 120,
+              background: `radial-gradient(circle, ${colors.cream} 0%, transparent 70%)`,
+              filter: 'blur(40px)',
+              opacity: 0.1
+            }}
+          />
+          
+          <p 
+            className="text-lg font-bold mb-1"
+            style={{ color: colors.cream }}
+          >
+            Ready for today's check-in?
           </p>
-          <p className="text-sm mb-4" style={{ color: colors.cream, opacity: 0.8 }}>
-            {data.practice.currentStreak} days in — every check-in builds the practice
+          <p 
+            className="text-sm mb-4"
+            style={{ color: colors.cream, opacity: 0.8 }}
+          >
+            Every check-in builds the picture
           </p>
-          <Link
-            href="/chat"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all hover:scale-105"
+          <button
+            onClick={() => router.push('/chat')}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-transform hover:scale-105"
             style={{ backgroundColor: colors.dark, color: colors.cream }}
           >
-            Today's Check-in <ArrowRight size={18} />
-          </Link>
+            Start Check-in <ArrowRight size={18} />
+          </button>
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-8 pb-4">
           <div className="flex items-center justify-center gap-2">
-            <div className="w-6 h-px" style={{ backgroundColor: colors.cream, opacity: 0.15 }} />
-            <StarIcon size={10} style={{ color: colors.cream, opacity: 0.2 }} />
-            <span className="text-xs font-bold" style={{ color: colors.cream, opacity: 0.2 }}>SEEN</span>
-            <StarIcon size={10} style={{ color: colors.cream, opacity: 0.2 }} />
-            <div className="w-6 h-px" style={{ backgroundColor: colors.cream, opacity: 0.15 }} />
+            <div className="w-6 h-px" style={{ backgroundColor: colors.creamMuted, opacity: 0.3 }} />
+            <StarIcon size={10} style={{ color: colors.creamMuted, opacity: 0.5 }} />
+            <span 
+              className="text-xs font-bold tracking-widest"
+              style={{ color: colors.creamMuted, opacity: 0.5 }}
+            >
+              SEEN
+            </span>
+            <StarIcon size={10} style={{ color: colors.creamMuted, opacity: 0.5 }} />
+            <div className="w-6 h-px" style={{ backgroundColor: colors.creamMuted, opacity: 0.3 }} />
           </div>
         </div>
       </div>
@@ -538,20 +673,18 @@ export default function InsightsPage() {
       <nav 
         className="fixed bottom-0 left-0 right-0 px-6 py-3"
         style={{ 
-          backgroundColor: colors.darkLight, 
+          backgroundColor: colors.darkCard, 
           borderTop: '1px solid rgba(255,255,255,0.05)',
         }}
       >
         <div className="max-w-lg mx-auto flex justify-around">
           <Link href="/home" className="flex flex-col items-center gap-1 py-2 px-4">
-            <StarIcon size={22} style={{ color: colors.cream, opacity: 0.4 }} />
-            <span className="text-xs" style={{ color: colors.cream, opacity: 0.4 }}>Home</span>
+            <Home size={22} style={{ color: colors.creamMuted }} />
+            <span className="text-xs" style={{ color: colors.creamMuted }}>Home</span>
           </Link>
           <Link href="/chat" className="flex flex-col items-center gap-1 py-2 px-4">
-            <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ color: colors.cream, opacity: 0.4 }}>
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            <span className="text-xs" style={{ color: colors.cream, opacity: 0.4 }}>Check-in</span>
+            <MessageCircle size={22} style={{ color: colors.creamMuted }} />
+            <span className="text-xs" style={{ color: colors.creamMuted }}>Check-in</span>
           </Link>
           <Link href="/insights" className="flex flex-col items-center gap-1 py-2 px-4">
             <BarChart3 size={22} style={{ color: colors.coral }} />
@@ -559,6 +692,6 @@ export default function InsightsPage() {
           </Link>
         </div>
       </nav>
-    </main>
+    </div>
   )
 }
