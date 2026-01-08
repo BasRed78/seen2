@@ -1,12 +1,2 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/daily-jobs",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/weekly-jobs",
-      "schedule": "0 9 * * 0"
-    }
-  ]
 }
