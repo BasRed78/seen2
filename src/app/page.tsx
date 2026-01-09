@@ -10,8 +10,7 @@ import {
   Lock,
   Server,
   Eye,
-  Check,
-  HelpCircle
+  Check
 } from 'lucide-react';
 
 const colors = {
@@ -20,6 +19,7 @@ const colors = {
   coralDark: '#e85a4f',
   bg: '#0f0f1a',
   dark: '#1a1a2e',
+  darkMid: '#1f1f38',
   darkLight: '#252542',
   cream: '#faf8f5',
   lightCream: '#F5F0E8',
@@ -288,85 +288,10 @@ const CycleDiagram = ({ className = "" }: { className?: string }) => {
   );
 };
 
-// Chat message for iPhone animation
-const ChatMessage = ({ msg, isAi }: { msg: string; isAi: boolean }) => (
-  <div className={isAi ? '' : 'flex justify-end'}>
-    <div 
-      className={`px-3 py-2 rounded-xl ${isAi ? 'rounded-tl-sm' : 'rounded-tr-sm'}`}
-      style={{ 
-        backgroundColor: isAi ? colors.dark : colors.coral, 
-        maxWidth: isAi ? '90%' : '85%',
-        color: colors.cream,
-        fontSize: '0.75rem',
-        lineHeight: 1.4
-      }}
-    >
-      {msg}
-    </div>
-  </div>
-);
-
-// Hook for in-view detection
-function useInView(threshold = 0.3) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setInView(true);
-      },
-      { threshold }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return { ref, inView };
-}
-
-// iPhone Check-in Animation Component
+// How It Works Section - Copy Only
 const HowItWorksPreview = () => {
-  const { ref, inView } = useInView(0.2);
-  const [step, setStep] = useState(0);
-  const chatRef = useRef<HTMLDivElement>(null);
-
-const conversation = [
-  { type: 'ai', text: 'Hey Alex, how are you feeling today?' },
-  { type: 'user', text: 'Tired. Didn\'t sleep well.' },
-  { type: 'ai', text: 'What kept you up?' },
-  { type: 'user', text: 'Just my mind racing. Work stuff mostly. Sunday nights.' },
-  { type: 'ai', text: 'When your mind races like that, what do you usually do?' },
-  { type: 'user', text: 'Scroll my phone. Or text people I shouldn\'t.' },
-  { type: 'ai', text: 'People you shouldn\'t?' },
-  { type: 'user', text: 'Yeah. Exes. People from my past. It\'s stupid.' },
-];
-
-const closing = "Doesn't sound stupid. Sounds like you're looking for something when your mind won't quiet down. Thanks for sharing that, Alex. I'll remember this — we can pick it up tomorrow. Take care.";
-
-  useEffect(() => {
-  if (!inView) return;
-  
-  const timers: NodeJS.Timeout[] = [];
-  timers.push(setTimeout(() => setStep(1), 400));
-  for (let i = 2; i <= 9; i++) {
-    timers.push(setTimeout(() => setStep(i), 400 + (i - 1) * 1200));
-  }
-  timers.push(setTimeout(() => setStep(10), 11000));
-  timers.push(setTimeout(() => setStep(11), 12500));
-
-  return () => timers.forEach(t => clearTimeout(t));
-}, [inView]);
-
-  useEffect(() => {
-    if (chatRef.current && step > 1) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }
-  }, [step]);
-
   return (
     <section 
-      ref={ref}
       className="relative z-30 py-24 px-6 rounded-t-[2rem]"
       style={{ 
         backgroundColor: colors.darkLight,
@@ -376,140 +301,36 @@ const closing = "Doesn't sound stupid. Sounds like you're looking for something 
       {/* Gradient orb */}
       <GradientBlur color={colors.coral} className="top-1/2 right-0 -translate-y-1/2" opacity={0.12} size={500} />
 
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div 
-          className="text-center mb-16"
-          style={{ 
-            opacity: step >= 1 ? 1 : 0, 
-            transform: step >= 1 ? 'translateY(0)' : 'translateY(30px)', 
-            transition: 'all 0.6s ease' 
-          }}
-        >
+      <div className="max-w-4xl mx-auto">
+        <FadeIn>
           <p 
-            className="text-sm font-bold uppercase tracking-widest mb-4"
+            className="text-lg md:text-xl font-bold uppercase tracking-widest mb-8"
             style={{ color: colors.coral }}
           >
             How it works
           </p>
-          <h2 
-            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
-            style={{ color: colors.cream }}
-          >
-            Seen checks in
-          </h2>
-          <p 
-            className="text-lg md:text-xl max-w-xl mx-auto"
-            style={{ color: colors.cream, opacity: 0.6 }}
-          >
-            Daily conversations that help you see what you&apos;d miss on your own
+        </FadeIn>
+        <FadeIn delay={0.3}>
+          <p className="text-2xl md:text-4xl lg:text-5xl leading-snug font-light" style={{ color: colors.cream }}>
+            Lives on your phone. Reaches out to you — you don&apos;t have to remember to open it.
           </p>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-12 items-center justify-center">
-          {/* iPhone Frame */}
-          <div 
-            style={{ 
-              backgroundColor: '#1c1c1e', 
-              borderRadius: 36, 
-              padding: 10,
-              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-              opacity: step >= 1 ? 1 : 0, 
-              transform: step >= 1 ? 'translateY(0)' : 'translateY(40px)', 
-              transition: 'all 0.8s ease'
-            }}
+        </FadeIn>
+        <FadeIn delay={0.6}>
+          <p className="text-2xl md:text-4xl lg:text-5xl leading-snug font-light mt-8" style={{ color: colors.cream }}>
+            Over time, patterns 
+            <span style={{ color: colors.coral }}> surface</span>. 
+            Progress you can actually see.
+          </p>
+        </FadeIn>
+        <FadeIn delay={0.9}>
+          <Link 
+            href="/how-it-works"
+            className="inline-flex items-center gap-2 text-lg font-semibold transition-all hover:gap-4 mt-12"
+            style={{ color: colors.coral }}
           >
-            <div 
-              className="flex flex-col overflow-hidden" 
-              style={{ 
-                backgroundColor: colors.dark, 
-                borderRadius: 28,
-                width: 260,
-                height: 520,
-              }}
-            >
-              {/* Dynamic Island */}
-              <div className="flex justify-center pt-2 pb-1">
-                <div style={{ backgroundColor: '#000', width: 80, height: 24, borderRadius: 16 }} />
-              </div>
-              
-              {/* Header */}
-              <div 
-                className="flex items-center justify-between px-3 pb-2 flex-shrink-0" 
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
-              >
-                <div className="flex items-center gap-2">
-                  <StarIcon size={12} style={{ color: colors.coral }} />
-                  <span style={{ color: colors.cream, fontSize: '0.7rem', fontWeight: 600 }}>Daily Check-in</span>
-                </div>
-                <span style={{ color: colors.cream, fontSize: '0.6rem', opacity: 0.5 }}>Day 3</span>
-              </div>
-              
-              {/* Messages */}
-              <div 
-                ref={chatRef}
-                className="px-3 py-2 flex-1 space-y-2" 
-                style={{ overflowY: 'auto', scrollbarWidth: 'none' }}
-              >
-                {conversation.map((msg, i) => (
-                  step >= i + 1 ? (
-                    <div 
-                      key={i}
-                      style={{
-                        opacity: step >= i + 1 ? 1 : 0,
-                        transform: step >= i + 1 ? 'translateY(0)' : 'translateY(10px)',
-                        transition: 'all 0.4s ease'
-                      }}
-                    >
-                      <ChatMessage msg={msg.text} isAi={msg.type === 'ai'} />
-                    </div>
-                  ) : null
-                ))}
-                {step >= 10 && (
-                  <div style={{ opacity: 1, transition: 'all 0.4s ease' }}>
-                    <ChatMessage msg={closing} isAi={true} />
-                  </div>
-                )}
-              </div>
-              
-              {/* Home bar */}
-              <div className="flex justify-center py-2">
-                <div style={{ backgroundColor: 'rgba(255,255,255,0.3)', width: 80, height: 4, borderRadius: 2 }} />
-              </div>
-            </div>
-          </div>
-
-          {/* Right side: narrative + CTA */}
-          <div 
-            className="text-center lg:text-left max-w-md"
-            style={{ 
-              opacity: step >= 11 ? 1 : 0, 
-              transform: step >= 9 ? 'translateY(0)' : 'translateY(30px)', 
-              transition: 'all 0.8s ease' 
-            }}
-          >
-            <p 
-              className="text-xl md:text-2xl font-medium mb-4"
-              style={{ color: colors.cream, lineHeight: 1.5 }}
-            >
-              Lives on your phone. Checks in daily — you don&apos;t have to remember.
-            </p>
-            <p 
-              className="text-lg mb-8"
-              style={{ color: colors.cream, opacity: 0.6, lineHeight: 1.5 }}
-            >
-              Every conversation builds. Patterns surface. Progress you can see.
-            </p>
-            
-            <Link 
-              href="/how-it-works"
-              className="inline-flex items-center gap-2 text-lg font-semibold transition-all hover:gap-4"
-              style={{ color: colors.coral }}
-            >
-              See how it builds <ArrowRight size={20} />
-            </Link>
-          </div>
-        </div>
+            See a sample conversation <ArrowRight size={20} />
+          </Link>
+        </FadeIn>
       </div>
     </section>
   );
@@ -549,7 +370,7 @@ export default function SeenLandingPage() {
       <Navigation scrolled={scrolled} scrollProgress={scrollProgress} />
 
       {/* Hero Section - STICKY so other sections slide over it */}
-      <section className="min-h-screen flex items-center relative px-6 sticky top-0 z-0" style={{ backgroundColor: colors.dark }}>
+      <section className="min-h-screen flex items-center relative px-6 sticky top-0 z-0" style={{ backgroundColor: colors.bg }}>
         <GradientBlur color={colors.coral} className="-top-40 -right-40" opacity={0.5} blur={100} size={500} />
         <GradientBlur color={colors.cyan} className="bottom-0 -left-40" opacity={0.3} blur={80} size={400} />
         <div className="max-w-6xl mx-auto w-full pt-16">
@@ -563,7 +384,7 @@ export default function SeenLandingPage() {
               <SlideIn direction="left" delay={0.3}>
                 <p className="text-lg md:text-xl mb-8 leading-relaxed max-w-xl" style={{ color: colors.cream, opacity: 0.85 }}>
                   Everyone develops ways to cope when life gets hard. Some work for a while. Some never did. 
-                  Seen helps you understand what&apos;s really going on — so you can choose, instead of just react.
+                  Seen helps you understand what&apos;s really going on — so you can take control of what happens next.
                 </p>
               </SlideIn>
               <SlideIn direction="left" delay={0.5}>
@@ -588,7 +409,7 @@ export default function SeenLandingPage() {
       <section 
         className="relative z-10 min-h-screen flex items-center py-20 px-6 rounded-t-[2rem] sticky top-0" 
         style={{ 
-          backgroundColor: colors.darkLight,
+          backgroundColor: colors.dark,
           boxShadow: '0 -20px 60px rgba(0,0,0,0.5)',
         }}
       >
@@ -618,7 +439,7 @@ export default function SeenLandingPage() {
       <section 
         className="relative z-20 min-h-screen flex items-center py-20 px-6" 
         style={{ 
-          backgroundColor: colors.dark,
+          backgroundColor: colors.darkMid,
         }}
       >
         <GradientBlur color={colors.cyan} className="-top-40 -right-60" opacity={0.15} size={500} />
@@ -628,19 +449,18 @@ export default function SeenLandingPage() {
           </FadeIn>
           <FadeIn delay={0.3}>
             <p className="text-2xl md:text-4xl lg:text-5xl leading-snug font-light" style={{ color: colors.cream }}>
-              Personal support that actually gets it.
+              A companion that helps you understand yourself.
             </p>
           </FadeIn>
           <FadeIn delay={0.6}>
             <p className="text-2xl md:text-4xl lg:text-5xl leading-snug font-light mt-8" style={{ color: colors.cream }}>
-              Seen checks in on you, learns what&apos;s going on, and helps you see what&apos;s 
-              <span style={{ color: colors.cyan }}> really </span>
-              driving your behavior.
+              Seen reaches out to you, remembers what you&apos;ve shared, and asks the questions that 
+              <span style={{ color: colors.cyan }}> matter</span>.
             </p>
           </FadeIn>
           <FadeIn delay={0.9}>
             <p className="text-xl md:text-2xl lg:text-3xl leading-snug font-light mt-12" style={{ color: colors.cream, opacity: 0.7 }}>
-              Not another meditation app. Not generic self-help. A daily practice built for people who are ready to look closer.
+              Not therapy. Not an app you forget to open. A practice that meets you where you are — and helps you see what&apos;s really going on.
             </p>
           </FadeIn>
         </div>
@@ -770,7 +590,7 @@ export default function SeenLandingPage() {
       </section>
 
 {/* Footer */}
-      <footer className="relative z-[80] py-6 px-6 border-t" style={{ backgroundColor: colors.dark, borderColor: 'rgba(255,255,255,0.1)' }}>
+      <footer className="relative z-[80] py-6 px-6 border-t" style={{ backgroundColor: colors.bg, borderColor: 'rgba(255,255,255,0.1)' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <StarIcon size={16} style={{ color: colors.coral }} />
