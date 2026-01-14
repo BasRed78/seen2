@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEEN: Go-to-Market Strategy Brief</title>
+    <style>
+        :root {
+            --coral: #C25441;
+            --coral-light: #e07a6a;
+            --cyan: #5B8F8F;
+            --cream: #FAF8F5;
+            --dark: #1a1a2e;
+            --dark-light: #2d2d44;
+            --text: #333;
+            --text-light: #666;
+            --border: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .confidential-banner {
+            background: var(--dark);
+            color: var(--cream);
+            padding: 10px 24px;
+            text-align: center;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .confidential-banner svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .header {
+            background: var(--dark);
+            padding: 16px 24px;
+            position: sticky;
+            top: 37px;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--cream);
+            text-decoration: none;
+            letter-spacing: 2px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .logo span {
+            color: var(--coral);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-nav button {
+            color: var(--cream);
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-nav button:hover,
+        .header-nav button.active {
+            opacity: 1;
+            background: var(--dark-light);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 32px 24px 140px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 3px solid var(--coral);
+        }
+
+        .page-eyebrow {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--coral);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .card.highlight {
+            border-left: 4px solid var(--coral);
+        }
+
+        .card.cyan {
+            border-left: 4px solid var(--cyan);
+        }
+
+        .card.warning {
+            background: #fff8f6;
+            border: 1px solid var(--coral-light);
+        }
+
+        .card.personal-note {
+            background: #f0f7f7;
+            border: 1px solid var(--cyan);
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #fff8f6 0%, #fff 100%);
+            border: 2px solid var(--coral);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .expert-quote {
+            background: var(--dark);
+            color: var(--cream);
+            padding: 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        .collapsible {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            width: 100%;
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            border: none;
+            text-align: left;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .collapsible-header:hover {
+            background: #f5f5f5;
+        }
+
+        .collapsible-content {
+            padding: 24px;
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+
+        .collapsible.open .collapsible-content {
+            display: block;
+        }
+
+        .collapsible-icon {
+            color: var(--coral);
+            transition: transform 0.2s;
+        }
+
+        .collapsible.open .collapsible-icon {
+            transform: rotate(180deg);
+        }
+
+        .nav-cards {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .nav-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+            flex: 1;
+            min-width: 200px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-card:hover {
+            border-color: var(--coral);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-card-number {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--coral);
+            margin-bottom: 4px;
+        }
+
+        .nav-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .nav-card-desc {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--dark);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 16px 24px;
+            z-index: 100;
+        }
+
+        .bottom-nav-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-button.prev {
+            border: 1px solid var(--border);
+            color: var(--dark);
+            background: transparent;
+        }
+
+        .nav-button.prev:hover {
+            border-color: var(--dark);
+        }
+
+        .nav-button.prev:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .nav-button.next {
+            background: var(--coral);
+            color: white;
+        }
+
+        .nav-button.next:hover {
+            background: var(--coral-light);
+        }
+
+        .nav-button.next:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-indicator {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .watermark-footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 11px;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 32px 0 16px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 24px 0 12px;
+        }
+
+        h4 {
+            font-size: 14px;
+            color: var(--coral);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 16px;
+        }
+
+        ul, ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        a {
+            color: var(--coral);
+        }
+
+        .text-coral { color: var(--coral); }
+        .text-cyan { color: var(--cyan); }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        @media (max-width: 600px) {
+            .header-nav { display: none; }
+            .nav-cards { flex-direction: column; }
+            .nav-card { min-width: 100%; }
+            .page-title { font-size: 24px; }
+            .nav-button { padding: 10px 16px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="confidential-banner">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span><strong>CONFIDENTIAL</strong> — Prepared exclusively for Martijn Ros — Please do not share or forward</span>
+    </div>
+
+    <header class="header">
+        <div class="header-inner">
+            <button class="logo" onclick="goToPage(0)">SEEN<span>.</span></button>
+            <nav class="header-nav">
+                <button onclick="goToPage(0)" id="nav-0">Home</button>
+                <button onclick="goToPage(4)" id="nav-4">Questions</button>
+                <button onclick="goToPage(5)" id="nav-5">Hormozi</button>
+                <button onclick="goToPage(6)" id="nav-6">Priestley</button>
+                <button onclick="goToPage(7)" id="nav-7">Brunson</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- PAGE 0: Home -->
+        <div class="page active" id="page-0">
+            <div class="page-header">
+                <div class="page-eyebrow">GTM Strategy Brief</div>
+                <h1 class="page-title">SEEN</h1>
+                <p class="page-subtitle">For strategic input — January 2025</p>
+            </div>
+
+            <div class="card highlight">
+                <p style="font-size: 18px; margin-bottom: 0;"><strong>SEEN</strong> is a mental health awareness platform that helps people identify and understand their stress-response behavioral patterns <strong>before they're ready for therapy</strong>.</p>
+            </div>
+
+            <div class="card personal-note">
+                <p style="margin-bottom: 0; font-size: 14px;">
+                    <strong>Martijn</strong> — Thanks for taking the time to look at this. I'm looking for your honest strategic input on positioning, go-to-market, and some specific questions I'm wrestling with. The full context is here, including analyses through three different expert frameworks. Jump to <strong><a href="#" onclick="goToPage(4); return false;">Questions</a></strong> if you want to cut to the chase.
+                </p>
+            </div>
+
+            <h2>Navigate This Brief</h2>
+            
+            <h4>Overview</h4>
+            <div class="nav-cards">
+                <div class="nav-card" onclick="goToPage(1)">
+                    <div class="nav-card-number">01</div>
+                    <div class="nav-card-title">What SEEN Is</div>
+                    <div class="nav-card-desc">The product, market, and opportunity</div>
+                </div>
+                <div class="nav-card" onclick="goToPage(2)">
+                    <div class="nav-card-number">02</div>
+                    <div class="nav-card-title">Founder Advantage & Tension ⚠️</div>
+                    <div class="nav-card-desc">The asset and its complications</div>
+                </div>
+            </div>
+
+            <h4>Strategic Analysis</h4>
+            <div class="nav-cards">
+                <div class="nav-card" onclick="goToPage(3)">
+                    <div class="nav-card-number">03</div>
+                    <div class="nav-card-title">Three Frameworks</div>
+                    <div class="nav-card-desc">Hormozi, Priestley, Brunson compared</div>
+                </div>
+            </div>
+
+            <h4>Key Questions</h4>
+            <div class="nav-cards">
+                <div class="nav-card" onclick="goToPage(4)">
+                    <div class="nav-card-number">04</div>
+                    <div class="nav-card-title">7 Strategic Questions</div>
+                    <div class="nav-card-desc">Where I need your input</div>
+                </div>
+            </div>
+
+            <h4>Expert Deep Dives</h4>
+            <div class="nav-cards">
+                <div class="nav-card" onclick="goToPage(5)">
+                    <div class="nav-card-number">05</div>
+                    <div class="nav-card-title">Alex Hormozi</div>
+                    <div class="nav-card-desc">Volume + iteration. Ship fast.</div>
+                </div>
+                <div class="nav-card" onclick="goToPage(6)">
+                    <div class="nav-card-number">06</div>
+                    <div class="nav-card-title">Daniel Priestley</div>
+                    <div class="nav-card-desc">Authority + scarcity. Build demand.</div>
+                </div>
+                <div class="nav-card" onclick="goToPage(7)">
+                    <div class="nav-card-number">07</div>
+                    <div class="nav-card-title">Russell Brunson</div>
+                    <div class="nav-card-desc">Storytelling + funnels. Belief first.</div>
+                </div>
+            </div>
+
+            <h4>Summary</h4>
+            <div class="nav-cards">
+                <div class="nav-card" onclick="goToPage(8)">
+                    <div class="nav-card-number">08</div>
+                    <div class="nav-card-title">What I Need From You</div>
+                    <div class="nav-card-desc">The asks and next steps</div>
+                </div>
+            </div>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+
+        <!-- PAGE 1: Overview -->
+        <div class="page" id="page-1">
+            <div class="page-header">
+                <div class="page-eyebrow">Page 1 of 8</div>
+                <h1 class="page-title">What SEEN Is</h1>
+                <p class="page-subtitle">The product, market, and opportunity</p>
+            </div>
+
+            <div class="card highlight">
+                <p>SEEN is a mental health awareness platform that helps people identify and understand their stress-response behavioral patterns <strong>before they're ready for therapy</strong>.</p>
+            </div>
+
+            <p><strong>The core insight:</strong> When stress hits, your brain has a go-to move—texting an ex, online shopping, overworking, drinking, seeking validation. Most people don't see it as a pattern. They see individual moments of weakness. SEEN helps connect the dots.</p>
+            
+            <p><strong>What it's not:</strong> Therapy, diagnosis, or treatment. It's a mirror—helping people see clearly enough to take the next step.</p>
+
+            <h2>Market Opportunity</h2>
+            
+            <div class="card">
+                <table>
+                    <tbody>
+                        <tr><td style="font-weight: 600; width: 140px;">11-year gap</td><td>Between recognizing patterns and seeking help</td></tr>
+                        <tr><td style="font-weight: 600;">70%</td><td>Of people who need support don't access it</td></tr>
+                        <tr><td style="font-weight: 600;">90K+ waitlists</td><td>Therapy waitlists in NL alone</td></tr>
+                        <tr><td style="font-weight: 600;">Competitors</td><td>Either too generic (Headspace) or poorly executed (Liven—2.1★)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>The Product</h2>
+
+            <h3>1. Free Quiz (14 questions)</h3>
+            <p>Identifies one of six stress-response patterns:</p>
+            <div class="card">
+                <ul style="margin-bottom: 0;">
+                    <li><strong>Intimacy Seeking</strong> — Seeking connection/validation through relationships</li>
+                    <li><strong>Substance Soothing</strong> — Alcohol, food, cannabis</li>
+                    <li><strong>Compulsive Spending</strong> — Retail as emotional regulation</li>
+                    <li><strong>Achievement Hiding</strong> — Overwork to avoid feelings</li>
+                    <li><strong>Approval Chasing</strong> — External validation seeking</li>
+                    <li><strong>Withdrawal & Avoidance</strong> — Isolation, shutdown</li>
+                </ul>
+            </div>
+
+            <h3>2. Paid Subscription (€7.99/mo)</h3>
+            <ul>
+                <li>Daily AI check-ins using motivational interviewing principles</li>
+                <li>Proactive outreach (SEEN reaches out to you)</li>
+                <li>Pattern tracking and trigger identification</li>
+            </ul>
+
+            <p><strong>Current state:</strong> Product deployed at seeyourself.today</p>
+            <p><strong>Launch target:</strong> End of January 2025</p>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: Founder -->
+        <div class="page" id="page-2">
+            <div class="page-header">
+                <div class="page-eyebrow">Page 2 of 8</div>
+                <h1 class="page-title">Founder Advantage & Tension ⚠️</h1>
+                <p class="page-subtitle">The asset and its complications</p>
+            </div>
+
+            <h2>The Founder Advantage</h2>
+
+            <div class="card highlight">
+                <p>Bas built SEEN because he lived it. Years in a pattern he couldn't see, things falling apart, group therapy where he finally heard "me too."</p>
+                <p style="margin-bottom: 0;"><strong>The founder story is genuine, vulnerable, and uncopyable by corporate competitors like Headspace.</strong></p>
+            </div>
+
+            <h2>The Personal Tension ⚠️</h2>
+
+            <div class="card warning">
+                <h3 style="margin-top: 0;">There's a complication</h3>
+                <p><strong>Bas is reluctant to literally be "the face" of SEEN.</strong></p>
+                <p>The reasons are personal and real:</p>
+                <ul>
+                    <li><strong>The nature of the pattern.</strong> The founder's stress-response pattern was in a sensitive personal category — one that carries social stigma and affected his family. This isn't something he wants publicly attached to his name and face permanently.</li>
+                    <li><strong>Family impact.</strong> He has a son. The story involves a period that affected his family. Being the visible face means that story becomes permanently searchable, potentially affecting his son now and in the future.</li>
+                    <li><strong>Vulnerability limits.</strong> There's a difference between sharing the story in controlled contexts (quiz intro, therapist meetings, 1:1 conversations) and having your face on Instagram ads tied to the specific behavior.</li>
+                </ul>
+            </div>
+
+            <h2>The Strategic Question</h2>
+
+            <p>All three expert frameworks emphasize founder-led positioning as a key differentiator. But how do you get the <em>benefits</em> of founder authenticity without the <em>exposure</em> of being literally the face?</p>
+
+            <div class="card cyan">
+                <h3 style="margin-top: 0;">Possible Approaches</h3>
+                <ul style="margin-bottom: 0;">
+                    <li><strong>Story without face:</strong> Share the narrative, but not as the visible front. Written content, not video.</li>
+                    <li><strong>Partial visibility:</strong> Be present in some contexts (podcasts, therapist meetings) but not in paid acquisition.</li>
+                    <li><strong>Anonymous founder archetype:</strong> "I built this because I wish it existed for me" without ever naming who "I" is.</li>
+                    <li><strong>Brand-forward, founder-backed:</strong> SEEN as the brand, with founder credibility established but not centered.</li>
+                </ul>
+            </div>
+
+            <div class="question-box">
+                <strong class="text-coral">This needs to be solved.</strong> The experts all say founder story is the differentiator. But the founder has real constraints on how visible he can be. What's the right balance?
+            </div>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: Frameworks -->
+        <div class="page" id="page-3">
+            <div class="page-header">
+                <div class="page-eyebrow">Page 3 of 8</div>
+                <h1 class="page-title">Three Frameworks</h1>
+                <p class="page-subtitle">Hormozi, Priestley, Brunson compared</p>
+            </div>
+
+            <p>We've analyzed SEEN through three expert lenses, each with a different philosophy:</p>
+
+            <div class="card">
+                <h4 style="margin-top: 0;" class="text-coral">Alex Hormozi</h4>
+                <p><strong>Volume + iteration. Ship fast. Lead with pain. Price signals value.</strong></p>
+                <p style="margin-bottom: 0;">Post 100 pieces of content. Test 20 hooks. Charge more. Add guarantees.</p>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-top: 0;" class="text-coral">Daniel Priestley</h4>
+                <p><strong>Authority + scarcity. Build demand before supply. The founder is the brand.</strong></p>
+                <p style="margin-bottom: 0;">Create waitlist. Limit spots. Publish (book, podcast). Let demand find you.</p>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-top: 0;" class="text-coral">Russell Brunson</h4>
+                <p><strong>Storytelling + funnels. Epiphany Bridge. New Opportunity positioning.</strong></p>
+                <p style="margin-bottom: 0;">Lead with founder story. Build email sequences. Create belief before asking for money.</p>
+            </div>
+
+            <h2>Where They Agree</h2>
+            <div class="card highlight">
+                <ul style="margin-bottom: 0;">
+                    <li>The founder story is the biggest asset — use it more aggressively</li>
+                    <li>"Pattern awareness" is too abstract — sell the transformation</li>
+                    <li>Quiz should capture email before giving full results</li>
+                    <li>Need proof (testimonials, timelines) before scaling</li>
+                    <li>€7.99 might signal low value</li>
+                </ul>
+            </div>
+
+            <h2>Where They Diverge</h2>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr><th>Dimension</th><th>Hormozi</th><th>Priestley</th><th>Brunson</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="font-weight: 600;">Speed</td><td>Ship now</td><td>Build demand first</td><td>Story first, then scale</td></tr>
+                        <tr><td style="font-weight: 600;">Acquisition</td><td>Paid ads + volume</td><td>Let demand find you</td><td>Dream 100</td></tr>
+                        <tr><td style="font-weight: 600;">Pricing</td><td>Charge more</td><td>Create scarcity</td><td>Value Ladder</td></tr>
+                        <tr><td style="font-weight: 600;">Founder role</td><td>Use for proof</td><td>IS the brand</td><td>Attractive Character</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+
+        <!-- PAGE 4: Questions -->
+        <div class="page" id="page-4">
+            <div class="page-header">
+                <div class="page-eyebrow">Page 4 of 8</div>
+                <h1 class="page-title">7 Strategic Questions</h1>
+                <p class="page-subtitle">Where I need your input</p>
+            </div>
+
+            <h2>1. Audience Strategy</h2>
+            <p><strong>One message or many?</strong></p>
+            <div class="card">
+                <ul style="margin-bottom: 0;">
+                    <li><strong>Broad:</strong> "Your brain has a go-to move when life gets hard" — Cheaper, simpler, less specific</li>
+                    <li><strong>Pattern-specific:</strong> Six different campaigns — Higher conversion, 6x the work</li>
+                    <li><strong>Hybrid:</strong> Broad acquisition → pattern-specific retargeting — Best of both, more complex</li>
+                </ul>
+            </div>
+            <div class="question-box"><strong class="text-coral">Question:</strong> Start with one pattern or stay broad?</div>
+
+            <h2>2. Transformation Statement</h2>
+            <p>Current framing ("pattern awareness") is too abstract. Need concrete transformation.</p>
+            <div class="card">
+                <p><strong>Candidates:</strong></p>
+                <ul style="margin-bottom: 0;">
+                    <li>"See the pattern controlling your life. Interrupt it in 30 days."</li>
+                    <li>"Finally understand why you do what you do—and take back control."</li>
+                    <li>"The gap between urge and action. We help you widen it."</li>
+                </ul>
+            </div>
+            <div class="question-box"><strong class="text-coral">Question:</strong> What's the one sentence that captures the value?</div>
+
+            <h2>3. Founder-Led vs. Brand-Led</h2>
+            <div class="card highlight"><p style="margin-bottom: 0;"><strong>For founder-forward:</strong> Uncopyable differentiator, trust signal, story IS the marketing</p></div>
+            <div class="card warning"><p style="margin-bottom: 0;"><strong>For limited visibility:</strong> Personal exposure concerns, family considerations, scalability</p></div>
+            <div class="question-box"><strong class="text-coral">Question:</strong> How do we get founder authenticity without full personal exposure?</div>
+
+            <h2>4. Launch Approach</h2>
+            <div class="card">
+                <ul style="margin-bottom: 0;">
+                    <li><strong>Hormozi:</strong> Ship now. €10/day ads. Post daily. Learn from volume.</li>
+                    <li><strong>Priestley:</strong> Waitlist first. 500 founding members. Create scarcity.</li>
+                    <li><strong>Brunson:</strong> Perfect the Epiphany Bridge. 5-day email sequence first.</li>
+                </ul>
+            </div>
+            <p><strong>Reality:</strong> Limited budget, solo founder, end-of-January target.</p>
+            <div class="question-box"><strong class="text-coral">Question:</strong> Given constraints, what's the right launch posture?</div>
+
+            <h2>5. Pricing Signal</h2>
+            <p><strong>Current:</strong> €7.99/month ("founding member pricing")</p>
+            <div class="card">
+                <p><strong>Options:</strong></p>
+                <ul style="margin-bottom: 0;">
+                    <li>Keep €7.99, add "goes to €14.99 after 500 members"</li>
+                    <li>Raise to €14.99 now with 30-day guarantee</li>
+                    <li>Annual option (€79/year = 2 months free)</li>
+                </ul>
+            </div>
+            <div class="question-box"><strong class="text-coral">Question:</strong> What price positions SEEN correctly?</div>
+
+            <h2>6. Hook Strategy</h2>
+            <div class="card">
+                <p><strong>Pain-forward:</strong> "You texted your ex at 2 AM. Again. Here's why you can't stop."</p>
+                <p><strong>Recognition-forward:</strong> "Everyone has a go-to move when life gets hard. What's yours?"</p>
+                <p style="margin-bottom: 0;"><strong>Story-forward:</strong> "I built this because I wish it existed for me."</p>
+            </div>
+            <div class="question-box"><strong class="text-coral">Question:</strong> Which hook style fits the brand and audience?</div>
+
+            <h2>7. Funnel Architecture</h2>
+            <p><strong>Current:</strong> Instagram → Quiz → Results → Pricing → Conversion</p>
+            <p><strong>Proposed:</strong> Hook → Quiz → Teaser → Email capture → Nurture (3-5 emails) → Conversion</p>
+            <div class="question-box"><strong class="text-coral">Question:</strong> Does this flow make sense? What's missing?</div>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+
+        <!-- PAGE 5: Hormozi -->
+        <div class="page" id="page-5">
+            <div class="page-header">
+                <div class="page-eyebrow">Page 5 of 8</div>
+                <h1 class="page-title">Alex Hormozi</h1>
+                <p class="page-subtitle">Volume + iteration. Ship fast.</p>
+            </div>
+
+            <div class="expert-quote">"You're overthinking and under-executing. You're being too nice to your customers by not calling out their pain hard enough. And you're being too nice to yourself by not shipping faster."</div>
+
+            <div class="collapsible open">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">The Value Equation <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Value = (Dream Outcome × Perceived Likelihood) ÷ (Time Delay × Effort)</strong></p>
+                    <ul>
+                        <li><strong>Dream Outcome:</strong> You're selling "pattern awareness." People don't want awareness — they want <strong>control</strong>.</li>
+                        <li><strong>Perceived Likelihood:</strong> No proof. No testimonials. No case studies.</li>
+                        <li><strong>Time Delay:</strong> How long until results? You never say.</li>
+                        <li><strong>Effort:</strong> €7.99/month, few minutes/day — actually good.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">The Naming Problem <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Before:</strong> "SEEN helps you understand your stress-response patterns through daily AI check-ins."</p>
+                    <p><strong>After:</strong> "Stop the behavior that's destroying your life. In 30 days, you'll catch yourself <em>before</em> you reach for the phone, the drink, the credit card. Guaranteed."</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">The Funnel Problem <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Current:</strong> Quiz → Results → Pricing (giving away value before capturing email)</p>
+                    <p><strong>Better:</strong> Quiz → "Want the full breakdown?" → Email capture → Results + pitch → Sequence → Conversion</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">The Guarantee & Pricing <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Add guarantee:</strong> "Try SEEN for 30 days. If you don't catch yourself at least once before acting on the pattern — full refund."</p>
+                    <p><strong>On pricing:</strong> What's the cost of the behavior? Compulsive spending = hundreds/month. And you're charging €7.99?</p>
+                    <p><strong>Low prices signal low value.</strong> Test €19.99 with a guarantee.</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">The Volume Problem <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Rule of 100:</strong></p>
+                    <ul>
+                        <li>100 pieces of content before you strategize</li>
+                        <li>100 quiz completions before you optimize</li>
+                        <li>100 subscribers before you perfect emails</li>
+                        <li>100 paying users before you mess with pricing</li>
+                    </ul>
+                    <p>You're optimizing before you have data. Stop. Ship. Learn.</p>
+                </div>
+            </div>
+
+            <h2>Key Takeaways</h2>
+            <div class="card highlight">
+                <ul style="margin-bottom: 0;">
+                    <li>Reframe from process to result: "break the cycle in 30 days"</li>
+                    <li>Quiz should capture email before full results</li>
+                    <li>Lead with pain, not recognition</li>
+                    <li>Volume over perfection — 100 posts before strategy</li>
+                    <li>Price signals value — €7.99 might be too low</li>
+                    <li>Add a guarantee to remove risk</li>
+                </ul>
+            </div>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+
+        <!-- PAGE 6: Priestley -->
+        <div class="page" id="page-6">
+            <div class="page-header">
+                <div class="page-eyebrow">Page 6 of 8</div>
+                <h1 class="page-title">Daniel Priestley</h1>
+                <p class="page-subtitle">Authority + scarcity. Build demand.</p>
+            </div>
+
+            <div class="expert-quote">"You're not building a mental health app. You're building a movement around a founder who lived the problem."</div>
+
+            <div class="collapsible open">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">You Are The Asset <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>The 5 Ps:</strong></p>
+                    <ul>
+                        <li><strong>Pitch:</strong> "I spent years stuck in a pattern I couldn't see. When it broke me, I got help. I'm building what I wish I'd had."</li>
+                        <li><strong>Publish:</strong> Your story IS your marketing. Tell it everywhere.</li>
+                        <li><strong>Product:</strong> The insight is what makes you valuable, not the features.</li>
+                        <li><strong>Profile:</strong> Be known as "the person who cracked stress patterns."</li>
+                        <li><strong>Partnership:</strong> Therapists, coaches, podcast hosts — they're amplifiers.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">The Oversubscribed Opportunity <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Principle:</strong> Demand must exceed supply before you launch.</p>
+                    <ol>
+                        <li><strong>Build waitlist:</strong> "500 founding members only. Join the list."</li>
+                        <li><strong>Create scarcity:</strong> "When it's full, price doubles." (Not artificial — you can't support unlimited users.)</li>
+                        <li><strong>Launch to demand:</strong> 1,000 on list for 500 spots = oversubscribed.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">The Assets Question <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>What will still be valuable in 5 years?</strong></p>
+                    <ul>
+                        <li>✅ Intellectual Property — The 6-pattern framework</li>
+                        <li>⚠️ Brand — Emerging, needs consistency</li>
+                        <li>❌ Content Library — Limited</li>
+                        <li>❌ Community — Doesn't exist yet</li>
+                        <li>❌ Partnerships — Early stage</li>
+                    </ul>
+                    <p>Where's the book? The podcast? Build assets that generate leads while you sleep.</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">Founder Visibility Spectrum <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <ol>
+                        <li><strong>Anonymous brand</strong> — No one knows who built it</li>
+                        <li><strong>Founder-backed</strong> — "Built by someone who lived it"</li>
+                        <li><strong>Founder-present</strong> — Known to insiders, not public face</li>
+                        <li><strong>Founder-led</strong> — Face on everything</li>
+                    </ol>
+                    <p><strong>Suggestion:</strong> Level 2-3. Story leads, person stays somewhat behind it.</p>
+                </div>
+            </div>
+
+            <h2>Priestley's Core Questions</h2>
+            <div class="card cyan">
+                <ol style="margin-bottom: 0;">
+                    <li>If you could only have 100 perfect users, who would they be?</li>
+                    <li>What would make quiz results so valuable people would pay? Give that away free.</li>
+                    <li>If you couldn't spend on ads, how would you reach 1,000 users?</li>
+                    <li>What assets will still generate leads in 5 years?</li>
+                </ol>
+            </div>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+
+        <!-- PAGE 7: Brunson -->
+        <div class="page" id="page-7">
+            <div class="page-header">
+                <div class="page-eyebrow">Page 7 of 8</div>
+                <h1 class="page-title">Russell Brunson</h1>
+                <p class="page-subtitle">Storytelling + funnels. Belief first.</p>
+            </div>
+
+            <div class="expert-quote">"People don't buy products. They buy access to who they want to become."</div>
+
+            <div class="collapsible open">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">You ARE the Expert. Own It. <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p>You have a legitimate <strong>Epiphany Bridge story</strong>. Every movement needs:</p>
+                    <ol>
+                        <li>A charismatic leader / attractive character</li>
+                        <li>A future-based cause</li>
+                        <li>A new opportunity</li>
+                    </ol>
+                    <p>You have all three. But you're hiding them. <strong>The quiz leads with the pattern. It should lead with YOU.</strong></p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">Improvement vs. New Opportunity <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Improvement offers</strong> are hard to sell — people have tried and failed, they're cynical.</p>
+                    <p>SEEN is positioned as improvement: "Understand your patterns better."</p>
+                    <p><strong>New Opportunity:</strong> "You've tried willpower. You've tried avoiding triggers. None worked because you were solving the wrong problem. Your brain found a survival mechanism. Until you see what it's protecting you from, you'll keep reaching for the same relief. This is different."</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">Hook, Story, Offer <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Hook:</strong> "You text your ex when stressed. Here's why." / "Your brain has a go-to move. You probably hate it."</p>
+                    <p><strong>Story:</strong> Years in denial → Things fell apart → Group therapy, heard "me too" → Behavior wasn't the problem → Built SEEN</p>
+                    <p><strong>Offer:</strong> Not "pattern awareness." The offer: <strong>See the pattern running your life — finally understand why.</strong></p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">The Epiphany Bridge Script <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p>8 elements for every story:</p>
+                    <ol>
+                        <li><strong>Backstory:</strong> Where were you before?</li>
+                        <li><strong>Desires:</strong> What did you want?</li>
+                        <li><strong>The Wall:</strong> What wasn't working?</li>
+                        <li><strong>The Epiphany:</strong> The moment everything changed</li>
+                        <li><strong>The Plan:</strong> What did you do differently?</li>
+                        <li><strong>The Conflict:</strong> What made it hard?</li>
+                        <li><strong>The Achievement:</strong> What results?</li>
+                        <li><strong>The Transformation:</strong> Who did you become?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header" onclick="this.parentElement.classList.toggle('open')">Value Ladder & Email Sequences <span class="collapsible-icon">▼</span></button>
+                <div class="collapsible-content">
+                    <p><strong>Current:</strong> Free quiz + 3 emails → €7.99/mo (not a ladder, a single step)</p>
+                    <p><strong>Build out:</strong></p>
+                    <ul>
+                        <li>Level 1 (Free): Quiz, story, 5-7 day sequence, sample check-in</li>
+                        <li>Level 2 (€7.99/mo): Daily check-ins, tracking, weekly insights</li>
+                        <li>Level 3 (€19-29/mo): Deep dive, founder access</li>
+                        <li>Level 4 (€297+): Group cohort, live calls, 12-week program</li>
+                    </ul>
+                    <p><strong>Soap Opera Sequence:</strong> Day 1 backstory → Day 2 drama → Day 3 epiphany → Day 4 transformation → Day 5 offer</p>
+                </div>
+            </div>
+
+            <h2>Key Takeaways</h2>
+            <div class="card highlight">
+                <ul style="margin-bottom: 0;">
+                    <li>Rewrite landing page to lead with YOUR story</li>
+                    <li>Position as New Opportunity, not improvement</li>
+                    <li>Hook → Story → Offer in everything</li>
+                    <li>Build a Value Ladder (know where €7.99 leads)</li>
+                    <li>5-day Soap Opera email sequence before asking for money</li>
+                    <li>Get proof with specific timelines</li>
+                </ul>
+            </div>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+
+        <!-- PAGE 8: Summary -->
+        <div class="page" id="page-8">
+            <div class="page-header">
+                <div class="page-eyebrow">Page 8 of 8</div>
+                <h1 class="page-title">What I Need From You</h1>
+                <p class="page-subtitle">The asks and next steps</p>
+            </div>
+
+            <h2>Framework Comparison</h2>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr><th>Dimension</th><th>Hormozi</th><th>Priestley</th><th>Brunson</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="font-weight: 600;">Primary driver</td><td>Volume + iteration</td><td>Authority + scarcity</td><td>Storytelling + funnels</td></tr>
+                        <tr><td style="font-weight: 600;">Launch</td><td>Ship fast, learn</td><td>Build waitlist</td><td>Perfect story first</td></tr>
+                        <tr><td style="font-weight: 600;">Content</td><td>100 posts before strategy</td><td>Assets that compound</td><td>Soap Opera sequences</td></tr>
+                        <tr><td style="font-weight: 600;">Pricing</td><td>Charge more</td><td>Create scarcity</td><td>Value Ladder</td></tr>
+                        <tr><td style="font-weight: 600;">Acquisition</td><td>Paid ads + volume</td><td>Let demand find you</td><td>Hook → Story → Offer</td></tr>
+                        <tr><td style="font-weight: 600;">Founder role</td><td>Use for proof</td><td>IS the brand</td><td>Attractive Character</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>What I'm Looking For</h2>
+            <div class="card highlight">
+                <p><strong>Martijn</strong> — your perspective on any/all of:</p>
+                <ol>
+                    <li><strong>Positioning:</strong> Is "pre-therapy pattern awareness" the right frame?</li>
+                    <li><strong>Audience:</strong> One segment or multiple? Which pattern to lead with?</li>
+                    <li><strong>Founder role:</strong> How to get authenticity without full visibility?</li>
+                    <li><strong>Launch strategy:</strong> Given constraints, what's the smart play?</li>
+                    <li><strong>Blind spots:</strong> What am I missing?</li>
+                </ol>
+            </div>
+
+            <h2>Quick Reference: 7 Questions</h2>
+            <div class="card">
+                <ol style="margin-bottom: 0;">
+                    <li><strong>Audience:</strong> Broad vs. pattern-specific</li>
+                    <li><strong>Transformation:</strong> One sentence that sells it</li>
+                    <li><strong>Founder visibility:</strong> Strategic value vs. personal limits</li>
+                    <li><strong>Launch:</strong> Ship fast vs. build demand</li>
+                    <li><strong>Pricing:</strong> €7.99 accessibility vs. value signal</li>
+                    <li><strong>Hooks:</strong> Pain vs. recognition vs. story</li>
+                    <li><strong>Funnel:</strong> Where to capture email, how to nurture</li>
+                </ol>
+            </div>
+
+            <div class="card" style="margin-top: 48px; text-align: center; background: var(--dark); color: var(--cream);">
+                <p style="margin-bottom: 8px; font-size: 18px;"><strong>Thanks for taking the time.</strong></p>
+                <p style="margin-bottom: 0; opacity: 0.8;">Looking forward to your thoughts — Bas</p>
+            </div>
+
+            <div class="watermark-footer">
+                <div>CONFIDENTIAL DOCUMENT</div>
+                <div>Prepared for <strong>Martijn Ros</strong> · January 2025</div>
+                <div style="margin-top: 4px; opacity: 0.6;">Unauthorized distribution prohibited</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <button class="nav-button prev" id="prev-btn" onclick="prevPage()">← Previous</button>
+            <span class="page-indicator" id="page-indicator">Home</span>
+            <button class="nav-button next" id="next-btn" onclick="nextPage()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 9;
+        const pageNames = ['Home', 'Page 1 of 8', 'Page 2 of 8', 'Page 3 of 8', 'Page 4 of 8', 'Page 5 of 8', 'Page 6 of 8', 'Page 7 of 8', 'Page 8 of 8'];
+
+        function goToPage(pageNum) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageNum).classList.add('active');
+            currentPage = pageNum;
+            updateNav();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages - 1) {
+                goToPage(currentPage + 1);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                goToPage(currentPage - 1);
+            }
+        }
+
+        function updateNav() {
+            document.getElementById('page-indicator').textContent = pageNames[currentPage];
+            document.getElementById('prev-btn').disabled = currentPage === 0;
+            document.getElementById('next-btn').disabled = currentPage === totalPages - 1;
+            
+            // Update header nav active state
+            document.querySelectorAll('.header-nav button').forEach(btn => btn.classList.remove('active'));
+            const activeNavBtn = document.getElementById('nav-' + currentPage);
+            if (activeNavBtn) activeNavBtn.classList.add('active');
+        }
+
+        // Track page view
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref') || 'direct';
+        console.log('[Analytics] Brief opened by ref:', ref);
+    </script>
+</body>
+</html>
