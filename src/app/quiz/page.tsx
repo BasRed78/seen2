@@ -477,6 +477,7 @@ export default function StressPatternQuiz() {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showSources, setShowSources] = useState(false);
   const [animKey, setAnimKey] = useState(0);
+  const [inTherapy, setInTherapy] = useState<boolean | null>(null);
 
   // Reset animation key on stage/step change
   useEffect(() => {
@@ -1404,8 +1405,88 @@ export default function StressPatternQuiz() {
       );
     }
 
-    // Step 6: Sign Up
+    // Step 6: Therapy Question
     if (resultsStep === 6) {
+      return (
+        <div className="min-h-screen p-6 py-12" style={{ backgroundColor: ds.bg }}>
+          <div className="max-w-2xl mx-auto">
+            <Reveal animKey={animKey} delay={0}>
+              <div className="text-center mb-10">
+                <h1 style={{ color: ds.cream, fontSize: '1.75rem', fontWeight: 700 }}>
+                  One more thing
+                </h1>
+              </div>
+            </Reveal>
+
+            <Reveal animKey={animKey} delay={150}>
+              <div className="rounded-2xl p-8" style={{ backgroundColor: ds.surface }}>
+                <p style={{ color: ds.cream, fontSize: '1.1rem', fontWeight: 600, marginBottom: 8 }}>
+                  Are you currently seeing a therapist or counsellor?
+                </p>
+                <p style={{ color: ds.muted, fontSize: '0.9rem', marginBottom: 24 }}>
+                  This helps us tailor your experience. There are no wrong answers.
+                </p>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                      setInTherapy(true);
+                      localStorage.setItem('seen_quiz_in_therapy', 'true');
+                      setResultsStep(7);
+                    }}
+                    className="w-full py-4 rounded-xl font-semibold text-left px-5 transition-all hover:scale-[1.02]"
+                    style={{
+                      backgroundColor: inTherapy === true ? `${ds.cyan}20` : ds.bg,
+                      color: ds.cream,
+                      border: `1px solid ${inTherapy === true ? ds.cyan : 'rgba(255,255,255,0.08)'}`,
+                    }}
+                  >
+                    <span style={{ fontSize: '1rem' }}>Yes, I am</span>
+                    <p style={{ color: ds.muted, fontSize: '0.8rem', marginTop: 4 }}>
+                      We will activate practice mode — tools to support your work between sessions
+                    </p>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setInTherapy(false);
+                      localStorage.setItem('seen_quiz_in_therapy', 'false');
+                      setResultsStep(7);
+                    }}
+                    className="w-full py-4 rounded-xl font-semibold text-left px-5 transition-all hover:scale-[1.02]"
+                    style={{
+                      backgroundColor: inTherapy === false ? `${ds.coral}20` : ds.bg,
+                      color: ds.cream,
+                      border: `1px solid ${inTherapy === false ? ds.coral : 'rgba(255,255,255,0.08)'}`,
+                    }}
+                  >
+                    <span style={{ fontSize: '1rem' }}>No, not right now</span>
+                    <p style={{ color: ds.muted, fontSize: '0.8rem', marginTop: 4 }}>
+                      No problem — you can always change this later in Settings
+                    </p>
+                  </button>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal animKey={animKey} delay={300}>
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={() => setResultsStep(5)}
+                  className="px-6 py-3 rounded-xl font-semibold transition-all"
+                  style={{ backgroundColor: ds.subtle, color: ds.cream }}
+                >
+                  <ArrowLeft size={20} />
+                </button>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      );
+    }
+
+    // Step 7: Sign Up
+    if (resultsStep === 7) {
       return (
         <div className="min-h-screen p-6 py-12" style={{ backgroundColor: ds.bg }}>
           <div className="max-w-2xl mx-auto">
@@ -1521,7 +1602,7 @@ export default function StressPatternQuiz() {
             <Reveal animKey={animKey} delay={300}>
               <div className="flex justify-center mt-8">
                 <button
-                  onClick={() => setResultsStep(5)}
+                  onClick={() => setResultsStep(6)}
                   className="px-6 py-3 rounded-xl font-semibold transition-all"
                   style={{ backgroundColor: ds.subtle, color: ds.cream }}
                 >
