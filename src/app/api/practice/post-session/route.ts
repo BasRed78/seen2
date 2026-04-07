@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, emotionalState, themeId, reflectionText, intentionText, targetDate } =
+    const { userId, emotionalState, themeIds, reflectionText, intentionText, targetDate } =
       await request.json()
 
     if (!userId) {
@@ -24,13 +24,19 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServerClient()
 
+    // Store the first selected theme in the FK column (DB supports single theme)
+    // All selected theme IDs are preserved in the practice_intentions link
+    const primaryThemeId = Array.isArray(themeIds) && themeIds.length > 0
+      ? themeIds[0]
+      : null
+
     // Create the post-session checkin
     const { data: checkin, error: checkinError } = await supabase
       .from('post_session_checkins')
       .insert({
         user_id: userId,
         emotional_state: emotionalState,
-        selected_theme_id: themeId || null,
+        selected_theme_id: primaryThemeId,
         reflection_text: reflectionText || null,
         practice_intention: intentionText || null,
         scheduled_practice_at: targetDate || null,
@@ -46,7 +52,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // If intention was provided, also create a practice_intentions row for tracking
+    // If intention was provided, create a practice_intentions row for tracking
     if (intentionText) {
       const { error: intentionError } = await supabase
         .from('practice_intentions')
@@ -54,7 +60,7 @@ export async function POST(request: NextRequest) {
           user_id: userId,
           post_session_checkin_id: checkin.id,
           intention_text: intentionText,
-          theme_id: themeId || null,
+          theme_id: primaryThemeId,
           target_date: targetDate || null,
           status: 'active',
         })
