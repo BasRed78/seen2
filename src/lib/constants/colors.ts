@@ -7,8 +7,8 @@ export const colors = {
   darkCardHover: '#252542',
   cream: '#faf8f5',
   creamMuted: 'rgba(250, 248, 245, 0.6)',
-  cyan: '#5B8F8F',
-  cyanLight: '#7ab5b5',
+  cyan: '#4ECDC4',
+  cyanLight: '#7EDED6',
   gold: '#FFD93D',
 }
 

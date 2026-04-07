@@ -23,8 +23,8 @@ const colors = {
   darkLight: '#252542',
   cream: '#faf8f5',
   lightCream: '#F5F0E8',
-  cyan: '#5B8F8F',
-  cyanLight: '#7ab5b5',
+  cyan: '#4ECDC4',
+  cyanLight: '#7EDED6',
   muted: 'rgba(250,248,245,0.4)',
   subtle: 'rgba(250,248,245,0.12)',
 };

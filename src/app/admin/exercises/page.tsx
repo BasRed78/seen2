@@ -371,9 +371,9 @@ export default function AdminExercisesPage() {
                     onClick={() => togglePattern(p)}
                     className="px-3 py-1 rounded-full text-xs transition-all"
                     style={{
-                      backgroundColor: (editingExercise.pattern_relevance || []).includes(p) ? '#5B8F8F30' : 'rgba(255,255,255,0.05)',
-                      color: (editingExercise.pattern_relevance || []).includes(p) ? '#5B8F8F' : 'rgba(250,248,245,0.5)',
-                      border: `1px solid ${(editingExercise.pattern_relevance || []).includes(p) ? '#5B8F8F50' : 'rgba(255,255,255,0.08)'}`,
+                      backgroundColor: (editingExercise.pattern_relevance || []).includes(p) ? '#4ECDC430' : 'rgba(255,255,255,0.05)',
+                      color: (editingExercise.pattern_relevance || []).includes(p) ? '#4ECDC4' : 'rgba(250,248,245,0.5)',
+                      border: `1px solid ${(editingExercise.pattern_relevance || []).includes(p) ? '#4ECDC450' : 'rgba(255,255,255,0.08)'}`,
                     }}
                   >
                     {p.replace('_', ' ')}
@@ -443,7 +443,7 @@ export default function AdminExercisesPage() {
               </div>
               <button
                 onClick={addStep}
-                className="mt-2 flex items-center gap-1 text-xs text-[#5B8F8F] hover:text-[#7ab5b5] transition-all"
+                className="mt-2 flex items-center gap-1 text-xs text-[#4ECDC4] hover:text-[#7EDED6] transition-all"
               >
                 <Plus size={14} /> Add step
               </button>
@@ -533,7 +533,7 @@ export default function AdminExercisesPage() {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {ex.is_onboarding && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#5B8F8F]/20 text-[#5B8F8F]">Onboarding</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#4ECDC4]/20 text-[#4ECDC4]">Onboarding</span>
                   )}
                   <span className="text-xs text-[#faf8f5]/30">#{ex.display_order}</span>
                   {isExpanded ? <ChevronUp size={16} className="text-[#faf8f5]/40" /> : <ChevronDown size={16} className="text-[#faf8f5]/40" />}

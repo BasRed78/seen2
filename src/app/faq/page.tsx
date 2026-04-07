@@ -14,7 +14,7 @@ const colors = {
   dark: '#1a1a2e',
   darkLight: '#252540',
   coral: '#C25441',
-  cyan: '#5B8F8F',
+  cyan: '#4ECDC4',
   cream: '#FAF8F5',
 };
 

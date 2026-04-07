@@ -11,7 +11,7 @@ const colors = {
   darkCard: '#1a1a2e',
   cream: '#faf8f5',
   creamMuted: 'rgba(250, 248, 245, 0.6)',
-  cyan: '#5B8F8F',
+  cyan: '#4ECDC4',
 }
 
 const StarIcon = ({ size = 24, style = {} }: { size?: number; style?: React.CSSProperties }) => (

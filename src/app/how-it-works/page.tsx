@@ -11,7 +11,7 @@ const colors = {
   darkLight: '#252542',
   coral: '#ff6b5b',
   coralDark: '#e85a4f',
-  cyan: '#5B8F8F',
+  cyan: '#4ECDC4',
   cream: '#faf8f5',
   muted: 'rgba(250,248,245,0.4)',
 };
