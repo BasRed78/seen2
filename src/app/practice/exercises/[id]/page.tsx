@@ -4,10 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Heart,
-  BarChart3,
-  Home,
-  MessageCircle,
   ArrowLeft,
   Clock,
   ChevronRight,
@@ -15,23 +11,8 @@ import {
   Check,
   Star,
 } from 'lucide-react'
-
-const colors = {
-  coral: '#ff6b5b',
-  dark: '#0f0f1a',
-  darkCard: '#1a1a2e',
-  darkCardHover: '#252542',
-  cream: '#faf8f5',
-  creamMuted: 'rgba(250, 248, 245, 0.6)',
-  cyan: '#5B8F8F',
-  cyanLight: '#7ab5b5',
-}
-
-const StarIcon = ({ size = 24, style = {} }: { size?: number; style?: React.CSSProperties }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={style}>
-    <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" />
-  </svg>
-)
+import { colors } from '@/lib/constants/colors'
+import { StarIcon } from '@/components/StarIcon'
 
 interface User {
   id: string
