@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, ChevronRight, Check, Calendar } from 'lucide-react'
 import { colors } from '@/lib/constants/colors'
 import { StarIcon } from '@/components/StarIcon'
+import { VoiceMicButton } from '@/components/VoiceMicButton'
+import useVoiceInput from '@/hooks/useVoiceInput'
 
 interface Theme {
   id: string
@@ -31,6 +33,16 @@ export default function PostSessionPage() {
   const [intentionText, setIntentionText] = useState('')
   const [targetDate, setTargetDate] = useState('')
   const [themesLoading, setThemesLoading] = useState(false)
+
+  // Voice input for reflection textarea
+  const reflectionVoice = useVoiceInput({
+    onTranscript: (text) => setReflectionText(text),
+  })
+
+  // Voice input for intention textarea
+  const intentionVoice = useVoiceInput({
+    onTranscript: (text) => setIntentionText(text),
+  })
 
   // Auth & phase gate
   useEffect(() => {
@@ -283,18 +295,33 @@ export default function PostSessionPage() {
               )}
 
               {/* Reflection textarea */}
-              <p className="text-sm mb-3" style={{ color: colors.creamMuted }}>
-                Capture any thoughts, insights, or ideas
-              </p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm" style={{ color: colors.creamMuted }}>
+                  Capture any thoughts, insights, or ideas
+                </p>
+                {reflectionVoice.supported && (
+                  <VoiceMicButton
+                    listening={reflectionVoice.listening}
+                    onToggle={() => {
+                      if (reflectionVoice.listening) {
+                        reflectionVoice.stop()
+                      } else {
+                        reflectionVoice.setPrefix(reflectionText)
+                        reflectionVoice.start()
+                      }
+                    }}
+                  />
+                )}
+              </div>
               <textarea
                 value={reflectionText}
                 onChange={(e) => setReflectionText(e.target.value)}
-                placeholder="Write freely — this is just for you..."
+                placeholder={reflectionVoice.listening ? 'Listening...' : 'Write or speak freely — this is just for you...'}
                 rows={5}
                 className="w-full px-4 py-4 rounded-xl text-sm leading-relaxed resize-none focus:outline-none transition-all"
                 style={{
                   backgroundColor: colors.darkCard,
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  border: `1px solid ${reflectionVoice.listening ? colors.cyan + '40' : 'rgba(255,255,255,0.08)'}`,
                   color: colors.cream,
                 }}
               />
@@ -307,19 +334,34 @@ export default function PostSessionPage() {
               <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
                 Set a practice intention
               </p>
-              <p className="text-sm mb-6" style={{ color: colors.creamMuted }}>
-                Is there something you'd like to practice before your next session?
-              </p>
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-sm" style={{ color: colors.creamMuted }}>
+                  Is there something you'd like to practice before your next session?
+                </p>
+                {intentionVoice.supported && (
+                  <VoiceMicButton
+                    listening={intentionVoice.listening}
+                    onToggle={() => {
+                      if (intentionVoice.listening) {
+                        intentionVoice.stop()
+                      } else {
+                        intentionVoice.setPrefix(intentionText)
+                        intentionVoice.start()
+                      }
+                    }}
+                  />
+                )}
+              </div>
 
               <textarea
                 value={intentionText}
                 onChange={(e) => setIntentionText(e.target.value)}
-                placeholder="e.g. Notice when I start avoiding difficult conversations..."
+                placeholder={intentionVoice.listening ? 'Listening...' : 'e.g. Notice when I start avoiding difficult conversations...'}
                 rows={3}
                 className="w-full px-4 py-4 rounded-xl text-sm leading-relaxed resize-none focus:outline-none transition-all mb-4"
                 style={{
                   backgroundColor: colors.darkCard,
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  border: `1px solid ${intentionVoice.listening ? colors.cyan + '40' : 'rgba(255,255,255,0.08)'}`,
                   color: colors.cream,
                 }}
                 autoFocus

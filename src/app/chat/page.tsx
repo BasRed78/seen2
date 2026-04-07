@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { Mic } from 'lucide-react'
+import useVoiceInput from '@/hooks/useVoiceInput'
 
 // Star icon component
 const StarIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
@@ -34,6 +36,11 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const hasStartedRef = useRef(false) // Prevent double-start in StrictMode
   const router = useRouter()
+
+  const voice = useVoiceInput({
+    onTranscript: (text) => setInput(text),
+    onEnd: () => {},
+  })
 
   // Load user from localStorage
   useEffect(() => {
@@ -91,6 +98,8 @@ export default function ChatPage() {
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || loading || !user || isComplete) return
+    if (voice.listening) voice.stop()
+    voice.setPrefix('')
 
     const userMessage = input.trim()
     setInput('')
@@ -220,20 +229,45 @@ export default function ChatPage() {
             </button>
           </div>
         ) : (
-          <form onSubmit={sendMessage} className="flex gap-3">
+          <form onSubmit={sendMessage} className="flex gap-2 items-center">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your response..."
+              placeholder={voice.listening ? 'Listening...' : 'Type your response...'}
               className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-cream placeholder:text-cream/30 focus:outline-none focus:border-coral/50 transition-colors"
+              style={{
+                borderColor: voice.listening ? '#4ECDC440' : undefined,
+              }}
               disabled={loading}
               autoFocus
             />
+            {voice.supported && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (voice.listening) {
+                    voice.stop()
+                  } else {
+                    voice.setPrefix(input)
+                    voice.start()
+                  }
+                }}
+                className="p-3 rounded-xl transition-all flex-shrink-0"
+                style={{
+                  backgroundColor: voice.listening ? '#4ECDC430' : 'rgba(255,255,255,0.05)',
+                  color: voice.listening ? '#4ECDC4' : 'rgba(250,248,245,0.4)',
+                  animation: voice.listening ? 'pulse 1.5s ease-in-out infinite' : 'none',
+                }}
+                title={voice.listening ? 'Stop listening' : 'Voice input'}
+              >
+                <Mic size={18} />
+              </button>
+            )}
             <button
               type="submit"
               disabled={!input.trim() || loading}
-              className="px-6 py-3 rounded-xl bg-coral text-cream font-medium hover:bg-coral-light disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="px-6 py-3 rounded-xl bg-coral text-cream font-medium hover:bg-coral-light disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
             >
               Send
             </button>
