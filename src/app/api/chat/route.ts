@@ -137,6 +137,64 @@ export async function POST(request: NextRequest) {
       daysSinceLastCheckin = Math.floor((today.getTime() - lastCheckinDate.getTime()) / (1000 * 60 * 60 * 24))
     }
 
+    // Fetch Phase 2 context if user is in practice phase
+    let recentExercises: Array<{ name: string; completed_at: string; reflection?: string | null }> = []
+    let activeIntentions: Array<{ text: string; status: string; created_at: string }> = []
+    let recentPostSessionReflections: Array<{ date: string; emotional_before: string | null; emotional_after: string | null; reflection: string | null; themes: string[] | null }> = []
+
+    if (user.current_phase === 'phase2') {
+      // Fetch recent exercise completions
+      const { data: exerciseData } = await supabase
+        .from('exercise_completions')
+        .select('completed_at, reflection, exercise:exercises(name)')
+        .eq('user_id', userId)
+        .order('completed_at', { ascending: false })
+        .limit(5)
+
+      if (exerciseData) {
+        recentExercises = exerciseData.map((e: Record<string, unknown>) => ({
+          name: (e.exercise as Record<string, string>)?.name || 'Unknown exercise',
+          completed_at: new Date(e.completed_at as string).toLocaleDateString(),
+          reflection: e.reflection as string | null,
+        }))
+      }
+
+      // Fetch active practice intentions
+      const { data: intentionData } = await supabase
+        .from('practice_intentions')
+        .select('intention_text, status, created_at')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+      if (intentionData) {
+        activeIntentions = intentionData.map((i: Record<string, unknown>) => ({
+          text: i.intention_text as string,
+          status: i.status as string,
+          created_at: new Date(i.created_at as string).toLocaleDateString(),
+        }))
+      }
+
+      // Fetch recent post-session reflections
+      const { data: postSessionData } = await supabase
+        .from('post_session_checkins')
+        .select('created_at, emotional_state_before, emotional_state_after, reflection, themes')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(3)
+
+      if (postSessionData) {
+        recentPostSessionReflections = postSessionData.map((p: Record<string, unknown>) => ({
+          date: new Date(p.created_at as string).toLocaleDateString(),
+          emotional_before: p.emotional_state_before as string | null,
+          emotional_after: p.emotional_state_after as string | null,
+          reflection: p.reflection as string | null,
+          themes: p.themes as string[] | null,
+        }))
+      }
+    }
+
     // Build system prompt with user context
     const systemPrompt = buildSystemPrompt({
       name: user.name,
@@ -153,6 +211,11 @@ export async function POST(request: NextRequest) {
       })),
       lastBehaviorDate: null, // TODO: track this
       daysSinceLastCheckin,
+      currentPhase: user.current_phase || 'phase1',
+      inTherapy: user.in_therapy || false,
+      recentExercises,
+      activeIntentions,
+      recentPostSessionReflections,
     })
 
     // Build conversation history for Claude
@@ -179,9 +242,12 @@ export async function POST(request: NextRequest) {
       })
     } else {
       // For starting, we add a system-level instruction
+      const isPhase2 = user.current_phase === 'phase2'
       conversationHistory.push({
         role: 'user',
-        content: 'Please start the daily check-in with a warm greeting and ask how I\'m feeling today.',
+        content: isPhase2
+          ? 'Please start the daily check-in with a warm greeting. You can ask how I\'m doing, how therapy is going, or reference any recent exercises or intentions if relevant.'
+          : 'Please start the daily check-in with a warm greeting and ask how I\'m feeling today.',
       })
     }
 
@@ -429,7 +495,20 @@ Write the closing now:`
 
       // Generate and save insights from this conversation
       try {
-        const insightPrompt = `You are a note-taker. Analyze the following check-in conversation and extract KEY LEARNINGS about the user's stress-response pattern.
+        const isPhase2User = user.current_phase === 'phase2'
+        const insightPrompt = isPhase2User
+          ? `You are a note-taker. Analyze the following check-in conversation and extract KEY LEARNINGS about this Practice phase user.
+
+Write 2-3 factual sentences (plain text, no markdown/formatting) summarizing what was learned about:
+- How their therapy work is connecting to daily life
+- Progress on exercises or intentions
+- Emotional patterns or shifts they're noticing
+- Their triggers and coping strategies
+
+Only include things actually discussed. Be concise and specific. Do not use bullet points or bold text.
+
+Example: "User reflected on boundary-setting exercise from therapy, finding it difficult at work. Noticed a pattern of people-pleasing under stress. Feeling more aware but not yet acting differently."`
+          : `You are a note-taker. Analyze the following check-in conversation and extract KEY LEARNINGS about the user's stress-response pattern.
 
 Write 2-3 factual sentences (plain text, no markdown/formatting) summarizing what was learned about:
 - Their triggers (what causes the behavior)
