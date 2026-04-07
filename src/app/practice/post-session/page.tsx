@@ -116,6 +116,7 @@ export default function PostSessionPage() {
   }
 
   const handleNext = () => {
+    if (!canProceed()) return
     if (step < TOTAL_STEPS) {
       setStep(step + 1)
       scrollToTop()
@@ -476,12 +477,12 @@ export default function PostSessionPage() {
           {step < 5 ? (
             <button
               onClick={handleNext}
-              disabled={!canProceed()}
               className="w-full py-4 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-2"
               style={{
                 backgroundColor: canProceed() ? colors.coral : colors.darkCard,
                 color: canProceed() ? colors.cream : colors.creamMuted,
                 opacity: canProceed() ? 1 : 0.5,
+                cursor: canProceed() ? 'pointer' : 'default',
               }}
             >
               {step === 4 && intentionText.trim() ? 'Next' : step === 4 ? 'Skip' : 'Next'}
