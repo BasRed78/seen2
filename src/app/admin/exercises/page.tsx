@@ -234,7 +234,7 @@ export default function AdminExercisesPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen p-6 max-w-4xl mx-auto">
+      <main className="min-h-screen p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#0f0f1a' }}>
         <p className="text-[#faf8f5]/60">Loading exercises...</p>
       </main>
     )
@@ -243,7 +243,7 @@ export default function AdminExercisesPage() {
   // ========== EDIT / NEW FORM ==========
   if (editingExercise) {
     return (
-      <main className="min-h-screen p-6 max-w-4xl mx-auto">
+      <main className="min-h-screen p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#0f0f1a' }}>
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-[#faf8f5]">
             {isNew ? 'New Exercise' : `Edit: ${(editingExercise as Exercise).title || ''}`}

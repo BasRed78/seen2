@@ -135,7 +135,7 @@ export default function ChatPage() {
 
   if (initializing) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0f0f1a' }}>
         <div className="text-center">
           <StarIcon size={40} className="text-coral animate-pulse mx-auto mb-4" />
           <p className="text-cream/60">Starting your check-in...</p>
@@ -145,7 +145,7 @@ export default function ChatPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col max-w-2xl mx-auto">
+    <main className="min-h-screen flex flex-col max-w-2xl mx-auto" style={{ backgroundColor: '#0f0f1a' }}>
       {/* Header */}
       <header className="flex items-center justify-between p-4 border-b border-white/10">
         <div className="flex items-center gap-3">

@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function StoryPage() {
   return (
-    <div className="min-h-screen p-6 py-12" style={{ backgroundColor: '#1a1a2e' }}>
+    <div className="min-h-screen p-6 py-12" style={{ backgroundColor: '#0f0f1a' }}>
       <div className="max-w-2xl mx-auto">
         {/* Back button */}
         <Link
@@ -63,7 +63,7 @@ export default function StoryPage() {
 
             <p 
               className="text-lg leading-relaxed font-medium"
-              style={{ color: '#C25441' }}
+              style={{ color: '#ff6b5b' }}
             >
               A place to finally see yourself clearly — so you can change before your patterns cost you what matters most.
             </p>
@@ -81,7 +81,7 @@ export default function StoryPage() {
               href="/quiz"
               className="w-full font-bold py-4 px-8 rounded-xl transition-all text-lg shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
               style={{ 
-                backgroundColor: '#C25441', 
+                backgroundColor: '#ff6b5b', 
                 color: '#FAF8F5' 
               }}
             >
@@ -96,7 +96,7 @@ export default function StoryPage() {
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <svg width={18} height={18} viewBox="0 0 24 24" fill="#C25441">
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="#ff6b5b">
                 <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" />
               </svg>
               <span className="font-bold" style={{ color: '#FAF8F5' }}>Seen</span>

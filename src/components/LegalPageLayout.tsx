@@ -15,7 +15,7 @@ interface LegalPageLayoutProps {
 
 export default function LegalPageLayout({ title, lastUpdated, children }: LegalPageLayoutProps) {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#1a1a2e' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#0f0f1a' }}>
       {/* Header */}
       <header className="border-b" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
         <div className="max-w-4xl mx-auto px-6 py-6 flex items-center justify-between">
@@ -54,7 +54,7 @@ export default function LegalPageLayout({ title, lastUpdated, children }: LegalP
           style={{ 
             '--tw-prose-body': 'rgba(250, 248, 245, 0.8)',
             '--tw-prose-headings': '#FAF8F5',
-            '--tw-prose-links': '#C25441',
+            '--tw-prose-links': '#ff6b5b',
             '--tw-prose-bold': '#FAF8F5',
             '--tw-prose-bullets': 'rgba(250, 248, 245, 0.4)',
             '--tw-prose-counters': 'rgba(250, 248, 245, 0.4)',

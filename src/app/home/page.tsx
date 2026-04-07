@@ -17,11 +17,12 @@ import {
 } from 'lucide-react'
 
 const colors = {
-  coral: '#FF6B5B',
-  dark: '#1a1a2e',
-  darkLight: '#252540',
-  cream: '#FAF8F5',
-  cyan: '#4ECDC4',
+  coral: '#ff6b5b',
+  dark: '#0f0f1a',
+  darkCard: '#1a1a2e',
+  darkLight: '#252542',
+  cream: '#faf8f5',
+  cyan: '#5B8F8F',
   gold: '#FFD93D',
 }
 
@@ -212,7 +213,7 @@ export default function HomePage() {
               <Link
                 href="/chat"
                 className="w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
-                style={{ backgroundColor: colors.dark, color: colors.cream }}
+                style={{ backgroundColor: colors.darkCard, color: colors.cream }}
               >
                 Start Check-in <ArrowRight size={18} />
               </Link>
@@ -268,7 +269,7 @@ export default function HomePage() {
                   <div 
                     className="h-10 rounded-lg flex items-center justify-center"
                     style={{ 
-                      backgroundColor: day.checkedIn ? colors.darkLight : colors.dark,
+                      backgroundColor: day.checkedIn ? colors.darkLight : colors.darkCard,
                       border: day.checkedIn ? `1px solid ${colors.cyan}30` : '1px solid transparent',
                     }}
                   >
