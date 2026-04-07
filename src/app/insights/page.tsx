@@ -111,6 +111,7 @@ export default function InsightsPage() {
   const [aggregation, setAggregation] = useState<Aggregation | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isPhase2, setIsPhase2] = useState(false)
   const [expandedSections, setExpandedSections] = useState({
     reflection: true,
     emotions: false,
@@ -130,6 +131,7 @@ export default function InsightsPage() {
         
         const user = JSON.parse(userStr)
         const userId = user.id
+        setIsPhase2((user.current_phase || 'phase1') === 'phase2')
 
         // Fetch insights via API route
         const response = await fetch(`/api/insights?userId=${userId}`)
@@ -686,6 +688,12 @@ export default function InsightsPage() {
             <MessageCircle size={22} style={{ color: colors.creamMuted }} />
             <span className="text-xs" style={{ color: colors.creamMuted }}>Check-in</span>
           </Link>
+          {isPhase2 && (
+            <Link href="/practice" className="flex flex-col items-center gap-1 py-2 px-4">
+              <Heart size={22} style={{ color: colors.creamMuted }} />
+              <span className="text-xs" style={{ color: colors.creamMuted }}>Practice</span>
+            </Link>
+          )}
           <Link href="/insights" className="flex flex-col items-center gap-1 py-2 px-4">
             <BarChart3 size={22} style={{ color: colors.coral }} />
             <span className="text-xs" style={{ color: colors.coral }}>Insights</span>

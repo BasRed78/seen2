@@ -41,8 +41,8 @@ export default function Login() {
       // Store user in localStorage (simple auth for MVP)
       localStorage.setItem('seen_user', JSON.stringify(data.user))
       
-      // Redirect to home
-      router.push('/home')
+      // Redirect to onboarding (skips automatically if already completed)
+      router.push('/onboarding')
     } catch (err) {
       setError('Something went wrong. Please try again.')
       setLoading(false)
