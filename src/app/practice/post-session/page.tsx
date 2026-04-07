@@ -29,19 +29,7 @@ interface Theme {
   display_order: number
 }
 
-const REFLECTION_PROMPTS: Record<string, string> = {
-  'Awareness & pattern logging': 'What patterns did you notice in yourself today?',
-  'Mindfulness & grounding': 'What came up for you today that you\'d like to stay present with?',
-  'Defusion & acceptance': 'What difficult thought or feeling are you willing to make space for?',
-  'Values & direction': 'What value felt most alive for you today, or most distant?',
-  'Emotion regulation': 'What emotion felt strongest today, and how did you relate to it?',
-  'Behavioral experiments': 'What assumption or habitual response came up that you could test differently?',
-  'Reflection & journaling': 'What stood out to you most from today\'s session?',
-  'Self-assessment & mapping': 'Where do you feel you are right now compared to where you want to be?',
-}
-const DEFAULT_PROMPT = 'What stood out to you most from today\'s session?'
-
-const TOTAL_STEPS = 5
+const TOTAL_STEPS = 4
 
 export default function PostSessionPage() {
   const [user, setUser] = useState<{ id: string; name: string; current_phase?: string } | null>(null)
@@ -54,7 +42,7 @@ export default function PostSessionPage() {
   // Form state
   const [emotionalState, setEmotionalState] = useState<number | null>(null)
   const [themes, setThemes] = useState<Theme[]>([])
-  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null)
+  const [selectedThemeIds, setSelectedThemeIds] = useState<string[]>([])
   const [reflectionText, setReflectionText] = useState('')
   const [intentionText, setIntentionText] = useState('')
   const [targetDate, setTargetDate] = useState('')
@@ -76,7 +64,7 @@ export default function PostSessionPage() {
     setLoading(false)
   }, [router])
 
-  // Pre-fetch themes as soon as page loads
+  // Pre-fetch themes on page load
   useEffect(() => {
     setThemesLoading(true)
     fetch('/api/practice/themes')
@@ -86,18 +74,24 @@ export default function PostSessionPage() {
       .finally(() => setThemesLoading(false))
   }, [])
 
-  const selectedTheme = themes.find(t => t.id === selectedThemeId)
-  const reflectionPrompt = selectedTheme
-    ? REFLECTION_PROMPTS[selectedTheme.name] || DEFAULT_PROMPT
-    : DEFAULT_PROMPT
+  const toggleTheme = (themeId: string) => {
+    setSelectedThemeIds(prev =>
+      prev.includes(themeId)
+        ? prev.filter(id => id !== themeId)
+        : [...prev, themeId]
+    )
+  }
+
+  const selectedThemeNames = themes
+    .filter(t => selectedThemeIds.includes(t.id))
+    .map(t => t.name)
 
   const canProceed = () => {
     switch (step) {
       case 1: return emotionalState !== null
-      case 2: return selectedThemeId !== null
-      case 3: return reflectionText.trim().length > 0
-      case 4: return true // intention is optional
-      case 5: return true
+      case 2: return selectedThemeIds.length > 0 || reflectionText.trim().length > 0
+      case 3: return true // intention is optional
+      case 4: return true
       default: return false
     }
   }
@@ -126,7 +120,7 @@ export default function PostSessionPage() {
   const handleSkipIntention = () => {
     setIntentionText('')
     setTargetDate('')
-    setStep(5)
+    setStep(4)
     scrollToTop()
   }
 
@@ -141,7 +135,7 @@ export default function PostSessionPage() {
         body: JSON.stringify({
           userId: user.id,
           emotionalState,
-          themeId: selectedThemeId,
+          themeIds: selectedThemeIds,
           reflectionText: reflectionText.trim(),
           intentionText: intentionText.trim() || undefined,
           targetDate: targetDate || undefined,
@@ -206,7 +200,7 @@ export default function PostSessionPage() {
           <span className="text-sm font-medium" style={{ color: colors.creamMuted }}>
             Post-Session Reflection
           </span>
-          <div className="w-8" /> {/* spacer */}
+          <div className="w-8" />
         </div>
 
         {/* Progress dots */}
@@ -264,60 +258,50 @@ export default function PostSessionPage() {
             </div>
           )}
 
-          {/* Step 2: Theme selection */}
+          {/* Step 2: Topics + Reflection (combined) */}
           {step === 2 && (
             <div className="pt-8">
               <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
-                What theme came up in your session?
+                What came up in your session?
               </p>
-              <p className="text-sm mb-6" style={{ color: colors.creamMuted }}>
-                Choose what resonated most
+              <p className="text-sm mb-5" style={{ color: colors.creamMuted }}>
+                Select any topics that came up
               </p>
 
-              {themesLoading && (
-                <div className="flex items-center justify-center py-12">
-                  <svg className="animate-spin h-8 w-8" viewBox="0 0 24 24" style={{ color: colors.cyan }}>
+              {/* Theme chips */}
+              {themesLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" style={{ color: colors.cyan }}>
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {themes.map(theme => {
+                    const isSelected = selectedThemeIds.includes(theme.id)
+                    return (
+                      <button
+                        key={theme.id}
+                        onClick={() => toggleTheme(theme.id)}
+                        className="px-4 py-2 rounded-full text-sm font-medium transition-all"
+                        style={{
+                          backgroundColor: isSelected ? colors.cyan + '25' : colors.darkCard,
+                          color: isSelected ? colors.cyan : colors.creamMuted,
+                          border: `1.5px solid ${isSelected ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
+                        }}
+                      >
+                        {theme.name}
+                      </button>
+                    )
+                  })}
+                </div>
               )}
 
-              <div className="space-y-3">
-                {themes.map(theme => (
-                  <button
-                    key={theme.id}
-                    onClick={() => setSelectedThemeId(theme.id)}
-                    className="w-full text-left rounded-2xl p-4 transition-all"
-                    style={{
-                      backgroundColor: colors.darkCard,
-                      border: `2px solid ${selectedThemeId === theme.id ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
-                    }}
-                  >
-                    <p className="font-semibold text-sm mb-1" style={{ color: colors.cream }}>
-                      {theme.name}
-                    </p>
-                    {theme.description && (
-                      <p className="text-xs leading-relaxed" style={{ color: colors.creamMuted }}>
-                        {theme.description}
-                      </p>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Reflection */}
-          {step === 3 && (
-            <div className="pt-8">
-              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
-                Reflect on your session
+              {/* Reflection textarea */}
+              <p className="text-sm mb-3" style={{ color: colors.creamMuted }}>
+                Capture any thoughts, insights, or ideas
               </p>
-              <p className="text-sm mb-6" style={{ color: colors.cyan }}>
-                {reflectionPrompt}
-              </p>
-
               <textarea
                 value={reflectionText}
                 onChange={(e) => setReflectionText(e.target.value)}
@@ -329,13 +313,12 @@ export default function PostSessionPage() {
                   border: '1px solid rgba(255,255,255,0.08)',
                   color: colors.cream,
                 }}
-                autoFocus
               />
             </div>
           )}
 
-          {/* Step 4: Practice intention (optional) */}
-          {step === 4 && (
+          {/* Step 3: Practice intention (optional) */}
+          {step === 3 && (
             <div className="pt-8">
               <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
                 Set a practice intention
@@ -384,8 +367,8 @@ export default function PostSessionPage() {
             </div>
           )}
 
-          {/* Step 5: Confirmation */}
-          {step === 5 && (
+          {/* Step 4: Confirmation */}
+          {step === 4 && (
             <div className="pt-8">
               <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
                 Your reflection
@@ -414,31 +397,46 @@ export default function PostSessionPage() {
                   </div>
                 </div>
 
-                {/* Theme */}
-                {selectedTheme && (
+                {/* Topics */}
+                {selectedThemeNames.length > 0 && (
                   <div
                     className="rounded-xl p-4"
                     style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
                   >
-                    <p className="text-xs mb-1" style={{ color: colors.creamMuted }}>Theme</p>
-                    <p className="text-sm font-medium" style={{ color: colors.cream }}>{selectedTheme.name}</p>
+                    <p className="text-xs mb-2" style={{ color: colors.creamMuted }}>Topics</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedThemeNames.map(name => (
+                        <span
+                          key={name}
+                          className="px-3 py-1 rounded-full text-xs font-medium"
+                          style={{
+                            backgroundColor: colors.cyan + '20',
+                            color: colors.cyan,
+                          }}
+                        >
+                          {name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
 
                 {/* Reflection */}
-                <div
-                  className="rounded-xl p-4"
-                  style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
-                >
-                  <p className="text-xs mb-1" style={{ color: colors.creamMuted }}>Reflection</p>
-                  <p className="text-sm leading-relaxed" style={{ color: colors.cream }}>
-                    {reflectionText.length > 200
-                      ? reflectionText.slice(0, 200) + '...'
-                      : reflectionText}
-                  </p>
-                </div>
+                {reflectionText.trim() && (
+                  <div
+                    className="rounded-xl p-4"
+                    style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+                  >
+                    <p className="text-xs mb-1" style={{ color: colors.creamMuted }}>Reflection</p>
+                    <p className="text-sm leading-relaxed" style={{ color: colors.cream }}>
+                      {reflectionText.length > 200
+                        ? reflectionText.slice(0, 200) + '...'
+                        : reflectionText}
+                    </p>
+                  </div>
+                )}
 
-                {/* Intention (if set) */}
+                {/* Intention */}
                 {intentionText.trim() && (
                   <div
                     className="rounded-xl p-4"
@@ -474,7 +472,7 @@ export default function PostSessionPage() {
         }}
       >
         <div className="max-w-lg mx-auto">
-          {step < 5 ? (
+          {step < TOTAL_STEPS ? (
             <button
               onClick={handleNext}
               className="w-full py-4 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-2"
@@ -485,18 +483,18 @@ export default function PostSessionPage() {
                 cursor: canProceed() ? 'pointer' : 'default',
               }}
             >
-              {step === 4 && intentionText.trim() ? 'Next' : step === 4 ? 'Skip' : 'Next'}
+              {step === 3 && !intentionText.trim() ? 'Skip' : 'Next'}
               <ChevronRight size={18} />
             </button>
           ) : (
             <button
               onClick={handleSubmit}
-              disabled={submitting}
               className="w-full py-4 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-2"
               style={{
                 backgroundColor: colors.coral,
                 color: colors.cream,
                 opacity: submitting ? 0.7 : 1,
+                cursor: submitting ? 'default' : 'pointer',
               }}
             >
               {submitting ? (
