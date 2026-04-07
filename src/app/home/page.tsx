@@ -229,71 +229,59 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Quick Insight */}
-        {insights?.latestInsight && (
-          <div 
-            className="rounded-2xl p-5 mb-4"
-            style={{ backgroundColor: `${colors.cyan}10`, border: `1px solid ${colors.cyan}20` }}
-          >
-            <div className="flex items-start gap-3">
-              <Eye size={20} style={{ color: colors.cyan }} />
-              <div>
-                <p className="font-semibold mb-1" style={{ color: colors.cream }}>
-                  {insights.latestInsight.title}
-                </p>
-                <p className="text-sm leading-relaxed" style={{ color: colors.cream, opacity: 0.7 }}>
-                  {insights.latestInsight.body}
-                </p>
+        {/* Insights & This Week — combined card */}
+        <div
+          className="rounded-2xl p-5 mb-4"
+          style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+        >
+          {/* Latest insight headline */}
+          {insights?.latestInsight && (
+            <div className="flex items-start gap-3 mb-4">
+              <Eye size={18} style={{ color: colors.cyan, flexShrink: 0, marginTop: 2 }} />
+              <p className="text-sm leading-relaxed" style={{ color: colors.cream, opacity: 0.8 }}>
+                {insights.latestInsight.title}
+              </p>
+            </div>
+          )}
+
+          {/* This week dots */}
+          {insights?.thisWeek && insights.thisWeek.length > 0 && (
+            <div className="mb-4">
+              <p className="text-xs font-semibold mb-2" style={{ color: colors.cream, opacity: 0.4 }}>
+                This week
+              </p>
+              <div className="flex gap-1.5">
+                {insights.thisWeek.map((day, idx) => (
+                  <div key={idx} className="flex-1 text-center">
+                    <div
+                      className="h-8 rounded-lg flex items-center justify-center"
+                      style={{
+                        backgroundColor: day.checkedIn ? colors.darkLight : colors.dark,
+                        border: day.checkedIn ? `1px solid ${colors.cyan}30` : '1px solid transparent',
+                      }}
+                    >
+                      {day.checkedIn && <CheckCircle size={12} style={{ color: colors.cyan }} />}
+                    </div>
+                    <span className="text-xs mt-1 block" style={{ color: colors.cream, opacity: 0.3 }}>
+                      {day.day}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* View Insights Link */}
-        <Link
-          href="/insights"
-          className="w-full rounded-2xl p-4 flex items-center justify-between"
-          style={{ backgroundColor: colors.darkLight, border: '1px solid rgba(255,255,255,0.05)' }}
-        >
-          <div className="flex items-center gap-3">
-            <BarChart3 size={20} style={{ color: colors.coral }} />
-            <span style={{ color: colors.cream }}>View your insights</span>
-          </div>
-          <ArrowRight size={18} style={{ color: colors.cream, opacity: 0.4 }} />
-        </Link>
-
-        {/* This Week Strip (if data available) */}
-        {insights?.thisWeek && insights.thisWeek.length > 0 && (
-          <div 
-            className="rounded-2xl p-5 mt-4"
-            style={{ backgroundColor: colors.darkLight, border: '1px solid rgba(255,255,255,0.08)' }}
+          {/* View insights button */}
+          <Link
+            href="/insights"
+            className="w-full py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold transition-all hover:scale-[1.01]"
+            style={{ backgroundColor: colors.darkLight, color: colors.cream }}
           >
-            <p className="text-sm font-semibold mb-3" style={{ color: colors.cream, opacity: 0.6 }}>
-              This week
-            </p>
-            <div className="flex gap-1.5">
-              {insights.thisWeek.map((day, idx) => (
-                <div key={idx} className="flex-1 text-center">
-                  <div 
-                    className="h-10 rounded-lg flex items-center justify-center"
-                    style={{ 
-                      backgroundColor: day.checkedIn ? colors.darkLight : colors.darkCard,
-                      border: day.checkedIn ? `1px solid ${colors.cyan}30` : '1px solid transparent',
-                    }}
-                  >
-                    {day.checkedIn && <CheckCircle size={14} style={{ color: colors.cyan }} />}
-                  </div>
-                  <span 
-                    className="text-xs mt-1 block"
-                    style={{ color: colors.cream, opacity: 0.4 }}
-                  >
-                    {day.day}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+            <BarChart3 size={16} style={{ color: colors.coral }} />
+            View your insights
+            <ArrowRight size={16} style={{ opacity: 0.4 }} />
+          </Link>
+        </div>
       </div>
 
       {/* Bottom Nav */}

@@ -113,11 +113,12 @@ export default function InsightsPage() {
   const [error, setError] = useState<string | null>(null)
   const [isPhase2, setIsPhase2] = useState(false)
   const [expandedSections, setExpandedSections] = useState({
-    reflection: true,
+    reflection: false,
     emotions: false,
     triggers: false,
     breakthroughs: true
   })
+  const [reflectionExpanded, setReflectionExpanded] = useState(false)
 
   useEffect(() => {
     async function fetchInsights() {
@@ -328,30 +329,71 @@ export default function InsightsPage() {
       {/* Main Content */}
       <div className="max-w-lg mx-auto px-6">
         
-        {/* Weekly Reflection - Primary */}
-        <Section 
-          id="reflection" 
-          title="This Week" 
-          icon={<MessageCircle size={20} style={{ color: colors.coral }} />}
+        {/* Weekly Reflection - Truncated with Read More */}
+        <div
+          className="rounded-2xl overflow-hidden mb-4"
+          style={{ backgroundColor: colors.darkCard }}
         >
-          <div 
-            className="rounded-xl p-5"
-            style={{ 
-              backgroundColor: colors.dark,
-              borderLeft: `3px solid ${colors.coral}`
-            }}
-          >
-            {summary_text.split('\n\n').map((paragraph, idx) => (
-              <p 
-                key={idx} 
-                className={`text-base leading-relaxed ${idx > 0 ? 'mt-4' : ''}`}
-                style={{ color: colors.cream, opacity: 0.9 }}
+          <div className="p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: `${colors.coral}20` }}
               >
-                {paragraph}
-              </p>
-            ))}
+                <MessageCircle size={20} style={{ color: colors.coral }} />
+              </div>
+              <span className="text-lg font-semibold" style={{ color: colors.cream }}>
+                This Week
+              </span>
+            </div>
+
+            <div
+              className="rounded-xl p-4"
+              style={{
+                backgroundColor: colors.dark,
+                borderLeft: `3px solid ${colors.coral}`,
+              }}
+            >
+              {(() => {
+                const paragraphs = summary_text.split('\n\n')
+                const preview = paragraphs.slice(0, 1)
+                const hasMore = paragraphs.length > 1
+
+                return (
+                  <>
+                    {(reflectionExpanded ? paragraphs : preview).map((paragraph, idx) => (
+                      <p
+                        key={idx}
+                        className={`text-sm leading-relaxed ${idx > 0 ? 'mt-3' : ''}`}
+                        style={{ color: colors.cream, opacity: 0.9 }}
+                      >
+                        {paragraph}
+                      </p>
+                    ))}
+                    {hasMore && !reflectionExpanded && (
+                      <button
+                        onClick={() => setReflectionExpanded(true)}
+                        className="mt-3 text-sm font-medium transition-all"
+                        style={{ color: colors.coral }}
+                      >
+                        Read more...
+                      </button>
+                    )}
+                    {reflectionExpanded && hasMore && (
+                      <button
+                        onClick={() => setReflectionExpanded(false)}
+                        className="mt-3 text-sm font-medium transition-all"
+                        style={{ color: colors.creamMuted }}
+                      >
+                        Show less
+                      </button>
+                    )}
+                  </>
+                )
+              })()}
+            </div>
           </div>
-        </Section>
+        </div>
 
         {/* Emotions Named */}
         {emotion_patterns?.emotions_user_named?.length > 0 && (
@@ -663,7 +705,7 @@ export default function InsightsPage() {
               className="text-xs font-bold tracking-widest"
               style={{ color: colors.creamMuted, opacity: 0.5 }}
             >
-              SEEN
+              Seen
             </span>
             <StarIcon size={10} style={{ color: colors.creamMuted, opacity: 0.5 }} />
             <div className="w-6 h-px" style={{ backgroundColor: colors.creamMuted, opacity: 0.3 }} />
@@ -672,10 +714,10 @@ export default function InsightsPage() {
       </div>
 
       {/* Bottom Nav */}
-      <nav 
-        className="fixed bottom-0 left-0 right-0 px-6 py-3"
-        style={{ 
-          backgroundColor: colors.darkCard, 
+      <nav
+        className="fixed bottom-0 left-0 right-0 px-6 py-3 z-20"
+        style={{
+          backgroundColor: colors.darkCard,
           borderTop: '1px solid rgba(255,255,255,0.05)',
         }}
       >
