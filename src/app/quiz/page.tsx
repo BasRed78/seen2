@@ -12,7 +12,7 @@ const ds = {
   surfaceLight: '#252542',
   coral: '#ff6b5b',
   cream: '#faf8f5',
-  cyan: '#5B8F8F',
+  cyan: '#4ECDC4',
   muted: 'rgba(250,248,245,0.5)',
   subtle: 'rgba(250,248,245,0.12)',
 };

@@ -230,8 +230,8 @@ export default function AdminPage() {
             onClick={() => toggleSection('manage-users')}
             className="w-full flex items-center gap-4 p-5 hover:bg-white/[0.02] transition-all text-left"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#5B8F8F]/15 flex items-center justify-center flex-shrink-0">
-              <Users size={20} className="text-[#5B8F8F]" />
+            <div className="w-10 h-10 rounded-xl bg-[#4ECDC4]/15 flex items-center justify-center flex-shrink-0">
+              <Users size={20} className="text-[#4ECDC4]" />
             </div>
             <div className="flex-1">
               <p className="font-semibold">Test Users</p>

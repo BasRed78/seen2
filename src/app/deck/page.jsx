@@ -120,7 +120,7 @@ const ds = {
   cream: '#faf8f5',
   muted: 'rgba(250,248,245,0.4)',
   subtle: 'rgba(250,248,245,0.12)',
-  cyan: '#5B8F8F',
+  cyan: '#4ECDC4',
 };
 
 export default function InvestorDeck() {
