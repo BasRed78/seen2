@@ -40,28 +40,36 @@ export default function OnboardingPage() {
       return
     }
 
-    setUser(JSON.parse(storedUser))
+    const parsed = JSON.parse(storedUser)
+    setUser(parsed)
+
+    // Check if the quiz already captured the therapy answer
+    const quizTherapyAnswer = localStorage.getItem('seen_quiz_in_therapy')
+    if (quizTherapyAnswer !== null) {
+      // Clean up the quiz flag
+      localStorage.removeItem('seen_quiz_in_therapy')
+
+      if (quizTherapyAnswer === 'true') {
+        // Auto-activate Phase 2 without asking again
+        activatePhase2(parsed.id)
+        return
+      } else {
+        // They said no in the quiz — skip the question
+        localStorage.setItem('seen_onboarding_complete', 'true')
+        router.push('/home')
+        return
+      }
+    }
+
     setLoading(false)
   }, [router])
 
-  const handleNo = () => {
-    localStorage.setItem('seen_onboarding_complete', 'true')
-    router.push('/home')
-  }
-
-  const handleYes = () => {
-    setShowDisclaimer(true)
-  }
-
-  const handleConfirm = async () => {
-    if (!user) return
-    setActivating(true)
-
+  const activatePhase2 = async (userId: string) => {
     try {
       const response = await fetch('/api/practice/phase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, action: 'activate' }),
+        body: JSON.stringify({ userId, action: 'activate' }),
       })
 
       const data = await response.json()
@@ -75,6 +83,21 @@ export default function OnboardingPage() {
 
     localStorage.setItem('seen_onboarding_complete', 'true')
     router.push('/home')
+  }
+
+  const handleNo = () => {
+    localStorage.setItem('seen_onboarding_complete', 'true')
+    router.push('/home')
+  }
+
+  const handleYes = () => {
+    setShowDisclaimer(true)
+  }
+
+  const handleConfirm = async () => {
+    if (!user) return
+    setActivating(true)
+    await activatePhase2(user.id)
   }
 
   if (loading || !user) {
