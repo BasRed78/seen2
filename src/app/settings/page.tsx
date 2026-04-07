@@ -143,7 +143,7 @@ export default function SettingsPage() {
             style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.gold}20` }}
           >
             <p className="text-xs leading-relaxed" style={{ color: colors.creamMuted }}>
-              In production, phase transitions will be managed by the clinical team. This switcher is for testing purposes only.
+              In production, phase transitions will be managed by the Seen team. This switcher is for testing purposes only.
             </p>
           </div>
 
