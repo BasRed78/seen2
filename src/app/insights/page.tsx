@@ -18,18 +18,18 @@ import {
   BarChart3,
   Home
 } from 'lucide-react'
-import { colors } from '@/lib/constants/colors'
+import { colors, phaseAccent } from '@/lib/constants/colors'
 import { StarIcon } from '@/components/StarIcon'
 import { BottomNav } from '@/components/BottomNav'
 
 // Gradient blur decoration
-const GradientBlur = ({ color, className = "", opacity = 0.15, size = 300 }: { 
-  color: string; 
-  className?: string; 
-  opacity?: number; 
-  size?: number 
+const GradientBlur = ({ color, className = "", opacity = 0.15, size = 300 }: {
+  color: string;
+  className?: string;
+  opacity?: number;
+  size?: number
 }) => (
-  <div 
+  <div
     className={`absolute rounded-full pointer-events-none ${className}`}
     style={{
       width: size,
@@ -93,7 +93,7 @@ export default function InsightsPage() {
   const [aggregation, setAggregation] = useState<Aggregation | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isPhase2, setIsPhase2] = useState(false)
+  const [phase, setPhase] = useState('phase1')
   const [expandedSections, setExpandedSections] = useState({
     reflection: false,
     emotions: false,
@@ -101,6 +101,10 @@ export default function InsightsPage() {
     breakthroughs: true
   })
   const [reflectionExpanded, setReflectionExpanded] = useState(false)
+
+  // Derive accent color from phase
+  const accent = phaseAccent(phase)
+  const accentLight = phase === 'phase2' ? colors.cyanLight : colors.coralLight
 
   useEffect(() => {
     async function fetchInsights() {
@@ -111,10 +115,10 @@ export default function InsightsPage() {
           router.push('/login')
           return
         }
-        
+
         const user = JSON.parse(userStr)
         const userId = user.id
-        setIsPhase2((user.current_phase || 'phase1') === 'phase2')
+        setPhase(user.current_phase || 'phase1')
 
         // Fetch insights via API route
         const response = await fetch(`/api/insights?userId=${userId}`)
@@ -145,13 +149,13 @@ export default function InsightsPage() {
   }
 
   // Collapsible section component
-  const Section = ({ 
-    id, 
-    title, 
-    icon, 
-    children, 
-    accentColor = colors.coral 
-  }: { 
+  const Section = ({
+    id,
+    title,
+    icon,
+    children,
+    accentColor = accent
+  }: {
     id: keyof typeof expandedSections
     title: string
     icon: React.ReactNode
@@ -159,21 +163,21 @@ export default function InsightsPage() {
     accentColor?: string
   }) => {
     const isOpen = expandedSections[id]
-    
+
     return (
-      <div 
+      <div
         className="rounded-2xl overflow-hidden mb-4"
         style={{ backgroundColor: colors.darkCard }}
       >
         <button
           onClick={() => toggleSection(id)}
           className="w-full p-5 flex items-center justify-between text-left transition-colors"
-          style={{ 
+          style={{
             borderBottom: isOpen ? `1px solid rgba(250, 248, 245, 0.1)` : 'none'
           }}
         >
           <div className="flex items-center gap-3">
-            <div 
+            <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
               style={{ backgroundColor: `${accentColor}20` }}
             >
@@ -189,7 +193,7 @@ export default function InsightsPage() {
             <ChevronDown size={20} style={{ color: colors.creamMuted }} />
           )}
         </button>
-        
+
         {isOpen && (
           <div className="p-5 pt-4">
             {children}
@@ -204,7 +208,7 @@ export default function InsightsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
         <div className="text-center">
-          <StarIcon size={32} style={{ color: colors.coral, animation: 'pulse 2s infinite' }} />
+          <StarIcon size={32} style={{ color: accent, animation: 'pulse 2s infinite' }} />
           <p className="mt-4" style={{ color: colors.creamMuted }}>Loading insights...</p>
         </div>
       </div>
@@ -216,8 +220,8 @@ export default function InsightsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: colors.dark }}>
         <div className="text-center">
-          <p style={{ color: colors.coral }}>{error}</p>
-          <button 
+          <p style={{ color: accent }}>{error}</p>
+          <button
             onClick={() => router.push('/home')}
             className="mt-4 px-4 py-2 rounded-lg"
             style={{ backgroundColor: colors.darkCard, color: colors.cream }}
@@ -232,18 +236,18 @@ export default function InsightsPage() {
   // No data state
   if (!aggregation) {
     return (
-      <div className="min-h-screen p-6" style={{ backgroundColor: colors.dark }}>
-        <div className="max-w-lg mx-auto">
-          <button 
+      <div className="min-h-screen pb-24" style={{ backgroundColor: colors.dark }}>
+        <div className="max-w-lg mx-auto p-6">
+          <button
             onClick={() => router.push('/home')}
             className="flex items-center gap-2 text-sm mb-8"
             style={{ color: colors.creamMuted }}
           >
             <ArrowLeft size={18} /> Back
           </button>
-          
+
           <div className="text-center py-16">
-            <StarIcon size={48} style={{ color: colors.coral, opacity: 0.5 }} />
+            <StarIcon size={48} style={{ color: accent, opacity: 0.5 }} />
             <h2 className="text-xl font-bold mt-6 mb-2" style={{ color: colors.cream }}>
               No insights yet
             </h2>
@@ -253,12 +257,14 @@ export default function InsightsPage() {
             <button
               onClick={() => router.push('/chat')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold"
-              style={{ backgroundColor: colors.coral, color: colors.cream }}
+              style={{ backgroundColor: accent, color: colors.cream }}
             >
               Start Check-in <ArrowRight size={18} />
             </button>
           </div>
         </div>
+
+        <BottomNav currentPage="insights" phase={phase} />
       </div>
     )
   }
@@ -271,12 +277,12 @@ export default function InsightsPage() {
     <div className="min-h-screen pb-24" style={{ backgroundColor: colors.dark }}>
       {/* Header */}
       <div className="relative overflow-hidden px-6 pt-8 pb-6">
-        <GradientBlur color={colors.coral} className="-top-40 -right-40" opacity={0.12} size={350} />
+        <GradientBlur color={accent} className="-top-40 -right-40" opacity={0.12} size={350} />
         <GradientBlur color={colors.cyan} className="-bottom-32 -left-32" opacity={0.08} size={250} />
-        
+
         <div className="max-w-lg mx-auto relative">
           {/* Back button */}
-          <button 
+          <button
             onClick={() => router.push('/home')}
             className="flex items-center gap-2 text-sm mb-6 transition-opacity hover:opacity-100"
             style={{ color: colors.creamMuted }}
@@ -286,22 +292,22 @@ export default function InsightsPage() {
 
           {/* Title */}
           <div className="flex items-center gap-2 mb-2">
-            <StarIcon size={14} style={{ color: colors.coral }} />
-            <span 
+            <StarIcon size={14} style={{ color: accent }} />
+            <span
               className="text-xs font-bold uppercase tracking-widest"
-              style={{ color: colors.coral }}
+              style={{ color: accent }}
             >
               Your Insights
             </span>
           </div>
-          
-          <h1 
+
+          <h1
             className="text-2xl font-bold mb-1"
             style={{ color: colors.cream }}
           >
             {formatDateRange(period_start, period_end)}
           </h1>
-          
+
           <p className="text-sm" style={{ color: colors.creamMuted }}>
             {stats.checkin_count} check-in{stats.checkin_count !== 1 ? 's' : ''} this week
           </p>
@@ -310,7 +316,7 @@ export default function InsightsPage() {
 
       {/* Main Content */}
       <div className="max-w-lg mx-auto px-6">
-        
+
         {/* Weekly Reflection - Truncated with Read More */}
         <div
           className="rounded-2xl overflow-hidden mb-4"
@@ -320,9 +326,9 @@ export default function InsightsPage() {
             <div className="flex items-center gap-3 mb-4">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: `${colors.coral}20` }}
+                style={{ backgroundColor: `${accent}20` }}
               >
-                <MessageCircle size={20} style={{ color: colors.coral }} />
+                <MessageCircle size={20} style={{ color: accent }} />
               </div>
               <span className="text-lg font-semibold" style={{ color: colors.cream }}>
                 This Week
@@ -333,7 +339,7 @@ export default function InsightsPage() {
               className="rounded-xl p-4"
               style={{
                 backgroundColor: colors.dark,
-                borderLeft: `3px solid ${colors.coral}`,
+                borderLeft: `3px solid ${accent}`,
               }}
             >
               {(() => {
@@ -356,7 +362,7 @@ export default function InsightsPage() {
                       <button
                         onClick={() => setReflectionExpanded(true)}
                         className="mt-3 text-sm font-medium transition-all"
-                        style={{ color: colors.coral }}
+                        style={{ color: accent }}
                       >
                         Read more...
                       </button>
@@ -379,20 +385,20 @@ export default function InsightsPage() {
 
         {/* Emotions Named */}
         {emotion_patterns?.emotions_user_named?.length > 0 && (
-          <Section 
-            id="emotions" 
-            title="Emotions You Named" 
-            icon={<Heart size={20} style={{ color: colors.coralLight }} />}
-            accentColor={colors.coralLight}
+          <Section
+            id="emotions"
+            title="Emotions You Named"
+            icon={<Heart size={20} style={{ color: accentLight }} />}
+            accentColor={accentLight}
           >
             <div className="flex flex-wrap gap-2 mb-4">
               {emotion_patterns.emotions_user_named.map((emotion, idx) => (
-                <span 
+                <span
                   key={idx}
                   className="px-4 py-2 rounded-full text-sm font-medium"
-                  style={{ 
-                    backgroundColor: `${colors.coral}20`,
-                    color: colors.coralLight
+                  style={{
+                    backgroundColor: `${accent}20`,
+                    color: accentLight
                   }}
                 >
                   {emotion}
@@ -407,16 +413,16 @@ export default function InsightsPage() {
 
         {/* Triggers & Patterns */}
         {(top_triggers?.length > 0 || trigger_chains?.length > 0) && (
-          <Section 
-            id="triggers" 
-            title="What Triggered You" 
+          <Section
+            id="triggers"
+            title="What Triggered You"
             icon={<AlertTriangle size={20} style={{ color: colors.cyan }} />}
             accentColor={colors.cyan}
           >
             {/* Top Triggers */}
             {top_triggers?.length > 0 && (
               <div className="mb-6">
-                <p 
+                <p
                   className="text-xs font-semibold uppercase tracking-wide mb-3"
                   style={{ color: colors.creamMuted }}
                 >
@@ -427,26 +433,26 @@ export default function InsightsPage() {
                     <div key={idx} className="flex items-center gap-3">
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <span 
+                          <span
                             className="text-sm font-medium capitalize"
                             style={{ color: colors.cream }}
                           >
                             {trigger.name.replace(/_/g, ' ')}
                           </span>
-                          <span 
+                          <span
                             className="text-xs font-bold"
                             style={{ color: colors.cyan }}
                           >
                             {trigger.count}×
                           </span>
                         </div>
-                        <div 
+                        <div
                           className="h-2 rounded-full overflow-hidden"
                           style={{ backgroundColor: `${colors.cyan}20` }}
                         >
-                          <div 
+                          <div
                             className="h-full rounded-full transition-all"
-                            style={{ 
+                            style={{
                               width: `${Math.min((trigger.count / 3) * 100, 100)}%`,
                               backgroundColor: colors.cyan
                             }}
@@ -462,7 +468,7 @@ export default function InsightsPage() {
             {/* Trigger Chains */}
             {trigger_chains?.length > 0 && (
               <div>
-                <p 
+                <p
                   className="text-xs font-semibold uppercase tracking-wide mb-3"
                   style={{ color: colors.creamMuted }}
                 >
@@ -470,7 +476,7 @@ export default function InsightsPage() {
                 </p>
                 <div className="space-y-3">
                   {trigger_chains.map((chain, idx) => (
-                    <div 
+                    <div
                       key={idx}
                       className="rounded-xl p-4"
                       style={{ backgroundColor: colors.dark }}
@@ -478,16 +484,16 @@ export default function InsightsPage() {
                       <div className="flex items-center flex-wrap gap-2">
                         {chain.pattern.split(' → ').map((step, stepIdx, arr) => (
                           <span key={stepIdx} className="flex items-center gap-2">
-                            <span 
+                            <span
                               className="px-3 py-1.5 rounded-lg text-sm font-medium"
                               style={{
-                                backgroundColor: stepIdx === 0 
-                                  ? colors.cyan 
-                                  : stepIdx === arr.length - 1 
-                                    ? colors.coral 
+                                backgroundColor: stepIdx === 0
+                                  ? colors.cyan
+                                  : stepIdx === arr.length - 1
+                                    ? accent
                                     : colors.darkCardHover,
-                                color: stepIdx === 0 || stepIdx === arr.length - 1 
-                                  ? colors.dark 
+                                color: stepIdx === 0 || stepIdx === arr.length - 1
+                                  ? colors.dark
                                   : colors.cream
                               }}
                             >
@@ -517,24 +523,24 @@ export default function InsightsPage() {
 
         {/* Breakthroughs */}
         {breakthroughs_this_week?.length > 0 && (
-          <Section 
-            id="breakthroughs" 
-            title="Breakthroughs" 
-            icon={<Flame size={20} style={{ color: colors.coral }} />}
+          <Section
+            id="breakthroughs"
+            title="Breakthroughs"
+            icon={<Flame size={20} style={{ color: accent }} />}
           >
             <div className="space-y-3">
               {breakthroughs_this_week.map((breakthrough, idx) => (
-                <div 
+                <div
                   key={idx}
                   className="rounded-xl p-4"
-                  style={{ 
+                  style={{
                     backgroundColor: `${colors.cyan}10`,
                     borderLeft: `3px solid ${colors.cyan}`
                   }}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <Zap size={14} style={{ color: colors.cyan }} />
-                    <span 
+                    <span
                       className="text-xs font-semibold uppercase tracking-wide"
                       style={{ color: colors.cyan }}
                     >
@@ -555,12 +561,12 @@ export default function InsightsPage() {
 
         {/* What You Did Instead */}
         {alternative_actions_reported?.length > 0 && (
-          <div 
+          <div
             className="rounded-2xl p-5 mb-4"
             style={{ backgroundColor: colors.darkCard }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div 
+              <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
                 style={{ backgroundColor: `${colors.cyan}20` }}
               >
@@ -572,7 +578,7 @@ export default function InsightsPage() {
             </div>
             <div className="space-y-2">
               {alternative_actions_reported.map((action, idx) => (
-                <div 
+                <div
                   key={idx}
                   className="flex items-center justify-between p-3 rounded-xl"
                   style={{ backgroundColor: colors.dark }}
@@ -580,7 +586,7 @@ export default function InsightsPage() {
                   <span className="text-sm capitalize" style={{ color: colors.cream }}>
                     {action.action.replace(/_/g, ' ')}
                   </span>
-                  <span 
+                  <span
                     className="text-xs font-bold px-2 py-1 rounded-full"
                     style={{ backgroundColor: `${colors.cyan}20`, color: colors.cyan }}
                   >
@@ -595,43 +601,43 @@ export default function InsightsPage() {
         {/* Simple Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
-            { 
-              label: 'Avg Stress', 
-              value: stats.avg_stress ?? '—', 
+            {
+              label: 'Avg Stress',
+              value: stats.avg_stress ?? '—',
               subtext: 'of 10',
               good: stats.avg_stress !== null && stats.avg_stress < 5
             },
-            { 
-              label: 'Episodes', 
-              value: stats.episodes_occurred ?? 0, 
+            {
+              label: 'Episodes',
+              value: stats.episodes_occurred ?? 0,
               subtext: 'occurred',
               good: stats.episodes_occurred === 0
             },
-            { 
-              label: 'Resisted', 
-              value: stats.episodes_resisted ?? 0, 
+            {
+              label: 'Resisted',
+              value: stats.episodes_resisted ?? 0,
               subtext: stats.episodes_resisted === 1 ? 'time' : 'times',
               good: (stats.episodes_resisted ?? 0) > 0
             },
           ].map((stat, idx) => (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               className="rounded-2xl p-4 text-center"
               style={{ backgroundColor: colors.darkCard }}
             >
-              <p 
+              <p
                 className="text-xs uppercase tracking-wide mb-2"
                 style={{ color: colors.creamMuted }}
               >
                 {stat.label}
               </p>
-              <p 
+              <p
                 className="text-3xl font-bold mb-1"
                 style={{ color: colors.cream }}
               >
                 {stat.value}
               </p>
-              <p 
+              <p
                 className="text-xs font-medium"
                 style={{ color: stat.good ? colors.cyan : colors.creamMuted }}
               >
@@ -642,11 +648,11 @@ export default function InsightsPage() {
         </div>
 
         {/* CTA */}
-        <div 
+        <div
           className="rounded-2xl p-6 text-center relative overflow-hidden"
-          style={{ backgroundColor: colors.coral }}
+          style={{ backgroundColor: accent }}
         >
-          <div 
+          <div
             className="absolute rounded-full pointer-events-none -top-10 -right-10"
             style={{
               width: 120,
@@ -656,14 +662,14 @@ export default function InsightsPage() {
               opacity: 0.1
             }}
           />
-          
-          <p 
+
+          <p
             className="text-lg font-bold mb-1"
             style={{ color: colors.cream }}
           >
             Ready for today's check-in?
           </p>
-          <p 
+          <p
             className="text-sm mb-4"
             style={{ color: colors.cream, opacity: 0.8 }}
           >
@@ -683,7 +689,7 @@ export default function InsightsPage() {
           <div className="flex items-center justify-center gap-2">
             <div className="w-6 h-px" style={{ backgroundColor: colors.creamMuted, opacity: 0.3 }} />
             <StarIcon size={10} style={{ color: colors.creamMuted, opacity: 0.5 }} />
-            <span 
+            <span
               className="text-xs font-bold tracking-widest"
               style={{ color: colors.creamMuted, opacity: 0.5 }}
             >
@@ -695,7 +701,7 @@ export default function InsightsPage() {
         </div>
       </div>
 
-      <BottomNav currentPage="insights" phase={isPhase2 ? 'phase2' : 'phase1'} />
+      <BottomNav currentPage="insights" phase={phase} />
     </div>
   )
 }
