@@ -49,13 +49,7 @@ export default function PracticePage() {
     )
   }
 
-  const comingSoonCards = [
-    {
-      icon: <Clock size={22} style={{ color: colors.cyan }} />,
-      title: 'Practice History',
-      description: 'Track your practice intentions, completions, and progress.',
-    },
-  ]
+  // No more coming soon cards - Practice History is now live
 
   return (
     <div className="min-h-screen pb-24" style={{ backgroundColor: colors.dark }}>
@@ -150,39 +144,33 @@ export default function PracticePage() {
           </div>
         </Link>
 
-        {/* Coming Soon Cards */}
-        <div className="space-y-3">
-          {comingSoonCards.map((card, i) => (
+        {/* Practice History */}
+        <Link
+          href="/practice/history"
+          className="block rounded-2xl p-5 mb-3 transition-all hover:scale-[1.01]"
+          style={{
+            backgroundColor: colors.darkCard,
+            border: `1px solid ${colors.cyan}30`,
+          }}
+        >
+          <div className="flex items-start gap-4">
             <div
-              key={i}
-              className="rounded-2xl p-5"
-              style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: colors.cyan + '15' }}
             >
-              <div className="flex items-start gap-4">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: colors.cyan + '15' }}
-                >
-                  {card.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold" style={{ color: colors.cream }}>{card.title}</p>
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: colors.darkCardHover, color: colors.creamMuted }}
-                    >
-                      Coming soon
-                    </span>
-                  </div>
-                  <p className="text-sm leading-relaxed" style={{ color: colors.creamMuted }}>
-                    {card.description}
-                  </p>
-                </div>
-              </div>
+              <Clock size={22} style={{ color: colors.cyan }} />
             </div>
-          ))}
-        </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-1">
+                <p className="font-semibold" style={{ color: colors.cream }}>Practice History</p>
+                <ChevronRight size={18} style={{ color: colors.cyan }} />
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: colors.creamMuted }}>
+                Track your practice intentions, completions, and progress.
+              </p>
+            </div>
+          </div>
+        </Link>
       </div>
 
       <BottomNav currentPage="practice" phase="phase2" />
