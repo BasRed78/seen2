@@ -12,6 +12,7 @@ import {
   BookOpen,
   ClipboardList,
   Clock,
+  ChevronRight,
 } from 'lucide-react'
 
 const colors = {
@@ -67,11 +68,6 @@ export default function PracticePage() {
 
   const comingSoonCards = [
     {
-      icon: <MessageCircle size={22} style={{ color: colors.cyan }} />,
-      title: 'Post-Session Reflection',
-      description: 'Process how you feel after a therapy session and set your practice focus.',
-    },
-    {
       icon: <BookOpen size={22} style={{ color: colors.cyan }} />,
       title: 'Exercises',
       description: 'Guided reflection, mindfulness, and skill-building exercises.',
@@ -126,6 +122,34 @@ export default function PracticePage() {
             </p>
           </div>
         </div>
+
+        {/* Post-Session Reflection — active */}
+        <Link
+          href="/practice/post-session"
+          className="block rounded-2xl p-5 mb-3 transition-all hover:scale-[1.01]"
+          style={{
+            backgroundColor: colors.darkCard,
+            border: `1px solid ${colors.cyan}30`,
+          }}
+        >
+          <div className="flex items-start gap-4">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: colors.cyan + '15' }}
+            >
+              <MessageCircle size={22} style={{ color: colors.cyan }} />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-1">
+                <p className="font-semibold" style={{ color: colors.cream }}>Post-Session Reflection</p>
+                <ChevronRight size={18} style={{ color: colors.cyan }} />
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: colors.creamMuted }}>
+                Process how you feel after a therapy session and set your practice focus.
+              </p>
+            </div>
+          </div>
+        </Link>
 
         {/* Coming Soon Cards */}
         <div className="space-y-3">
