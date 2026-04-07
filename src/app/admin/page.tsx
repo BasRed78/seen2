@@ -306,21 +306,6 @@ export default function AdminPage() {
         </a>
       </div>
 
-      {/* Admin links */}
-      <div className="mt-8 bg-white/5 rounded-2xl p-6 border border-white/10">
-        <h2 className="text-xl font-semibold mb-4">Content Management</h2>
-        <a
-          href="/admin/exercises"
-          className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all"
-        >
-          <div>
-            <p className="font-medium">Exercises</p>
-            <p className="text-sm text-cream/60">Create, edit, and manage practice exercises</p>
-          </div>
-          <span className="text-cream/40">→</span>
-        </a>
-      </div>
-
       {/* Back link */}
       <div className="mt-8 text-center">
         <a href="/" className="text-cream/40 hover:text-cream/60 transition-colors text-sm">
