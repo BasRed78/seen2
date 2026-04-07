@@ -13,6 +13,8 @@ import {
 } from 'lucide-react'
 import { colors } from '@/lib/constants/colors'
 import { StarIcon } from '@/components/StarIcon'
+import { VoiceMicButton } from '@/components/VoiceMicButton'
+import useVoiceInput from '@/hooks/useVoiceInput'
 
 interface User {
   id: string
@@ -59,6 +61,10 @@ export default function ExerciseDoPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const router = useRouter()
+
+  const reflectionVoice = useVoiceInput({
+    onTranscript: (text) => setReflectionText(text),
+  })
   const params = useParams()
   const exerciseId = params.id as string
 
@@ -429,18 +435,33 @@ export default function ExerciseDoPage() {
 
                 {/* Reflection */}
                 <div className="mb-6">
-                  <p className="text-sm font-medium mb-3" style={{ color: colors.cream }}>
-                    Any reflections? (optional)
-                  </p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-medium" style={{ color: colors.cream }}>
+                      Any reflections? (optional)
+                    </p>
+                    {reflectionVoice.supported && (
+                      <VoiceMicButton
+                        listening={reflectionVoice.listening}
+                        onToggle={() => {
+                          if (reflectionVoice.listening) {
+                            reflectionVoice.stop()
+                          } else {
+                            reflectionVoice.setPrefix(reflectionText)
+                            reflectionVoice.start()
+                          }
+                        }}
+                      />
+                    )}
+                  </div>
                   <textarea
                     value={reflectionText}
                     onChange={e => setReflectionText(e.target.value)}
-                    placeholder="What came up for you during this exercise..."
+                    placeholder={reflectionVoice.listening ? 'Listening...' : 'What came up for you during this exercise...'}
                     className="w-full rounded-xl p-4 text-sm resize-none focus:outline-none"
                     style={{
                       backgroundColor: colors.darkCard,
                       color: colors.cream,
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      border: `1px solid ${reflectionVoice.listening ? colors.cyan + '40' : 'rgba(255,255,255,0.1)'}`,
                       minHeight: '100px',
                     }}
                   />
