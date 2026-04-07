@@ -141,6 +141,8 @@ export async function POST(request: NextRequest) {
     let recentExercises: Array<{ name: string; completed_at: string; reflection?: string | null }> = []
     let activeIntentions: Array<{ text: string; status: string; created_at: string }> = []
     let recentPostSessionReflections: Array<{ date: string; emotional_before: string | null; emotional_after: string | null; reflection: string | null; themes: string[] | null }> = []
+    let availableExercises: Array<{ title: string; description: string | null; category: string; pattern_relevance: string[] | null }> = []
+    let completedExerciseIds: string[] = []
 
     if (user.current_phase === 'phase2') {
       // Fetch recent exercise completions
@@ -193,6 +195,32 @@ export async function POST(request: NextRequest) {
           themes: p.themes as string[] | null,
         }))
       }
+
+      // Fetch available exercises for suggestion awareness
+      const { data: exerciseCatalog } = await supabase
+        .from('exercises')
+        .select('title, description, category, pattern_relevance')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
+
+      if (exerciseCatalog) {
+        availableExercises = exerciseCatalog.map((e: Record<string, unknown>) => ({
+          title: e.title as string,
+          description: e.description as string | null,
+          category: e.category as string,
+          pattern_relevance: e.pattern_relevance as string[] | null,
+        }))
+      }
+
+      // Fetch IDs of exercises the user has already completed
+      const { data: completedData } = await supabase
+        .from('exercise_completions')
+        .select('exercise_id')
+        .eq('user_id', userId)
+
+      if (completedData) {
+        completedExerciseIds = completedData.map((c: Record<string, unknown>) => c.exercise_id as string)
+      }
     }
 
     // Build system prompt with user context
@@ -216,6 +244,8 @@ export async function POST(request: NextRequest) {
       recentExercises,
       activeIntentions,
       recentPostSessionReflections,
+      availableExercises,
+      completedExerciseIds,
     })
 
     // Build conversation history for Claude

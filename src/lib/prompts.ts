@@ -54,6 +54,13 @@ export interface UserContext {
     reflection: string | null
     themes: string[] | null
   }>
+  availableExercises?: Array<{
+    title: string
+    description: string | null
+    category: string
+    pattern_relevance: string[] | null
+  }>
+  completedExerciseIds?: string[] // IDs of exercises user has already done
 }
 
 export function generateInviteCode(): string {
@@ -96,8 +103,9 @@ export function buildSystemPrompt(context: UserContext): string {
   const resistanceSection = buildResistanceSuccessSection()
   const affectLabelingSection = buildAffectLabelingSection()
 
-  // Phase 2 section
+  // Phase 2 sections
   const phaseSection = buildPhaseSection(context)
+  const exerciseSuggestionSection = buildExerciseSuggestionSection(context)
 
   const isPhase2 = context.currentPhase === 'phase2'
 
@@ -158,6 +166,8 @@ ${forbiddenSection}
 ${crisisSection}
 
 ${phaseSection}
+
+${exerciseSuggestionSection}
 
 ═══════════════════════════════════════
 SESSION STRUCTURE
@@ -1111,6 +1121,88 @@ PRACTICE PHASE CONVERSATION STYLE:
 `
 
   return section
+}
+
+// ============================================
+// #12 - EXERCISE SUGGESTIONS (Phase 2 only)
+// ============================================
+
+function buildExerciseSuggestionSection(context: UserContext): string {
+  if (context.currentPhase !== 'phase2') return ''
+  if (!context.availableExercises || context.availableExercises.length === 0) return ''
+
+  // Group exercises by category for the AI
+  const byCategory: Record<string, Array<{ title: string; description: string | null; pattern_relevance: string[] | null }>> = {}
+  for (const ex of context.availableExercises) {
+    if (!byCategory[ex.category]) byCategory[ex.category] = []
+    byCategory[ex.category].push(ex)
+  }
+
+  const completedSet = new Set(context.completedExerciseIds || [])
+  const hasCompletedSome = completedSet.size > 0
+
+  let exerciseList = ''
+  for (const [category, exercises] of Object.entries(byCategory)) {
+    const categoryLabel = category.replace(/_/g, ' ')
+    exerciseList += `\n  ${categoryLabel.toUpperCase()}:\n`
+    for (const ex of exercises) {
+      const relevance = ex.pattern_relevance && ex.pattern_relevance.length > 0
+        ? ` (relevant for: ${ex.pattern_relevance.join(', ')})`
+        : ''
+      exerciseList += `    • "${ex.title}"${relevance}${ex.description ? ` — ${ex.description}` : ''}\n`
+    }
+  }
+
+  return `
+═══════════════════════════════════════
+EXERCISE SUGGESTIONS
+═══════════════════════════════════════
+You have access to the following exercises in Seen. When a conversation topic naturally connects to one, you can gently suggest it.
+
+AVAILABLE EXERCISES:
+${exerciseList}
+${hasCompletedSome ? `The user has already completed some exercises, so they know how the exercise system works.\n` : ''}
+WHEN TO SUGGEST:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• When they describe a struggle that an exercise directly addresses
+• When they express curiosity about working on something specific
+• When they mention wanting to try something between therapy sessions
+• NOT in the opening — wait until you understand what they're dealing with today
+• Maximum ONE suggestion per check-in — don't overwhelm
+• Only suggest if it genuinely fits what they shared — never force it
+
+HOW TO SUGGEST:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Keep it natural and optional. Frame it as an invitation, not a prescription.
+
+GOOD examples:
+• "There's an exercise in Seen called [title] that connects to what you're describing. Might be worth a look when you have a few minutes."
+• "What you're noticing sounds like it could connect with the [title] exercise — it's about [brief description]. No pressure, just something to explore."
+• "If you want to sit with that between now and your next session, there's a [title] exercise that might help you work through it."
+
+BAD examples (NEVER do these):
+• "You should try the [exercise]" (prescriptive)
+• "I recommend doing [exercise]" (clinical)
+• "Have you done the [exercise] yet?" (checking up)
+• Suggesting multiple exercises at once
+• Suggesting an exercise they just completed recently
+
+MATCHING GUIDE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Struggling to name feelings → "Name It to Tame It"
+• Feeling overwhelmed/anxious → "Five Senses Check-in" or "Arriving in the Present"
+• Ruminating on thoughts → "Noticing Your Thoughts"
+• Unclear on what matters → "What Matters Most" or "Choice Point"
+• Avoiding discomfort → "Sitting with Discomfort"
+• Making assumptions about others → "Testing an Assumption"
+• Stuck in same reactions → "Trying a Different Response"
+• Wanting to process a therapy session → "Session Unpacking"
+• Wanting to reflect on progress → "Progress Check" or "Where Am I Now?"
+• Wanting to understand their pattern → "Trigger Chain Mapping" or "Three Circles"
+• Needing self-care/calm → "Self-Soothing with Senses"
+• Wanting to journal/write → "Thought Awareness Journal" or "Letter to Yourself"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`
 }
 
 // ============================================
