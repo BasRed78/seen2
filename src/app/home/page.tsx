@@ -3,14 +3,17 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  ArrowRight, 
-  Bell, 
-  BarChart3, 
-  Flame, 
-  TrendingUp, 
+import {
+  ArrowRight,
+  Bell,
+  BarChart3,
+  Flame,
+  TrendingUp,
   CheckCircle,
-  Eye
+  Eye,
+  Heart,
+  Settings,
+  MessageCircle,
 } from 'lucide-react'
 
 const colors = {
@@ -34,6 +37,7 @@ interface User {
   pattern_type: string | null
   pattern_description: string | null
   stage: string
+  current_phase?: string
 }
 
 interface InsightData {
@@ -133,13 +137,9 @@ export default function HomePage() {
             <StarIcon size={16} style={{ color: colors.coral }} />
             <span className="font-bold" style={{ color: colors.cream }}>SEEN</span>
           </div>
-          <button 
-            onClick={handleLogout}
-            className="text-sm"
-            style={{ color: colors.cream, opacity: 0.5 }}
-          >
-            Sign out
-          </button>
+          <Link href="/settings">
+            <Settings size={20} style={{ color: colors.cream, opacity: 0.5 }} />
+          </Link>
         </div>
 
         {/* Greeting */}
@@ -301,11 +301,15 @@ export default function HomePage() {
             <span className="text-xs" style={{ color: colors.coral }}>Home</span>
           </Link>
           <Link href="/chat" className="flex flex-col items-center gap-1 py-2 px-4">
-            <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ color: colors.cream, opacity: 0.4 }}>
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
+            <MessageCircle size={22} style={{ color: colors.cream, opacity: 0.4 }} />
             <span className="text-xs" style={{ color: colors.cream, opacity: 0.4 }}>Check-in</span>
           </Link>
+          {(user?.current_phase || 'phase1') === 'phase2' && (
+            <Link href="/practice" className="flex flex-col items-center gap-1 py-2 px-4">
+              <Heart size={22} style={{ color: colors.cream, opacity: 0.4 }} />
+              <span className="text-xs" style={{ color: colors.cream, opacity: 0.4 }}>Practice</span>
+            </Link>
+          )}
           <Link href="/insights" className="flex flex-col items-center gap-1 py-2 px-4">
             <BarChart3 size={22} style={{ color: colors.cream, opacity: 0.4 }} />
             <span className="text-xs" style={{ color: colors.cream, opacity: 0.4 }}>Insights</span>
