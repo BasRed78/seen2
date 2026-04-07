@@ -261,16 +261,16 @@ export default function PostSessionPage() {
                   </svg>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div className="grid grid-cols-2 gap-2 mb-6">
                   {themes.map(theme => {
                     const isSelected = selectedThemeIds.includes(theme.id)
                     return (
                       <button
                         key={theme.id}
                         onClick={() => toggleTheme(theme.id)}
-                        className="px-4 py-2 rounded-full text-sm font-medium transition-all"
+                        className="px-3 py-3 rounded-xl text-sm font-medium transition-all text-left"
                         style={{
-                          backgroundColor: isSelected ? colors.cyan + '25' : colors.darkCard,
+                          backgroundColor: isSelected ? colors.cyan + '20' : colors.darkCard,
                           color: isSelected ? colors.cyan : colors.creamMuted,
                           border: `1.5px solid ${isSelected ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
                         }}
