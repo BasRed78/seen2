@@ -14,6 +14,16 @@ import {
 } from 'lucide-react'
 import { colors } from '@/lib/constants/colors'
 
+interface ScheduledExercise {
+  id: string
+  exercise_id: string | null
+  title: string
+  description: string | null
+  scheduled_at: string
+  duration_minutes: number
+  status: string
+}
+
 interface HomeSummary {
   activeIntentions: {
     id: string
@@ -44,9 +54,11 @@ interface HomeSummary {
 interface PracticeHomeProps {
   userName: string
   summary: HomeSummary | null
+  upcomingExercises?: ScheduledExercise[]
+  onMarkDone?: (id: string) => void
 }
 
-export function PracticeHome({ userName, summary }: PracticeHomeProps) {
+export function PracticeHome({ userName, summary, upcomingExercises, onMarkDone }: PracticeHomeProps) {
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 
@@ -178,6 +190,70 @@ export function PracticeHome({ userName, summary }: PracticeHomeProps) {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Upcoming Scheduled Exercises */}
+        {upcomingExercises && upcomingExercises.length > 0 && (
+          <div
+            className="rounded-2xl p-5 mb-4"
+            style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Calendar size={14} style={{ color: colors.gold }} />
+              <p className="text-xs font-semibold" style={{ color: colors.gold }}>
+                Upcoming this week
+              </p>
+            </div>
+            <div className="space-y-2">
+              {upcomingExercises.map((scheduled) => {
+                const scheduledDate = new Date(scheduled.scheduled_at)
+                const now = new Date()
+                const hoursUntil = (scheduledDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+                const isApproaching = hoursUntil > 0 && hoursUntil <= 1
+
+                return (
+                  <div
+                    key={scheduled.id}
+                    className="flex items-center gap-3 p-3 rounded-xl"
+                    style={{
+                      backgroundColor: isApproaching ? `${colors.gold}10` : colors.darkCardHover,
+                      border: isApproaching ? `1px solid ${colors.gold}30` : 'none',
+                    }}
+                  >
+                    <div className="flex-1 min-w-0">
+                      {scheduled.exercise_id ? (
+                        <Link
+                          href={`/practice/exercises/${scheduled.exercise_id}`}
+                          className="text-sm font-medium hover:underline"
+                          style={{ color: colors.cream }}
+                        >
+                          {scheduled.title}
+                        </Link>
+                      ) : (
+                        <p className="text-sm font-medium" style={{ color: colors.cream }}>
+                          {scheduled.title}
+                        </p>
+                      )}
+                      <p className="text-xs mt-0.5" style={{ color: colors.creamMuted }}>
+                        {scheduledDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                        {' at '}
+                        {scheduledDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    {onMarkDone && (
+                      <button
+                        onClick={() => onMarkDone(scheduled.id)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                        style={{ backgroundColor: colors.cyan + '20', color: colors.cyan }}
+                      >
+                        Done
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}

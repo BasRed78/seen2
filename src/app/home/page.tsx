@@ -22,6 +22,7 @@ export default function HomePage() {
   const [user, setUser] = useState<User | null>(null)
   const [insights, setInsights] = useState<any>(null)
   const [homeSummary, setHomeSummary] = useState<any>(null)
+  const [upcomingExercises, setUpcomingExercises] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -75,15 +76,35 @@ export default function HomePage() {
 
   const fetchHomeSummary = async (userId: string) => {
     try {
-      const response = await fetch(`/api/user/home-summary?userId=${userId}`)
-      if (response.ok) {
-        const data = await response.json()
-        setHomeSummary(data)
+      const [summaryRes, scheduledRes] = await Promise.all([
+        fetch(`/api/user/home-summary?userId=${userId}`),
+        fetch(`/api/practice/scheduled?userId=${userId}`),
+      ])
+
+      if (summaryRes.ok) {
+        setHomeSummary(await summaryRes.json())
+      }
+      if (scheduledRes.ok) {
+        const scheduledData = await scheduledRes.json()
+        setUpcomingExercises(scheduledData.exercises || [])
       }
     } catch (error) {
       console.error('Failed to fetch home summary:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleMarkDone = async (scheduledId: string) => {
+    try {
+      await fetch('/api/practice/scheduled', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: scheduledId, status: 'completed' }),
+      })
+      setUpcomingExercises(prev => prev.filter(e => e.id !== scheduledId))
+    } catch (error) {
+      console.error('Failed to mark done:', error)
     }
   }
 
@@ -105,7 +126,12 @@ export default function HomePage() {
       <FixedHeader phase={phase} />
 
       {phase === 'phase2' ? (
-        <PracticeHome userName={firstName} summary={homeSummary} />
+        <PracticeHome
+          userName={firstName}
+          summary={homeSummary}
+          upcomingExercises={upcomingExercises}
+          onMarkDone={handleMarkDone}
+        />
       ) : (
         <AwarenessHome userName={firstName} insights={insights} />
       )}
