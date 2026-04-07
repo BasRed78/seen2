@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ChevronRight, Check, Calendar } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Check, Calendar, Plus, Clock, ChevronDown } from 'lucide-react'
 import { colors } from '@/lib/constants/colors'
 import { StarIcon } from '@/components/StarIcon'
 import { VoiceMicButton } from '@/components/VoiceMicButton'
 import useVoiceInput from '@/hooks/useVoiceInput'
+import { downloadICS } from '@/lib/calendar/ics'
 
 interface Theme {
   id: string
@@ -15,7 +16,27 @@ interface Theme {
   display_order: number
 }
 
-const TOTAL_STEPS = 4
+interface Exercise {
+  id: string
+  title: string
+  description: string | null
+  category: string
+  duration_minutes: number | null
+}
+
+interface SelectedExercise {
+  exerciseId?: string
+  title: string
+  description: string
+  durationMinutes: number
+}
+
+interface ScheduleEntry {
+  date: string
+  time: string
+}
+
+const TOTAL_STEPS = 6
 
 export default function PostSessionPage() {
   const [user, setUser] = useState<{ id: string; name: string; current_phase?: string } | null>(null)
@@ -33,6 +54,17 @@ export default function PostSessionPage() {
   const [intentionText, setIntentionText] = useState('')
   const [targetDate, setTargetDate] = useState('')
   const [themesLoading, setThemesLoading] = useState(false)
+
+  // Exercise selection state (step 4)
+  const [matchedExercises, setMatchedExercises] = useState<Exercise[]>([])
+  const [allExercises, setAllExercises] = useState<Exercise[]>([])
+  const [showAllExercises, setShowAllExercises] = useState(false)
+  const [selectedExercises, setSelectedExercises] = useState<SelectedExercise[]>([])
+  const [customActivityText, setCustomActivityText] = useState('')
+  const [exercisesLoading, setExercisesLoading] = useState(false)
+
+  // Scheduling state (step 5)
+  const [scheduleEntries, setScheduleEntries] = useState<Record<number, ScheduleEntry>>({})
 
   // Voice input for reflection textarea
   const reflectionVoice = useVoiceInput({
@@ -82,12 +114,93 @@ export default function PostSessionPage() {
     .filter(t => selectedThemeIds.includes(t.id))
     .map(t => t.name)
 
+  // Fetch matched exercises when entering step 4
+  useEffect(() => {
+    if (step !== 4 || matchedExercises.length > 0) return
+    setExercisesLoading(true)
+
+    // Fetch exercises matching selected themes
+    const fetchMatched = async () => {
+      const exerciseSet = new Map<string, Exercise>()
+
+      for (const themeId of selectedThemeIds) {
+        try {
+          const res = await fetch(`/api/practice/exercises?themeId=${themeId}`)
+          const data = await res.json()
+          for (const ex of (data.exercises || [])) {
+            exerciseSet.set(ex.id, ex)
+          }
+        } catch { /* ignore */ }
+      }
+
+      setMatchedExercises(Array.from(exerciseSet.values()).slice(0, 6))
+      setExercisesLoading(false)
+    }
+
+    fetchMatched()
+  }, [step, selectedThemeIds, matchedExercises.length])
+
+  // Fetch all exercises when user expands the list
+  useEffect(() => {
+    if (!showAllExercises || allExercises.length > 0) return
+
+    fetch('/api/practice/exercises')
+      .then(res => res.json())
+      .then(data => setAllExercises(data.exercises || []))
+      .catch(() => {})
+  }, [showAllExercises, allExercises.length])
+
+  const toggleExercise = (exercise: Exercise) => {
+    setSelectedExercises(prev => {
+      const exists = prev.find(e => e.exerciseId === exercise.id)
+      if (exists) {
+        return prev.filter(e => e.exerciseId !== exercise.id)
+      }
+      return [...prev, {
+        exerciseId: exercise.id,
+        title: exercise.title,
+        description: exercise.description || '',
+        durationMinutes: exercise.duration_minutes || 15,
+      }]
+    })
+  }
+
+  const addCustomActivity = () => {
+    if (!customActivityText.trim()) return
+    setSelectedExercises(prev => [...prev, {
+      title: customActivityText.trim(),
+      description: 'Custom activity',
+      durationMinutes: 15,
+    }])
+    setCustomActivityText('')
+  }
+
+  const getNextWeekDates = () => {
+    const dates: string[] = []
+    const today = new Date()
+    for (let i = 1; i <= 7; i++) {
+      const d = new Date(today)
+      d.setDate(today.getDate() + i)
+      dates.push(d.toISOString().split('T')[0])
+    }
+    return dates
+  }
+
+  const updateSchedule = (index: number, field: 'date' | 'time', value: string) => {
+    setScheduleEntries(prev => ({
+      ...prev,
+      [index]: { ...prev[index], [field]: value },
+    }))
+  }
+
   const canProceed = () => {
     switch (step) {
       case 1: return emotionalState !== null
       case 2: return selectedThemeIds.length > 0 || reflectionText.trim().length > 0
       case 3: return true // intention is optional
-      case 4: return true
+      case 4: return true // exercise selection is optional
+      case 5: return selectedExercises.length === 0 || Object.keys(scheduleEntries).length > 0
+      case 6: return true
       default: return false
     }
   }
@@ -107,6 +220,12 @@ export default function PostSessionPage() {
 
   const handleNext = () => {
     if (!canProceed()) return
+    if (step === 4 && selectedExercises.length === 0) {
+      // Skip scheduling if no exercises selected
+      setStep(6)
+      scrollToTop()
+      return
+    }
     if (step < TOTAL_STEPS) {
       setStep(step + 1)
       scrollToTop()
@@ -117,6 +236,17 @@ export default function PostSessionPage() {
     setIntentionText('')
     setTargetDate('')
     setStep(4)
+    scrollToTop()
+  }
+
+  const handleSkipExercises = () => {
+    setSelectedExercises([])
+    setStep(6) // Skip to confirmation
+    scrollToTop()
+  }
+
+  const handleSkipScheduling = () => {
+    setStep(6)
     scrollToTop()
   }
 
@@ -138,14 +268,48 @@ export default function PostSessionPage() {
         }),
       })
 
-      if (response.ok) {
-        setSubmitted(true)
-        setTimeout(() => router.push('/practice'), 2000)
-      } else {
+      if (!response.ok) {
         const data = await response.json()
         console.error('Failed to save:', data.error)
         setSubmitting(false)
+        return
       }
+
+      const result = await response.json()
+
+      // Schedule exercises if any were selected with times
+      if (selectedExercises.length > 0 && Object.keys(scheduleEntries).length > 0) {
+        const exercisesToSchedule = selectedExercises
+          .map((ex, i) => {
+            const schedule = scheduleEntries[i]
+            if (!schedule?.date || !schedule?.time) return null
+            return {
+              exerciseId: ex.exerciseId,
+              customTitle: ex.exerciseId ? undefined : ex.title,
+              title: ex.title,
+              description: ex.description,
+              scheduledAt: new Date(`${schedule.date}T${schedule.time}`).toISOString(),
+              durationMinutes: ex.durationMinutes,
+            }
+          })
+          .filter(Boolean)
+
+        if (exercisesToSchedule.length > 0) {
+          // Save to database for in-app tracking
+          await fetch('/api/calendar/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: user.id,
+              exercises: exercisesToSchedule,
+              postSessionCheckinId: result.checkin?.id,
+            }),
+          })
+        }
+      }
+
+      setSubmitted(true)
+      setTimeout(() => router.push('/practice'), 2000)
     } catch (err) {
       console.error('Submit error:', err)
       setSubmitting(false)
@@ -393,8 +557,275 @@ export default function PostSessionPage() {
             </div>
           )}
 
-          {/* Step 4: Confirmation */}
+          {/* Step 4: Exercise selection */}
           {step === 4 && (
+            <div className="pt-8">
+              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
+                Plan your practice
+              </p>
+              <p className="text-sm mb-6" style={{ color: colors.creamMuted }}>
+                Choose exercises to do before your next session
+              </p>
+
+              {exercisesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" style={{ color: colors.cyan }}>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                </div>
+              ) : (
+                <>
+                  {/* Matched exercises */}
+                  {matchedExercises.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-xs font-medium mb-3" style={{ color: colors.cyan }}>
+                        Based on your session
+                      </p>
+                      <div className="space-y-2">
+                        {matchedExercises.map(ex => {
+                          const isSelected = selectedExercises.some(s => s.exerciseId === ex.id)
+                          return (
+                            <button
+                              key={ex.id}
+                              onClick={() => toggleExercise(ex)}
+                              className="w-full rounded-xl p-4 text-left transition-all"
+                              style={{
+                                backgroundColor: isSelected ? colors.cyan + '15' : colors.darkCard,
+                                border: `1.5px solid ${isSelected ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
+                              }}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium" style={{ color: colors.cream }}>{ex.title}</p>
+                                  {ex.description && (
+                                    <p className="text-xs mt-1 line-clamp-2" style={{ color: colors.creamMuted }}>{ex.description}</p>
+                                  )}
+                                  {ex.duration_minutes && (
+                                    <div className="flex items-center gap-1 mt-2">
+                                      <Clock size={12} style={{ color: colors.creamMuted }} />
+                                      <span className="text-xs" style={{ color: colors.creamMuted }}>{ex.duration_minutes} min</span>
+                                    </div>
+                                  )}
+                                </div>
+                                {isSelected && (
+                                  <div className="w-6 h-6 rounded-full flex items-center justify-center ml-3 flex-shrink-0"
+                                    style={{ backgroundColor: colors.cyan }}>
+                                    <Check size={14} style={{ color: colors.cream }} />
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show all exercises */}
+                  {!showAllExercises ? (
+                    <button
+                      onClick={() => setShowAllExercises(true)}
+                      className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 mb-4"
+                      style={{
+                        backgroundColor: colors.darkCard,
+                        color: colors.creamMuted,
+                        border: '1px solid rgba(255,255,255,0.08)',
+                      }}
+                    >
+                      Browse all exercises <ChevronDown size={16} />
+                    </button>
+                  ) : (
+                    <div className="mb-4">
+                      <p className="text-xs font-medium mb-3" style={{ color: colors.creamMuted }}>
+                        All exercises
+                      </p>
+                      <div className="space-y-2 max-h-60 overflow-y-auto">
+                        {allExercises
+                          .filter(ex => !matchedExercises.some(m => m.id === ex.id))
+                          .map(ex => {
+                            const isSelected = selectedExercises.some(s => s.exerciseId === ex.id)
+                            return (
+                              <button
+                                key={ex.id}
+                                onClick={() => toggleExercise(ex)}
+                                className="w-full rounded-xl p-3 text-left transition-all"
+                                style={{
+                                  backgroundColor: isSelected ? colors.cyan + '15' : colors.darkCard,
+                                  border: `1.5px solid ${isSelected ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
+                                }}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-sm font-medium" style={{ color: colors.cream }}>{ex.title}</p>
+                                    <p className="text-xs" style={{ color: colors.creamMuted }}>{ex.category.replace(/_/g, ' ')}</p>
+                                  </div>
+                                  {isSelected && (
+                                    <div className="w-5 h-5 rounded-full flex items-center justify-center"
+                                      style={{ backgroundColor: colors.cyan }}>
+                                      <Check size={12} style={{ color: colors.cream }} />
+                                    </div>
+                                  )}
+                                </div>
+                              </button>
+                            )
+                          })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Custom activity */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={customActivityText}
+                      onChange={(e) => setCustomActivityText(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && addCustomActivity()}
+                      placeholder="Add your own activity..."
+                      className="flex-1 px-4 py-3 rounded-xl text-sm focus:outline-none"
+                      style={{
+                        backgroundColor: colors.darkCard,
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        color: colors.cream,
+                      }}
+                    />
+                    <button
+                      onClick={addCustomActivity}
+                      className="p-3 rounded-xl transition-all"
+                      style={{
+                        backgroundColor: customActivityText.trim() ? colors.cyan : colors.darkCard,
+                        color: colors.cream,
+                      }}
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+
+                  {/* Selected count */}
+                  {selectedExercises.length > 0 && (
+                    <p className="text-xs text-center mb-2" style={{ color: colors.cyan }}>
+                      {selectedExercises.length} exercise{selectedExercises.length !== 1 ? 's' : ''} selected
+                    </p>
+                  )}
+                </>
+              )}
+
+              <button
+                onClick={handleSkipExercises}
+                className="w-full text-sm py-2 mt-2"
+                style={{ color: colors.creamMuted }}
+              >
+                Skip for now
+              </button>
+            </div>
+          )}
+
+          {/* Step 5: Scheduling */}
+          {step === 5 && (
+            <div className="pt-8">
+              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
+                Schedule your exercises
+              </p>
+              <p className="text-sm mb-6" style={{ color: colors.creamMuted }}>
+                Pick a day and time for each one
+              </p>
+
+              <div className="space-y-4 mb-6">
+                {selectedExercises.map((ex, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl p-4"
+                    style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+                  >
+                    <p className="text-sm font-medium mb-3" style={{ color: colors.cream }}>{ex.title}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 flex-1">
+                        <Calendar size={16} style={{ color: colors.creamMuted }} />
+                        <select
+                          value={scheduleEntries[i]?.date || ''}
+                          onChange={(e) => updateSchedule(i, 'date', e.target.value)}
+                          className="flex-1 px-3 py-2 rounded-lg text-sm focus:outline-none"
+                          style={{
+                            backgroundColor: colors.dark,
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            color: colors.cream,
+                            colorScheme: 'dark',
+                          }}
+                        >
+                          <option value="">Day</option>
+                          {getNextWeekDates().map(d => (
+                            <option key={d} value={d}>
+                              {new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock size={16} style={{ color: colors.creamMuted }} />
+                        <input
+                          type="time"
+                          value={scheduleEntries[i]?.time || '09:00'}
+                          onChange={(e) => updateSchedule(i, 'time', e.target.value)}
+                          className="px-3 py-2 rounded-lg text-sm focus:outline-none"
+                          style={{
+                            backgroundColor: colors.dark,
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            color: colors.cream,
+                            colorScheme: 'dark',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add to calendar */}
+              <div
+                className="rounded-xl p-4 mb-4"
+                style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}30` }}
+              >
+                <p className="text-xs font-medium mb-3" style={{ color: colors.cyan }}>
+                  Add to your calendar
+                </p>
+                <button
+                  onClick={() => {
+                    const events = selectedExercises.map((ex, i) => {
+                      const schedule = scheduleEntries[i]
+                      const dateStr = schedule?.date || getNextWeekDates()[0]
+                      const timeStr = schedule?.time || '09:00'
+                      return {
+                        title: ex.title,
+                        description: ex.description || 'Scheduled via Seen',
+                        startAt: new Date(`${dateStr}T${timeStr}:00`),
+                        durationMinutes: ex.durationMinutes || 15,
+                      }
+                    })
+                    downloadICS(events, 'seen-exercises.ics')
+                  }}
+                  className="w-full py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2"
+                  style={{ backgroundColor: colors.cyan, color: colors.cream }}
+                >
+                  <Calendar size={16} />
+                  Add to calendar
+                </button>
+                <p className="text-xs text-center mt-2" style={{ color: colors.creamMuted }}>
+                  Downloads a .ics file — works with Google, Apple, and Outlook
+                </p>
+              </div>
+
+              <button
+                onClick={handleSkipScheduling}
+                className="w-full text-sm py-2"
+                style={{ color: colors.creamMuted }}
+              >
+                Skip — just remind me in the app
+              </button>
+            </div>
+          )}
+
+          {/* Step 6: Confirmation */}
+          {step === 6 && (
             <div className="pt-8">
               <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
                 Your reflection
@@ -483,6 +914,39 @@ export default function PostSessionPage() {
                     )}
                   </div>
                 )}
+
+                {/* Scheduled exercises */}
+                {selectedExercises.length > 0 && (
+                  <div
+                    className="rounded-xl p-4"
+                    style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.gold}30` }}
+                  >
+                    <p className="text-xs mb-2" style={{ color: colors.creamMuted }}>Scheduled exercises</p>
+                    <div className="space-y-2">
+                      {selectedExercises.map((ex, i) => {
+                        const schedule = scheduleEntries[i]
+                        return (
+                          <div key={i} className="flex items-center justify-between">
+                            <span className="text-sm" style={{ color: colors.cream }}>{ex.title}</span>
+                            {schedule?.date && (
+                              <span className="text-xs" style={{ color: colors.gold }}>
+                                {new Date(schedule.date + 'T00:00:00').toLocaleDateString('en-US', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric',
+                                })}
+                                {schedule.time && ` at ${schedule.time}`}
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <p className="text-xs mt-2" style={{ color: colors.creamMuted }}>
+                      Added to your calendar
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -509,7 +973,10 @@ export default function PostSessionPage() {
                 cursor: canProceed() ? 'pointer' : 'default',
               }}
             >
-              {step === 3 && !intentionText.trim() ? 'Skip' : 'Next'}
+              {step === 3 && !intentionText.trim() ? 'Skip' :
+               step === 4 && selectedExercises.length === 0 ? 'Skip' :
+               step === 4 ? `Schedule ${selectedExercises.length}` :
+               'Next'}
               <ChevronRight size={18} />
             </button>
           ) : (
