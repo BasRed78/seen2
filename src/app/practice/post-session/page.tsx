@@ -467,7 +467,7 @@ export default function PostSessionPage() {
 
       {/* Bottom action bar */}
       <div
-        className="fixed bottom-0 left-0 right-0 px-6 py-4"
+        className="fixed bottom-0 left-0 right-0 px-6 py-4 z-20"
         style={{
           backgroundColor: colors.dark,
           borderTop: '1px solid rgba(255,255,255,0.05)',
