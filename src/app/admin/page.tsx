@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Users, BookOpen, ChevronRight, Plus, Trash2, UserPlus } from 'lucide-react'
 
 interface User {
   id: string
@@ -12,9 +13,12 @@ interface User {
   created_at: string
 }
 
+type ActiveSection = null | 'create-user' | 'manage-users'
+
 export default function AdminPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeSection, setActiveSection] = useState<ActiveSection>(null)
   const [creating, setCreating] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [newUser, setNewUser] = useState({
@@ -47,16 +51,13 @@ export default function AdminPage() {
     if (!confirm(`Delete ${userName} and all their check-in data? This cannot be undone.`)) {
       return
     }
-
     setDeleting(userId)
-
     try {
       const response = await fetch('/api/users', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       })
-
       if (response.ok) {
         fetchUsers()
       } else {
@@ -74,20 +75,16 @@ export default function AdminPage() {
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newUser.name) return
-
     setCreating(true)
     setCreatedCode(null)
     setEmailSent(false)
-
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...newUser, sendWelcome: sendWelcome && !!newUser.email }),
       })
-
       const data = await response.json()
-
       if (response.ok) {
         setCreatedCode(data.inviteCode)
         setEmailSent(data.emailSent || false)
@@ -112,157 +109,207 @@ export default function AdminPage() {
     { value: 'stress_pleaser', label: 'Stress Pleaser - Over-accommodates others' },
   ]
 
+  const toggleSection = (section: ActiveSection) => {
+    setActiveSection(prev => prev === section ? null : section)
+  }
+
   return (
     <main className="min-h-screen p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Admin: Test Users</h1>
-      <p className="text-cream/60 mb-8">Create and manage test users for friends & family testing</p>
+      <h1 className="text-3xl font-bold mb-1">Admin</h1>
+      <p className="text-cream/50 mb-8 text-sm">Manage users, content, and settings</p>
 
-      {/* Create new user form */}
-      <div className="bg-white/5 rounded-2xl p-6 mb-8 border border-white/10">
-        <h2 className="text-xl font-semibold mb-4">Create New Test User</h2>
-        
-        <form onSubmit={createUser} className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1 text-cream/80">Name *</label>
-              <input
-                type="text"
-                value={newUser.name}
-                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                placeholder="Enter name"
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-cream placeholder:text-cream/30 focus:outline-none focus:border-coral/50"
-                required
-              />
+      <div className="space-y-3">
+        {/* ===== Create Test User ===== */}
+        <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
+          <button
+            onClick={() => toggleSection('create-user')}
+            className="w-full flex items-center gap-4 p-5 hover:bg-white/[0.02] transition-all text-left"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#ff6b5b]/15 flex items-center justify-center flex-shrink-0">
+              <UserPlus size={20} className="text-[#ff6b5b]" />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-cream/80">Email (optional)</label>
-              <input
-                type="email"
-                value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                placeholder="Enter email"
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-cream placeholder:text-cream/30 focus:outline-none focus:border-coral/50"
-              />
-              {newUser.email && (
-                <label className="flex items-center gap-2 mt-2 text-sm text-cream/60 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={sendWelcome}
-                    onChange={(e) => setSendWelcome(e.target.checked)}
-                    className="rounded border-white/20 bg-white/5 text-coral focus:ring-coral/50"
+            <div className="flex-1">
+              <p className="font-semibold">Create Test User</p>
+              <p className="text-sm text-cream/50">Generate invite codes for new testers</p>
+            </div>
+            <ChevronRight
+              size={18}
+              className="text-cream/30 transition-transform"
+              style={{ transform: activeSection === 'create-user' ? 'rotate(90deg)' : 'none' }}
+            />
+          </button>
+
+          {activeSection === 'create-user' && (
+            <div className="px-5 pb-5 border-t border-white/5">
+              <form onSubmit={createUser} className="space-y-4 pt-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-cream/80">Name *</label>
+                    <input
+                      type="text"
+                      value={newUser.name}
+                      onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                      placeholder="Enter name"
+                      className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-cream placeholder:text-cream/30 focus:outline-none focus:border-coral/50"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-cream/80">Email (optional)</label>
+                    <input
+                      type="email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                      placeholder="Enter email"
+                      className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-cream placeholder:text-cream/30 focus:outline-none focus:border-coral/50"
+                    />
+                    {newUser.email && (
+                      <label className="flex items-center gap-2 mt-2 text-sm text-cream/60 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={sendWelcome}
+                          onChange={(e) => setSendWelcome(e.target.checked)}
+                          className="rounded border-white/20 bg-white/5 text-coral focus:ring-coral/50"
+                        />
+                        Send welcome email with invite code
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-cream/80">Pattern Type</label>
+                  <select
+                    value={newUser.patternType}
+                    onChange={(e) => setNewUser({ ...newUser, patternType: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-cream focus:outline-none focus:border-coral/50"
+                  >
+                    <option value="">Select a pattern (optional)</option>
+                    {patternTypes.map((type) => (
+                      <option key={type.value} value={type.value}>{type.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-cream/80">Pattern Description</label>
+                  <textarea
+                    value={newUser.patternDescription}
+                    onChange={(e) => setNewUser({ ...newUser, patternDescription: e.target.value })}
+                    placeholder="Describe their specific pattern in plain language"
+                    rows={2}
+                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-cream placeholder:text-cream/30 focus:outline-none focus:border-coral/50 resize-none"
                   />
-                  Send welcome email with invite code
-                </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={!newUser.name || creating}
+                  className="px-6 py-2 rounded-lg bg-coral text-cream font-medium hover:bg-coral-light disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  {creating ? 'Creating...' : 'Create User & Generate Invite Code'}
+                </button>
+              </form>
+
+              {createdCode && (
+                <div className="mt-4 p-4 bg-cyan/20 rounded-lg border border-cyan/30">
+                  <p className="text-sm text-cream/80 mb-1">User created! Share this invite code:</p>
+                  <p className="text-2xl font-mono font-bold tracking-widest text-cyan">{createdCode}</p>
+                  {emailSent && (
+                    <p className="text-sm text-cream/60 mt-2">Welcome email sent!</p>
+                  )}
+                </div>
               )}
             </div>
-          </div>
+          )}
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-cream/80">Pattern Type</label>
-            <select
-              value={newUser.patternType}
-              onChange={(e) => setNewUser({ ...newUser, patternType: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-cream focus:outline-none focus:border-coral/50"
-            >
-              <option value="">Select a pattern (optional)</option>
-              {patternTypes.map((type) => (
-                <option key={type.value} value={type.value}>{type.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1 text-cream/80">Pattern Description</label>
-            <textarea
-              value={newUser.patternDescription}
-              onChange={(e) => setNewUser({ ...newUser, patternDescription: e.target.value })}
-              placeholder="Describe their specific pattern in plain language (e.g., 'Reaches out to ex-partners when feeling overwhelmed at work')"
-              rows={2}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-cream placeholder:text-cream/30 focus:outline-none focus:border-coral/50 resize-none"
-            />
-          </div>
-
+        {/* ===== Manage Test Users ===== */}
+        <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
           <button
-            type="submit"
-            disabled={!newUser.name || creating}
-            className="px-6 py-2 rounded-lg bg-coral text-cream font-medium hover:bg-coral-light disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            onClick={() => toggleSection('manage-users')}
+            className="w-full flex items-center gap-4 p-5 hover:bg-white/[0.02] transition-all text-left"
           >
-            {creating ? 'Creating...' : 'Create User & Generate Invite Code'}
+            <div className="w-10 h-10 rounded-xl bg-[#5B8F8F]/15 flex items-center justify-center flex-shrink-0">
+              <Users size={20} className="text-[#5B8F8F]" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold">Test Users</p>
+              <p className="text-sm text-cream/50">
+                {loading ? 'Loading...' : `${users.length} user${users.length !== 1 ? 's' : ''}`}
+              </p>
+            </div>
+            <ChevronRight
+              size={18}
+              className="text-cream/30 transition-transform"
+              style={{ transform: activeSection === 'manage-users' ? 'rotate(90deg)' : 'none' }}
+            />
           </button>
-        </form>
 
-        {createdCode && (
-          <div className="mt-4 p-4 bg-cyan/20 rounded-lg border border-cyan/30 animate-fade-in">
-            <p className="text-sm text-cream/80 mb-1">✨ User created! Share this invite code:</p>
-            <p className="text-2xl font-mono font-bold tracking-widest text-cyan">{createdCode}</p>
-            {emailSent && (
-              <p className="text-sm text-cream/60 mt-2">📧 Welcome email sent!</p>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Users list */}
-      <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-        <h2 className="text-xl font-semibold mb-4">Existing Test Users</h2>
-        
-        {loading ? (
-          <p className="text-cream/60">Loading...</p>
-        ) : users.length === 0 ? (
-          <p className="text-cream/60">No users yet. Create your first test user above.</p>
-        ) : (
-          <div className="space-y-3">
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center justify-between p-4 bg-white/5 rounded-lg"
-              >
-                <div>
-                  <p className="font-medium">{user.name}</p>
-                  <p className="text-sm text-cream/60">
-                    {user.email || 'No email'} · {user.pattern_type || 'No pattern'} · Stage: {user.stage}
-                  </p>
+          {activeSection === 'manage-users' && (
+            <div className="px-5 pb-5 border-t border-white/5">
+              {loading ? (
+                <p className="text-cream/60 pt-4">Loading...</p>
+              ) : users.length === 0 ? (
+                <p className="text-cream/60 pt-4">No users yet.</p>
+              ) : (
+                <div className="space-y-2 pt-4">
+                  {users.map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm truncate">{user.name}</p>
+                        <p className="text-xs text-cream/50 truncate">
+                          {user.email || 'No email'} · {user.pattern_type || 'No pattern'} · {user.stage}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0 ml-3">
+                        <div className="text-right">
+                          <p className="font-mono text-sm text-coral">{user.invite_code}</p>
+                          <p className="text-xs text-cream/30">
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => deleteUser(user.id, user.name)}
+                          disabled={deleting === user.id}
+                          className="p-1.5 rounded-lg bg-red-500/10 text-red-400/60 hover:bg-red-500/20 hover:text-red-400 disabled:opacity-50 transition-all"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="font-mono text-lg text-coral">{user.invite_code}</p>
-                    <p className="text-xs text-cream/40">
-                      Created {new Date(user.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => deleteUser(user.id, user.name)}
-                    disabled={deleting === user.id}
-                    className="px-3 py-1 text-sm rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 disabled:opacity-50 transition-all"
-                  >
-                    {deleting === user.id ? '...' : 'Delete'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              )}
+            </div>
+          )}
+        </div>
 
-      {/* Admin links */}
-      <div className="mt-8 bg-white/5 rounded-2xl p-6 border border-white/10">
-        <h2 className="text-xl font-semibold mb-4">Content Management</h2>
+        {/* ===== Exercises (links to sub-page) ===== */}
         <a
           href="/admin/exercises"
-          className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all"
+          className="block bg-white/5 rounded-2xl border border-white/10 overflow-hidden"
         >
-          <div>
-            <p className="font-medium">Exercises</p>
-            <p className="text-sm text-cream/60">Create, edit, and manage practice exercises</p>
+          <div className="flex items-center gap-4 p-5 hover:bg-white/[0.02] transition-all">
+            <div className="w-10 h-10 rounded-xl bg-[#ff6b5b]/15 flex items-center justify-center flex-shrink-0">
+              <BookOpen size={20} className="text-[#ff6b5b]" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold">Exercises</p>
+              <p className="text-sm text-cream/50">Create, edit, and manage practice exercises</p>
+            </div>
+            <ChevronRight size={18} className="text-cream/30" />
           </div>
-          <span className="text-cream/40">→</span>
         </a>
       </div>
 
       {/* Back link */}
-      <div className="mt-6 text-center">
-        <a href="/" className="text-cream/60 hover:text-cream transition-colors">
-          ← Back to login
+      <div className="mt-8 text-center">
+        <a href="/" className="text-cream/40 hover:text-cream/60 transition-colors text-sm">
+          ← Back to landing page
         </a>
       </div>
     </main>
