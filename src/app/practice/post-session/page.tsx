@@ -224,9 +224,9 @@ export default function PostSessionPage() {
                     onClick={() => setEmotionalState(num)}
                     className="w-12 h-12 rounded-full font-semibold text-lg transition-all"
                     style={{
-                      backgroundColor: emotionalState === num ? colors.coral : colors.darkCard,
+                      backgroundColor: emotionalState === num ? colors.cyan : colors.darkCard,
                       color: emotionalState === num ? colors.cream : colors.creamMuted,
-                      border: `2px solid ${emotionalState === num ? colors.coral : 'rgba(255,255,255,0.08)'}`,
+                      border: `2px solid ${emotionalState === num ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
                       transform: emotionalState === num ? 'scale(1.1)' : 'scale(1)',
                     }}
                   >
@@ -371,7 +371,7 @@ export default function PostSessionPage() {
                   <div className="flex items-center gap-2">
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm"
-                      style={{ backgroundColor: colors.coral, color: colors.cream }}
+                      style={{ backgroundColor: colors.cyan, color: colors.cream }}
                     >
                       {emotionalState}
                     </div>
@@ -461,7 +461,7 @@ export default function PostSessionPage() {
               onClick={handleNext}
               className="w-full py-4 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-2"
               style={{
-                backgroundColor: canProceed() ? colors.coral : colors.darkCard,
+                backgroundColor: canProceed() ? colors.cyan : colors.darkCard,
                 color: canProceed() ? colors.cream : colors.creamMuted,
                 opacity: canProceed() ? 1 : 0.5,
                 cursor: canProceed() ? 'pointer' : 'default',
@@ -475,7 +475,7 @@ export default function PostSessionPage() {
               onClick={handleSubmit}
               className="w-full py-4 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-2"
               style={{
-                backgroundColor: colors.coral,
+                backgroundColor: colors.cyan,
                 color: colors.cream,
                 opacity: submitting ? 0.7 : 1,
                 cursor: submitting ? 'default' : 'pointer',

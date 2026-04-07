@@ -537,13 +537,13 @@ export default function PracticeHistoryPage() {
                           className="rounded-xl p-4"
                           style={{
                             backgroundColor: colors.darkCard,
-                            borderLeft: `3px solid ${colors.coral}`,
+                            borderLeft: `3px solid ${colors.cyanLight}`,
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <Target size={14} style={{ color: colors.coral }} />
-                              <span className="text-xs font-medium" style={{ color: colors.coral }}>
+                              <Target size={14} style={{ color: colors.cyanLight }} />
+                              <span className="text-xs font-medium" style={{ color: colors.cyanLight }}>
                                 Intention set
                               </span>
                             </div>

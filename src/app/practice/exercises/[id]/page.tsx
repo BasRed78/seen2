@@ -201,8 +201,8 @@ export default function ExerciseDoPage() {
   const getStepTypeColor = (type?: string) => {
     switch (type) {
       case 'pause': return colors.cyanLight
-      case 'prompt': return colors.coral
-      case 'reflection': return colors.coral
+      case 'prompt': return colors.cyan
+      case 'reflection': return colors.cyanLight
       default: return colors.cyan
     }
   }
@@ -465,7 +465,7 @@ export default function ExerciseDoPage() {
               <button
                 onClick={startExercise}
                 className="w-full py-3.5 rounded-xl font-semibold text-sm transition-all"
-                style={{ backgroundColor: colors.coral, color: colors.cream }}
+                style={{ backgroundColor: colors.cyan, color: colors.cream }}
               >
                 Begin Exercise
               </button>
@@ -483,7 +483,7 @@ export default function ExerciseDoPage() {
                 <button
                   onClick={nextStep}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-sm transition-all"
-                  style={{ backgroundColor: colors.coral, color: colors.cream }}
+                  style={{ backgroundColor: colors.cyan, color: colors.cream }}
                 >
                   {currentStepIndex < totalSteps - 1 ? 'Next' : 'Finish'}
                 </button>
@@ -498,7 +498,7 @@ export default function ExerciseDoPage() {
                 }}
                 className="w-full py-3.5 rounded-xl font-semibold text-sm transition-all"
                 style={{
-                  backgroundColor: saving ? colors.darkCardHover : colors.coral,
+                  backgroundColor: saving ? colors.darkCardHover : colors.cyan,
                   color: colors.cream,
                   opacity: saving ? 0.7 : 1,
                 }}
