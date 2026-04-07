@@ -7,7 +7,6 @@ import { colors } from '@/lib/constants/colors'
 import { StarIcon } from '@/components/StarIcon'
 import { VoiceMicButton } from '@/components/VoiceMicButton'
 import useVoiceInput from '@/hooks/useVoiceInput'
-import useGoogleCalendar from '@/hooks/useGoogleCalendar'
 import { downloadICS } from '@/lib/calendar/ics'
 
 interface Theme {
@@ -66,7 +65,6 @@ export default function PostSessionPage() {
 
   // Scheduling state (step 5)
   const [scheduleEntries, setScheduleEntries] = useState<Record<number, ScheduleEntry>>({})
-  const [calendarProvider, setCalendarProvider] = useState<'google' | 'ics' | 'none'>('none')
 
   // Voice input for reflection textarea
   const reflectionVoice = useVoiceInput({
@@ -77,9 +75,6 @@ export default function PostSessionPage() {
   const intentionVoice = useVoiceInput({
     onTranscript: (text) => setIntentionText(text),
   })
-
-  // Google Calendar
-  const googleCalendar = useGoogleCalendar({ userId: user?.id || null })
 
   // Auth & phase gate
   useEffect(() => {
@@ -251,7 +246,6 @@ export default function PostSessionPage() {
   }
 
   const handleSkipScheduling = () => {
-    setCalendarProvider('none')
     setStep(6)
     scrollToTop()
   }
@@ -292,7 +286,7 @@ export default function PostSessionPage() {
             return {
               exerciseId: ex.exerciseId,
               customTitle: ex.exerciseId ? undefined : ex.title,
-              exerciseTitle: ex.title,
+              title: ex.title,
               description: ex.description,
               scheduledAt: new Date(`${schedule.date}T${schedule.time}`).toISOString(),
               durationMinutes: ex.durationMinutes,
@@ -301,26 +295,13 @@ export default function PostSessionPage() {
           .filter(Boolean)
 
         if (exercisesToSchedule.length > 0) {
-          const provider = googleCalendar.isConnected ? 'google' : calendarProvider
-
-          if (provider === 'ics') {
-            // Download .ics file
-            downloadICS(exercisesToSchedule.map(ex => ({
-              title: ex!.exerciseTitle || ex!.customTitle || 'Exercise',
-              description: ex!.description || '',
-              startAt: new Date(ex!.scheduledAt),
-              durationMinutes: ex!.durationMinutes,
-            })))
-          }
-
-          // Save to database (and Google Calendar if connected)
+          // Save to database for in-app tracking
           await fetch('/api/calendar/events', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               userId: user.id,
               exercises: exercisesToSchedule,
-              provider: provider === 'ics' ? 'ics' : provider,
               postSessionCheckinId: result.checkin?.id,
             }),
           })
@@ -799,7 +780,7 @@ export default function PostSessionPage() {
                 ))}
               </div>
 
-              {/* Calendar connection */}
+              {/* Add to calendar */}
               <div
                 className="rounded-xl p-4 mb-4"
                 style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}30` }}
@@ -807,39 +788,30 @@ export default function PostSessionPage() {
                 <p className="text-xs font-medium mb-3" style={{ color: colors.cyan }}>
                   Add to your calendar
                 </p>
-
-                {googleCalendar.isConnected ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.cyan + '30' }}>
-                      <Check size={12} style={{ color: colors.cyan }} />
-                    </div>
-                    <span className="text-sm" style={{ color: colors.cream }}>Google Calendar connected</span>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => {
-                        googleCalendar.connect()
-                        setCalendarProvider('google')
-                      }}
-                      className="w-full py-3 rounded-xl text-sm font-medium transition-all"
-                      style={{ backgroundColor: colors.cyan, color: colors.cream }}
-                    >
-                      Connect Google Calendar
-                    </button>
-                    <button
-                      onClick={() => setCalendarProvider('ics')}
-                      className="w-full py-3 rounded-xl text-sm font-medium transition-all"
-                      style={{
-                        backgroundColor: calendarProvider === 'ics' ? colors.cyan + '15' : colors.dark,
-                        color: calendarProvider === 'ics' ? colors.cyan : colors.creamMuted,
-                        border: `1px solid ${calendarProvider === 'ics' ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
-                      }}
-                    >
-                      Download calendar file (.ics)
-                    </button>
-                  </div>
-                )}
+                <button
+                  onClick={() => {
+                    const events = selectedExercises.map((ex, i) => {
+                      const schedule = scheduleEntries[i]
+                      const dateStr = schedule?.date || getNextWeekDates()[0]
+                      const timeStr = schedule?.time || '09:00'
+                      return {
+                        title: ex.title,
+                        description: ex.description || 'Scheduled via Seen',
+                        startAt: new Date(`${dateStr}T${timeStr}:00`),
+                        durationMinutes: ex.durationMinutes || 15,
+                      }
+                    })
+                    downloadICS(events, 'seen-exercises.ics')
+                  }}
+                  className="w-full py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2"
+                  style={{ backgroundColor: colors.cyan, color: colors.cream }}
+                >
+                  <Calendar size={16} />
+                  Add to calendar
+                </button>
+                <p className="text-xs text-center mt-2" style={{ color: colors.creamMuted }}>
+                  Downloads a .ics file — works with Google, Apple, and Outlook
+                </p>
               </div>
 
               <button
@@ -971,9 +943,7 @@ export default function PostSessionPage() {
                       })}
                     </div>
                     <p className="text-xs mt-2" style={{ color: colors.creamMuted }}>
-                      {googleCalendar.isConnected ? 'Will be added to Google Calendar' :
-                       calendarProvider === 'ics' ? 'Calendar file will download' :
-                       'Reminders in app only'}
+                      Added to your calendar
                     </p>
                   </div>
                 )}
