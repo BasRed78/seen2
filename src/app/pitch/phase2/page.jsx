@@ -315,7 +315,7 @@ export default function Phase2Pitch() {
       <div style={{ height: 240, position: 'relative' }}>
         {[
           { stat: '50%+', highlight: 'homework compliance problems', desc: 'Therapists report problems with homework in more than half of all cases. The work that could accelerate progress goes undone.', cite: 'Helbig & Fehm, 2004 \u2014 Behavioural and Cognitive Psychotherapy' },
-          { stat: 'r = .26', highlight: 'compliance predicts outcomes', desc: 'A meta-analysis of 23 studies found a significant link between homework compliance and therapy outcomes. Doing the work matters.', cite: 'Mausbach et al., 2010 \u2014 Cognitive Therapy and Research' },
+          { stat: '23', highlight: 'studies confirm it', desc: 'A meta-analysis confirms what therapists already know: clients who do the work between sessions get more out of therapy.', cite: 'Mausbach et al., 2010 \u2014 Cognitive Therapy and Research' },
           { stat: '99.4%', highlight: 'of your week without support', desc: 'One hour of therapy per week. 167 hours on your own. The session plants the seed \u2014 practice grows it.', cite: '' },
         ].map((item, i) => (
           <div key={i} style={{ position: 'absolute', width: '100%', top: 0, transition: 'all 0.5s ease', opacity: statsStep === i ? 1 : 0, transform: statsStep === i ? 'translateY(0)' : 'translateY(30px)' }}>
