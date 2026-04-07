@@ -344,9 +344,14 @@ const Navigation = ({ scrolled, scrollProgress }: { scrolled: boolean; scrollPro
         <StarIcon size={28} style={{ color: colors.coral }} />
         <span className="font-black text-2xl" style={{ color: colors.cream }}>Seen</span>
       </div>
-      <Link href="/quiz" className="px-5 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105" style={{ backgroundColor: colors.coral, color: colors.cream }}>
-        Take the Quiz
-      </Link>
+      <div className="flex items-center gap-3">
+        <Link href="/login" className="px-4 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105" style={{ color: colors.cream, border: `1px solid ${colors.cream}30` }}>
+          Log in
+        </Link>
+        <Link href="/quiz" className="px-5 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105" style={{ backgroundColor: colors.coral, color: colors.cream }}>
+          Take the Quiz
+        </Link>
+      </div>
     </div>
   </nav>
 );
