@@ -234,12 +234,14 @@ export default function HomePage() {
           className="rounded-2xl p-5 mb-4"
           style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
         >
-          {/* Latest insight headline */}
+          {/* Latest insight summary */}
           {insights?.latestInsight && (
-            <div className="flex items-start gap-3 mb-4">
-              <Eye size={18} style={{ color: colors.cyan, flexShrink: 0, marginTop: 2 }} />
-              <p className="text-sm leading-relaxed" style={{ color: colors.cream, opacity: 0.8 }}>
+            <div className="mb-4">
+              <p className="text-xs font-semibold mb-2" style={{ color: colors.cyan }}>
                 {insights.latestInsight.title}
+              </p>
+              <p className="text-sm leading-relaxed line-clamp-2" style={{ color: colors.cream, opacity: 0.7 }}>
+                {insights.latestInsight.body}
               </p>
             </div>
           )}

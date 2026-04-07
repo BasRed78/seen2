@@ -10,7 +10,6 @@ import {
   MessageCircle,
   Shield,
   BookOpen,
-  ClipboardList,
   Clock,
   ChevronRight,
 } from 'lucide-react'
@@ -84,16 +83,21 @@ export default function PracticePage() {
         }}
       />
 
-      <div className="relative z-10 max-w-lg mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2">
-            <Heart size={16} style={{ color: colors.cyan }} />
-            <span className="font-bold" style={{ color: colors.cream }}>Practice</span>
-          </div>
-          <ClipboardList size={20} style={{ color: colors.creamMuted }} />
+      {/* Fixed Header */}
+      <header
+        className="fixed top-0 left-0 right-0 z-30 px-6 py-4"
+        style={{
+          backgroundColor: colors.dark,
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+        }}
+      >
+        <div className="max-w-lg mx-auto flex items-center gap-2">
+          <Heart size={16} style={{ color: colors.cyan }} />
+          <span className="font-bold" style={{ color: colors.cream }}>Practice</span>
         </div>
+      </header>
 
+      <div className="relative z-10 max-w-lg mx-auto px-6 pt-20 pb-8">
         {/* Welcome */}
         <div className="mb-6">
           <p className="text-2xl font-bold mb-1" style={{ color: colors.cream }}>
@@ -211,7 +215,7 @@ export default function PracticePage() {
 
       {/* Bottom Nav */}
       <nav
-        className="fixed bottom-0 left-0 right-0 px-6 py-3"
+        className="fixed bottom-0 left-0 right-0 px-6 py-3 z-20"
         style={{
           backgroundColor: colors.darkCard,
           borderTop: '1px solid rgba(255,255,255,0.05)',
