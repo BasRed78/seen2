@@ -131,18 +131,26 @@ export default function HomePage() {
         }}
       />
 
-      <div className="relative z-10 max-w-lg mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+      {/* Fixed Header */}
+      <header
+        className="fixed top-0 left-0 right-0 z-30 px-6 py-4"
+        style={{
+          backgroundColor: colors.dark,
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+        }}
+      >
+        <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <StarIcon size={16} style={{ color: colors.coral }} />
-            <span className="font-bold" style={{ color: colors.cream }}>SEEN</span>
+            <span className="font-bold" style={{ color: colors.cream }}>Seen</span>
           </div>
           <Link href="/settings">
             <Settings size={20} style={{ color: colors.cream, opacity: 0.5 }} />
           </Link>
         </div>
+      </header>
 
+      <div className="relative z-10 max-w-lg mx-auto px-6 pt-20 pb-8">
         {/* Greeting */}
         <div className="mb-8">
           <p className="text-2xl font-bold mb-1" style={{ color: colors.cream }}>
@@ -289,10 +297,10 @@ export default function HomePage() {
       </div>
 
       {/* Bottom Nav */}
-      <nav 
-        className="fixed bottom-0 left-0 right-0 px-6 py-3"
-        style={{ 
-          backgroundColor: colors.darkLight, 
+      <nav
+        className="fixed bottom-0 left-0 right-0 px-6 py-3 z-20"
+        style={{
+          backgroundColor: colors.darkCard,
           borderTop: '1px solid rgba(255,255,255,0.05)',
         }}
       >
