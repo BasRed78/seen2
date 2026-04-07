@@ -4,32 +4,16 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Heart,
-  BarChart3,
-  Home,
   MessageCircle,
   Shield,
   BookOpen,
   Clock,
   ChevronRight,
 } from 'lucide-react'
-
-const colors = {
-  coral: '#ff6b5b',
-  dark: '#0f0f1a',
-  darkCard: '#1a1a2e',
-  darkCardHover: '#252542',
-  cream: '#faf8f5',
-  creamMuted: 'rgba(250, 248, 245, 0.6)',
-  cyan: '#5B8F8F',
-  cyanLight: '#7ab5b5',
-}
-
-const StarIcon = ({ size = 24, style = {} }: { size?: number; style?: React.CSSProperties }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={style}>
-    <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" />
-  </svg>
-)
+import { colors } from '@/lib/constants/colors'
+import { StarIcon } from '@/components/StarIcon'
+import { FixedHeader } from '@/components/FixedHeader'
+import { BottomNav } from '@/components/BottomNav'
 
 interface User {
   id: string
@@ -83,19 +67,7 @@ export default function PracticePage() {
         }}
       />
 
-      {/* Fixed Header */}
-      <header
-        className="fixed top-0 left-0 right-0 z-30 px-6 py-4"
-        style={{
-          backgroundColor: colors.dark,
-          borderBottom: '1px solid rgba(255,255,255,0.05)',
-        }}
-      >
-        <div className="max-w-lg mx-auto flex items-center gap-2">
-          <Heart size={16} style={{ color: colors.cyan }} />
-          <span className="font-bold" style={{ color: colors.cream }}>Practice</span>
-        </div>
-      </header>
+      <FixedHeader phase="phase2" title="Practice" />
 
       <div className="relative z-10 max-w-lg mx-auto px-6 pt-20 pb-8">
         {/* Welcome */}
@@ -122,7 +94,7 @@ export default function PracticePage() {
           </div>
         </div>
 
-        {/* Post-Session Reflection — active */}
+        {/* Post-Session Reflection */}
         <Link
           href="/practice/post-session"
           className="block rounded-2xl p-5 mb-3 transition-all hover:scale-[1.01]"
@@ -150,7 +122,7 @@ export default function PracticePage() {
           </div>
         </Link>
 
-        {/* Exercises — active */}
+        {/* Exercises */}
         <Link
           href="/practice/exercises"
           className="block rounded-2xl p-5 mb-3 transition-all hover:scale-[1.01]"
@@ -213,33 +185,7 @@ export default function PracticePage() {
         </div>
       </div>
 
-      {/* Bottom Nav */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 px-6 py-3 z-20"
-        style={{
-          backgroundColor: colors.darkCard,
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-        }}
-      >
-        <div className="max-w-lg mx-auto flex justify-around">
-          <Link href="/home" className="flex flex-col items-center gap-1 py-2 px-4">
-            <Home size={22} style={{ color: colors.creamMuted }} />
-            <span className="text-xs" style={{ color: colors.creamMuted }}>Home</span>
-          </Link>
-          <Link href="/chat" className="flex flex-col items-center gap-1 py-2 px-4">
-            <MessageCircle size={22} style={{ color: colors.creamMuted }} />
-            <span className="text-xs" style={{ color: colors.creamMuted }}>Check-in</span>
-          </Link>
-          <Link href="/practice" className="flex flex-col items-center gap-1 py-2 px-4">
-            <Heart size={22} style={{ color: colors.cyan }} />
-            <span className="text-xs" style={{ color: colors.cyan }}>Practice</span>
-          </Link>
-          <Link href="/insights" className="flex flex-col items-center gap-1 py-2 px-4">
-            <BarChart3 size={22} style={{ color: colors.creamMuted }} />
-            <span className="text-xs" style={{ color: colors.creamMuted }}>Insights</span>
-          </Link>
-        </div>
-      </nav>
+      <BottomNav currentPage="practice" phase="phase2" />
     </div>
   )
 }
