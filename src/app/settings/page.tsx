@@ -6,31 +6,14 @@ import Link from 'next/link'
 import {
   ArrowLeft,
   Heart,
-  BarChart3,
-  Home,
-  MessageCircle,
   Settings,
   Shield,
   Check,
+  FlaskConical,
 } from 'lucide-react'
-
-const colors = {
-  coral: '#ff6b5b',
-  coralLight: '#ff8a7a',
-  dark: '#0f0f1a',
-  darkCard: '#1a1a2e',
-  darkCardHover: '#252542',
-  cream: '#faf8f5',
-  creamMuted: 'rgba(250, 248, 245, 0.6)',
-  cyan: '#5B8F8F',
-  cyanLight: '#7ab5b5',
-}
-
-const StarIcon = ({ size = 24, style = {} }: { size?: number; style?: React.CSSProperties }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={style}>
-    <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" />
-  </svg>
-)
+import { colors } from '@/lib/constants/colors'
+import { StarIcon } from '@/components/StarIcon'
+import { BottomNav } from '@/components/BottomNav'
 
 interface User {
   id: string
@@ -51,7 +34,8 @@ export default function SettingsPage() {
   const [activating, setActivating] = useState(false)
   const router = useRouter()
 
-  const isPhase2 = (user?.current_phase || 'phase1') === 'phase2'
+  const phase = user?.current_phase || 'phase1'
+  const isPhase2 = phase === 'phase2'
 
   useEffect(() => {
     const storedUser = localStorage.getItem('seen_user')
@@ -115,7 +99,7 @@ export default function SettingsPage() {
             <ArrowLeft size={20} style={{ color: colors.cream }} />
           </Link>
           <div className="flex items-center gap-2">
-            <Settings size={16} style={{ color: colors.coral }} />
+            <Settings size={16} style={{ color: isPhase2 ? colors.cyan : colors.coral }} />
             <span className="font-bold" style={{ color: colors.cream }}>Settings</span>
           </div>
         </div>
@@ -138,11 +122,30 @@ export default function SettingsPage() {
           )}
         </div>
 
-        {/* Phase 2 Section */}
+        {/* Phase Switcher — testing only */}
         <div className="mb-6">
-          <p className="text-sm font-semibold mb-3" style={{ color: colors.creamMuted }}>
-            Your practice journey
-          </p>
+          <div className="flex items-center gap-2 mb-3">
+            <FlaskConical size={14} style={{ color: colors.gold }} />
+            <p className="text-sm font-semibold" style={{ color: colors.creamMuted }}>
+              Phase switcher
+            </p>
+            <span
+              className="text-xs px-2 py-0.5 rounded-full font-medium"
+              style={{ backgroundColor: colors.gold + '20', color: colors.gold }}
+            >
+              Testing only
+            </span>
+          </div>
+
+          {/* Info note */}
+          <div
+            className="rounded-xl p-3 mb-3"
+            style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.gold}20` }}
+          >
+            <p className="text-xs leading-relaxed" style={{ color: colors.creamMuted }}>
+              In production, phase transitions will be managed by the clinical team. This switcher is for testing purposes only.
+            </p>
+          </div>
 
           <div
             className="rounded-2xl p-5"
@@ -165,11 +168,10 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={() => handlePhaseToggle('deactivate')}
-                  disabled={activating}
                   className="text-sm transition-colors"
-                  style={{ color: colors.creamMuted }}
+                  style={{ color: colors.creamMuted, opacity: activating ? 0.5 : 1 }}
                 >
-                  {activating ? 'Updating...' : 'Deactivate practice mode'}
+                  {activating ? 'Updating...' : 'Switch to Awareness (Phase 1)'}
                 </button>
               </div>
             ) : showConfirm ? (
@@ -204,9 +206,8 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => handlePhaseToggle('activate')}
-                    disabled={activating}
                     className="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all"
-                    style={{ backgroundColor: colors.coral, color: colors.cream }}
+                    style={{ backgroundColor: colors.coral, color: colors.cream, opacity: activating ? 0.5 : 1 }}
                   >
                     {activating ? 'Activating...' : 'Confirm'}
                   </button>
@@ -223,8 +224,7 @@ export default function SettingsPage() {
               /* Inactive state */
               <div>
                 <p className="text-sm mb-3 leading-relaxed" style={{ color: colors.creamMuted }}>
-                  If you're currently working with a therapist or counselor, you can activate
-                  practice mode to support your work between sessions.
+                  Currently in Awareness (Phase 1). Switch to Practice mode to test the Phase 2 experience.
                 </p>
                 <button
                   onClick={() => setShowConfirm(true)}
@@ -232,7 +232,7 @@ export default function SettingsPage() {
                   style={{ backgroundColor: colors.coral, color: colors.cream }}
                 >
                   <Heart size={16} />
-                  I'm working with a therapist
+                  Switch to Practice (Phase 2)
                 </button>
               </div>
             )}
@@ -253,35 +253,7 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {/* Bottom Nav */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 px-6 py-3"
-        style={{
-          backgroundColor: colors.darkCard,
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-        }}
-      >
-        <div className="max-w-lg mx-auto flex justify-around">
-          <Link href="/home" className="flex flex-col items-center gap-1 py-2 px-4">
-            <Home size={22} style={{ color: colors.creamMuted }} />
-            <span className="text-xs" style={{ color: colors.creamMuted }}>Home</span>
-          </Link>
-          <Link href="/chat" className="flex flex-col items-center gap-1 py-2 px-4">
-            <MessageCircle size={22} style={{ color: colors.creamMuted }} />
-            <span className="text-xs" style={{ color: colors.creamMuted }}>Check-in</span>
-          </Link>
-          {isPhase2 && (
-            <Link href="/practice" className="flex flex-col items-center gap-1 py-2 px-4">
-              <Heart size={22} style={{ color: colors.creamMuted }} />
-              <span className="text-xs" style={{ color: colors.creamMuted }}>Practice</span>
-            </Link>
-          )}
-          <Link href="/insights" className="flex flex-col items-center gap-1 py-2 px-4">
-            <BarChart3 size={22} style={{ color: colors.creamMuted }} />
-            <span className="text-xs" style={{ color: colors.creamMuted }}>Insights</span>
-          </Link>
-        </div>
-      </nav>
+      <BottomNav currentPage="home" phase={phase} />
     </div>
   )
 }
