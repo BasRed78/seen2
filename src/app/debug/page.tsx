@@ -78,7 +78,7 @@ export default function DebugPage() {
   const selectedUserData = users.find(u => u.id === selectedUser)
 
   return (
-    <main className="min-h-screen p-6 max-w-6xl mx-auto">
+    <main className="min-h-screen p-6 max-w-6xl mx-auto" style={{ backgroundColor: '#0f0f1a' }}>
       <h1 className="text-3xl font-bold mb-2">Debug: Conversation Viewer</h1>
       <p className="text-cream/60 mb-8">View all check-ins and the system prompt being sent to Claude</p>
 

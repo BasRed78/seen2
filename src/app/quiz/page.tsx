@@ -10,7 +10,7 @@ const ds = {
   bg: '#0f0f1a',
   surface: '#1a1a2e',
   surfaceLight: '#252542',
-  coral: '#e85a4f',
+  coral: '#ff6b5b',
   cream: '#faf8f5',
   cyan: '#5B8F8F',
   muted: 'rgba(250,248,245,0.5)',

@@ -114,7 +114,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen p-6 max-w-4xl mx-auto">
+    <main className="min-h-screen p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#0f0f1a' }}>
       <h1 className="text-3xl font-bold mb-1">Admin</h1>
       <p className="text-cream/50 mb-8 text-sm">Manage users, content, and settings</p>
 

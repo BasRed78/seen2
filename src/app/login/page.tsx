@@ -50,12 +50,12 @@ export default function Login() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6" style={{ backgroundColor: '#0f0f1a' }}>
       {/* Background gradient */}
       <div 
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(circle at 30% 20%, rgba(194, 84, 65, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(91, 143, 143, 0.1) 0%, transparent 50%)',
+          background: 'radial-gradient(circle at 30% 20%, rgba(255, 107, 91, 0.12) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(91, 143, 143, 0.1) 0%, transparent 50%)',
         }}
       />
 

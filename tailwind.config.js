@@ -8,11 +8,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        coral: '#C25441',
-        'coral-light': '#E07A5F',
-        'coral-dark': '#A13D2D',
-        dark: '#1a1a2e',
-        'dark-light': '#252540',
+        coral: '#ff6b5b',
+        'coral-light': '#ff8a7a',
+        'coral-dark': '#e85a4f',
+        dark: '#0f0f1a',
+        'dark-light': '#1a1a2e',
         navy: '#205179',
         cream: '#FAF8F5',
         'cream-light': '#F5F0E8',
