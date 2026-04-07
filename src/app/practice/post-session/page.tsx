@@ -102,17 +102,23 @@ export default function PostSessionPage() {
     }
   }
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const handleBack = () => {
     if (step === 1) {
       router.push('/practice')
     } else {
       setStep(step - 1)
+      scrollToTop()
     }
   }
 
   const handleNext = () => {
     if (step < TOTAL_STEPS) {
       setStep(step + 1)
+      scrollToTop()
     }
   }
 
@@ -120,6 +126,7 @@ export default function PostSessionPage() {
     setIntentionText('')
     setTargetDate('')
     setStep(5)
+    scrollToTop()
   }
 
   const handleSubmit = async () => {
