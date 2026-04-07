@@ -290,9 +290,9 @@ export default function Phase2Pitch() {
       <h2 style={{ color: ds.cream, fontSize: '2rem', fontWeight: 800, marginBottom: 40 }}>What happens between sessions?</h2>
       <div style={{ height: 170, position: 'relative', overflow: 'hidden' }}>
         {[
-          { quote: 'The insight fades', explain: "By Wednesday, the breakthrough from Monday's session feels distant.", cite: 'Kazantzis et al., 2016 \u2014 Cognitive Behaviour Therapy' },
-          { quote: 'The homework doesn\'t happen', explain: "Life takes over. Good intentions stay on the therapist's notepad.", cite: 'Helbig & Fehm, 2004 \u2014 therapy homework compliance' },
-          { quote: '"What did we even talk about?"', explain: "You walk into the next session and can't remember what felt so important.", cite: 'Tang & DeRubeis, 1999 \u2014 session recall' },
+          { quote: 'The insight fades', explain: "By Wednesday, the breakthrough from Monday's session feels distant.", cite: '' },
+          { quote: 'The homework doesn\'t happen', explain: "Therapists report compliance problems in more than half of all cases.", cite: 'Helbig & Fehm, 2004 \u2014 Behavioural and Cognitive Psychotherapy' },
+          { quote: '"What did we even talk about?"', explain: "You walk into the next session and can't remember what felt so important.", cite: '' },
         ].map((item, i) => (
           <div key={i} style={{ position: 'absolute', width: '100%', transition: 'all 0.6s ease', transform: forgetStep === i ? 'translateY(0)' : forgetStep > i ? 'translateY(-100px)' : 'translateY(100px)', opacity: forgetStep === i ? 1 : 0 }}>
             <p style={{ color: ds.cyan, fontSize: '2.25rem', fontWeight: 800, lineHeight: 1.2, marginBottom: 12 }}>{item.quote}</p>
@@ -314,9 +314,9 @@ export default function Phase2Pitch() {
       <p style={{ color: ds.muted, fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 24 }}>What the research says</p>
       <div style={{ height: 240, position: 'relative' }}>
         {[
-          { stat: '50%', highlight: 'of therapy homework', desc: 'is never completed. The assignments that could accelerate progress go undone.', cite: 'Kazantzis, Deane & Ronan, 2000' },
-          { stat: '2\u00d7', highlight: 'faster progress', desc: 'when clients do engage with between-session work. Therapy homework doubles the rate of improvement.', cite: 'Mausbach et al., 2010 \u2014 meta-analysis' },
-          { stat: '80%', highlight: 'of therapeutic gains', desc: 'happen outside the therapy room. The session plants the seed \u2014 practice grows it.', cite: 'Scheel et al., 2004' },
+          { stat: '50%+', highlight: 'homework compliance problems', desc: 'Therapists report problems with homework in more than half of all cases. The work that could accelerate progress goes undone.', cite: 'Helbig & Fehm, 2004 \u2014 Behavioural and Cognitive Psychotherapy' },
+          { stat: 'r = .26', highlight: 'compliance predicts outcomes', desc: 'A meta-analysis of 23 studies found a significant link between homework compliance and therapy outcomes. Doing the work matters.', cite: 'Mausbach et al., 2010 \u2014 Cognitive Therapy and Research' },
+          { stat: '99.4%', highlight: 'of your week without support', desc: 'One hour of therapy per week. 167 hours on your own. The session plants the seed \u2014 practice grows it.', cite: '' },
         ].map((item, i) => (
           <div key={i} style={{ position: 'absolute', width: '100%', top: 0, transition: 'all 0.5s ease', opacity: statsStep === i ? 1 : 0, transform: statsStep === i ? 'translateY(0)' : 'translateY(30px)' }}>
             <h2 style={{ color: ds.cyan, fontSize: '5rem', fontWeight: 900, lineHeight: 0.9, letterSpacing: '-0.04em' }}>{item.stat}</h2>
