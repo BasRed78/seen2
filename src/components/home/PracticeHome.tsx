@@ -126,6 +126,28 @@ export function PracticeHome({ userName, summary, upcomingExercises, onMarkDone 
           )}
         </div>
 
+        {/* Session Prep CTA */}
+        <Link
+          href="/practice/session-prep"
+          className="block rounded-2xl p-4 mb-4 transition-all hover:scale-[1.01]"
+          style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}25` }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Calendar size={18} style={{ color: colors.cyan }} />
+              <div>
+                <p className="font-semibold text-sm" style={{ color: colors.cream }}>
+                  Prepare for session
+                </p>
+                <p className="text-xs" style={{ color: colors.cream, opacity: 0.4 }}>
+                  Review your week before therapy
+                </p>
+              </div>
+            </div>
+            <ChevronRight size={18} style={{ color: colors.cream, opacity: 0.3 }} />
+          </div>
+        </Link>
+
         {/* Post-Session Reflection CTA */}
         <Link
           href="/practice/post-session"
