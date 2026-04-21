@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -66,7 +66,9 @@ export default function ExerciseDoPage() {
     onTranscript: (text) => setReflectionText(text),
   })
   const params = useParams()
+  const searchParams = useSearchParams()
   const exerciseId = params.id as string
+  const scheduledId = searchParams.get('scheduled')
 
   useEffect(() => {
     const storedUser = localStorage.getItem('seen_user')
@@ -157,9 +159,23 @@ export default function ExerciseDoPage() {
           selfRating,
         }),
       })
+
+      // If launched from a scheduled item, mark it completed too
+      if (scheduledId) {
+        try {
+          await fetch('/api/practice/scheduled', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: scheduledId, status: 'completed' }),
+          })
+        } catch (err) {
+          console.error('Failed to mark scheduled as completed:', err)
+        }
+      }
+
       setSaved(true)
       setTimeout(() => {
-        router.push('/practice/exercises')
+        router.push(scheduledId ? '/home' : '/practice/exercises')
       }, 1500)
     } catch (err) {
       console.error('Failed to complete exercise:', err)
