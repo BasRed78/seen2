@@ -212,45 +212,66 @@ export function PracticeHome({ userName, summary, upcomingExercises, onMarkDone 
                 const now = new Date()
                 const hoursUntil = (scheduledDate.getTime() - now.getTime()) / (1000 * 60 * 60)
                 const isApproaching = hoursUntil > 0 && hoursUntil <= 1
+                const startHref = scheduled.exercise_id
+                  ? `/practice/exercises/${scheduled.exercise_id}?scheduled=${scheduled.id}`
+                  : null
 
                 return (
                   <div
                     key={scheduled.id}
-                    className="flex items-center gap-3 p-3 rounded-xl"
+                    className="p-3 rounded-xl"
                     style={{
                       backgroundColor: isApproaching ? `${colors.gold}10` : colors.darkCardHover,
                       border: isApproaching ? `1px solid ${colors.gold}30` : 'none',
                     }}
                   >
-                    <div className="flex-1 min-w-0">
-                      {scheduled.exercise_id ? (
-                        <Link
-                          href={`/practice/exercises/${scheduled.exercise_id}`}
-                          className="text-sm font-medium hover:underline"
-                          style={{ color: colors.cream }}
-                        >
-                          {scheduled.title}
-                        </Link>
-                      ) : (
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium" style={{ color: colors.cream }}>
                           {scheduled.title}
                         </p>
+                        <p className="text-xs mt-0.5" style={{ color: colors.creamMuted }}>
+                          {scheduledDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          {' at '}
+                          {scheduledDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                        </p>
+                      </div>
+                      {isApproaching && (
+                        <span
+                          className="px-2 py-0.5 rounded text-xs font-bold flex-shrink-0"
+                          style={{ backgroundColor: colors.gold, color: colors.dark }}
+                        >
+                          Soon
+                        </span>
                       )}
-                      <p className="text-xs mt-0.5" style={{ color: colors.creamMuted }}>
-                        {scheduledDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                        {' at '}
-                        {scheduledDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                      </p>
                     </div>
-                    {onMarkDone && (
-                      <button
-                        onClick={() => onMarkDone(scheduled.id)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-                        style={{ backgroundColor: colors.cyan + '20', color: colors.cyan }}
-                      >
-                        Done
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2 mt-3">
+                      {startHref && (
+                        <Link
+                          href={startHref}
+                          className="flex-1 text-center px-3 py-2 rounded-lg text-xs font-semibold transition-all hover:scale-[1.01]"
+                          style={{
+                            backgroundColor: isApproaching ? colors.gold : colors.cyan,
+                            color: isApproaching ? colors.dark : colors.cream,
+                          }}
+                        >
+                          Start now
+                        </Link>
+                      )}
+                      {onMarkDone && (
+                        <button
+                          onClick={() => onMarkDone(scheduled.id)}
+                          className="px-3 py-2 rounded-lg text-xs font-medium transition-all"
+                          style={{
+                            backgroundColor: 'transparent',
+                            color: colors.creamMuted,
+                            border: `1px solid ${colors.creamMuted}30`,
+                          }}
+                        >
+                          Mark done
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )
               })}
