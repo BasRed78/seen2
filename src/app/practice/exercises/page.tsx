@@ -9,7 +9,7 @@ import {
   ChevronRight,
   BookOpen,
 } from 'lucide-react'
-import { colors } from '@/lib/constants/colors'
+import { useTheme } from '@/lib/theme'
 import { StarIcon } from '@/components/StarIcon'
 import { BottomNav } from '@/components/BottomNav'
 
@@ -49,6 +49,7 @@ const categoryLabels: Record<string, string> = {
 }
 
 export default function ExercisesPage() {
+  const theme = useTheme()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [exercises, setExercises] = useState<Exercise[]>([])
@@ -85,8 +86,8 @@ export default function ExercisesPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
-        <StarIcon size={40} style={{ color: colors.cyan, animation: 'pulse 2s infinite' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <StarIcon size={40} style={{ color: theme.cyan, animation: 'pulse 2s infinite' }} />
       </div>
     )
   }
@@ -105,12 +106,12 @@ export default function ExercisesPage() {
   })
 
   return (
-    <div className="min-h-screen pb-24" style={{ backgroundColor: colors.dark }}>
+    <div className="min-h-screen pb-24" style={{ backgroundColor: theme.bg }}>
       {/* Background gradient */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 30% 10%, ${colors.cyan}12 0%, transparent 40%)`,
+          background: `radial-gradient(circle at 30% 10%, ${theme.cyan}12 0%, transparent 40%)`,
         }}
       />
 
@@ -120,18 +121,18 @@ export default function ExercisesPage() {
           <button
             onClick={() => router.push('/practice')}
             className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: colors.darkCard }}
+            style={{ backgroundColor: theme.card }}
           >
-            <ArrowLeft size={18} style={{ color: colors.cream }} />
+            <ArrowLeft size={18} style={{ color: theme.text }} />
           </button>
           <div className="flex items-center gap-2">
-            <BookOpen size={16} style={{ color: colors.cyan }} />
-            <span className="font-bold" style={{ color: colors.cream }}>Exercises</span>
+            <BookOpen size={16} style={{ color: theme.cyan }} />
+            <span className="font-bold" style={{ color: theme.text }}>Exercises</span>
           </div>
         </div>
 
         {/* Intro */}
-        <p className="text-sm mb-6" style={{ color: colors.creamMuted }}>
+        <p className="text-sm mb-6" style={{ color: theme.textMuted }}>
           Guided exercises to support your practice between sessions.
         </p>
 
@@ -141,25 +142,25 @@ export default function ExercisesPage() {
             onClick={() => setSelectedThemeId(null)}
             className="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
             style={{
-              backgroundColor: !selectedThemeId ? colors.cyan + '30' : colors.darkCard,
-              color: !selectedThemeId ? colors.cyan : colors.creamMuted,
-              border: `1px solid ${!selectedThemeId ? colors.cyan + '50' : 'rgba(255,255,255,0.08)'}`,
+              backgroundColor: !selectedThemeId ? theme.cyan + '30' : theme.card,
+              color: !selectedThemeId ? theme.cyan : theme.textMuted,
+              border: `1px solid ${!selectedThemeId ? theme.cyan + '50' : 'rgba(255,255,255,0.08)'}`,
             }}
           >
             All
           </button>
-          {themes.map(theme => (
+          {themes.map(t => (
             <button
-              key={theme.id}
-              onClick={() => setSelectedThemeId(theme.id)}
+              key={t.id}
+              onClick={() => setSelectedThemeId(t.id)}
               className="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
               style={{
-                backgroundColor: selectedThemeId === theme.id ? colors.cyan + '30' : colors.darkCard,
-                color: selectedThemeId === theme.id ? colors.cyan : colors.creamMuted,
-                border: `1px solid ${selectedThemeId === theme.id ? colors.cyan + '50' : 'rgba(255,255,255,0.08)'}`,
+                backgroundColor: selectedThemeId === t.id ? theme.cyan + '30' : theme.card,
+                color: selectedThemeId === t.id ? theme.cyan : theme.textMuted,
+                border: `1px solid ${selectedThemeId === t.id ? theme.cyan + '50' : theme.border}`,
               }}
             >
-              {theme.name}
+              {t.name}
             </button>
           ))}
         </div>
@@ -167,13 +168,13 @@ export default function ExercisesPage() {
         {/* Exercise list grouped by category */}
         {Object.keys(grouped).length === 0 ? (
           <div className="text-center py-12">
-            <p style={{ color: colors.creamMuted }}>No exercises found for this filter.</p>
+            <p style={{ color: theme.textMuted }}>No exercises found for this filter.</p>
           </div>
         ) : (
           <div className="space-y-6">
             {Object.entries(grouped).map(([category, exs]) => (
               <div key={category}>
-                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: colors.cyan }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: theme.cyan }}>
                   {categoryLabels[category] || category}
                 </p>
                 <div className="space-y-2">
@@ -183,23 +184,23 @@ export default function ExercisesPage() {
                       href={`/practice/exercises/${ex.id}`}
                       className="block rounded-2xl p-4 transition-all hover:scale-[1.01]"
                       style={{
-                        backgroundColor: colors.darkCard,
+                        backgroundColor: theme.card,
                         border: '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1 pr-3">
-                          <p className="font-medium text-sm mb-1" style={{ color: colors.cream }}>
+                          <p className="font-medium text-sm mb-1" style={{ color: theme.text }}>
                             {ex.title}
                           </p>
                           {ex.description && (
-                            <p className="text-xs leading-relaxed line-clamp-2" style={{ color: colors.creamMuted }}>
+                            <p className="text-xs leading-relaxed line-clamp-2" style={{ color: theme.textMuted }}>
                               {ex.description}
                             </p>
                           )}
                           <div className="flex items-center gap-3 mt-2">
                             {ex.duration_minutes && (
-                              <span className="flex items-center gap-1 text-xs" style={{ color: colors.creamMuted }}>
+                              <span className="flex items-center gap-1 text-xs" style={{ color: theme.textMuted }}>
                                 <Clock size={12} />
                                 {ex.duration_minutes} min
                               </span>
@@ -207,14 +208,14 @@ export default function ExercisesPage() {
                             {ex.is_onboarding && (
                               <span
                                 className="text-xs px-2 py-0.5 rounded-full"
-                                style={{ backgroundColor: colors.cyan + '20', color: colors.cyan }}
+                                style={{ backgroundColor: theme.cyan + '20', color: theme.cyan }}
                               >
                                 Recommended
                               </span>
                             )}
                           </div>
                         </div>
-                        <ChevronRight size={18} style={{ color: colors.cyan, flexShrink: 0 }} />
+                        <ChevronRight size={18} style={{ color: theme.cyan, flexShrink: 0 }} />
                       </div>
                     </Link>
                   ))}

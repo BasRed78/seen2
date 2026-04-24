@@ -8,6 +8,7 @@ import { FixedHeader } from '@/components/FixedHeader'
 import { BottomNav } from '@/components/BottomNav'
 import { AwarenessHome } from '@/components/home/AwarenessHome'
 import { PracticeHome } from '@/components/home/PracticeHome'
+import { useTheme, darkTheme } from '@/lib/theme'
 
 interface User {
   id: string
@@ -27,6 +28,8 @@ export default function HomePage() {
   const router = useRouter()
 
   const phase = user?.current_phase || 'phase1'
+  const themed = useTheme()
+  const theme = phase === 'phase2' ? themed : darkTheme
 
   useEffect(() => {
     const storedUser = localStorage.getItem('seen_user')
@@ -110,10 +113,10 @@ export default function HomePage() {
 
   if (loading || !user) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.bg }}>
         <div className="text-center">
-          <StarIcon size={40} className="animate-pulse mx-auto mb-4" style={{ color: phase === 'phase2' ? colors.cyan : colors.coral }} />
-          <p style={{ color: colors.cream, opacity: 0.6 }}>Loading...</p>
+          <StarIcon size={40} className="animate-pulse mx-auto mb-4" style={{ color: phase === 'phase2' ? theme.cyan : colors.coral }} />
+          <p style={{ color: theme.text, opacity: 0.6 }}>Loading...</p>
         </div>
       </main>
     )
@@ -122,7 +125,7 @@ export default function HomePage() {
   const firstName = user.name?.split(' ')[0] || 'there'
 
   return (
-    <main className="min-h-screen pb-24" style={{ backgroundColor: colors.dark }}>
+    <main className="min-h-screen pb-24" style={{ backgroundColor: theme.bg }}>
       <FixedHeader phase={phase} />
 
       {phase === 'phase2' ? (

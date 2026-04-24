@@ -12,7 +12,7 @@ import {
   Heart,
   Star as StarLucide,
 } from 'lucide-react'
-import { colors } from '@/lib/constants/colors'
+import { useTheme } from '@/lib/theme'
 import { StarIcon } from '@/components/StarIcon'
 
 interface User {
@@ -66,6 +66,7 @@ interface PrepData {
 }
 
 export default function SessionPrepPage() {
+  const theme = useTheme()
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -110,8 +111,8 @@ export default function SessionPrepPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
-        <StarIcon size={40} style={{ color: colors.cyan, animation: 'pulse 2s infinite' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <StarIcon size={40} style={{ color: theme.cyan, animation: 'pulse 2s infinite' }} />
       </div>
     )
   }
@@ -124,29 +125,29 @@ export default function SessionPrepPage() {
   const completedIntentions = intentions.filter(i => i.status === 'completed')
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.dark }}>
+    <div className="min-h-screen" style={{ backgroundColor: theme.bg }}>
       {/* Background gradient */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 30% 10%, ${colors.cyan}12 0%, transparent 40%)`,
+          background: `radial-gradient(circle at 30% 10%, ${theme.cyan}12 0%, transparent 40%)`,
         }}
       />
 
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-20 px-6 py-4" style={{ backgroundColor: colors.dark }}>
+      <div className="fixed top-0 left-0 right-0 z-20 px-6 py-4" style={{ backgroundColor: theme.bg }}>
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <Link href="/home" className="p-2 -ml-2">
-            <ArrowLeft size={20} style={{ color: colors.cream }} />
+            <ArrowLeft size={20} style={{ color: theme.text }} />
           </Link>
-          <p className="text-lg font-bold" style={{ color: colors.cream }}>Session prep</p>
+          <p className="text-lg font-bold" style={{ color: theme.text }}>Session prep</p>
         </div>
       </div>
 
       <div className="relative z-10 max-w-lg mx-auto px-6 pt-20 pb-8">
         {/* Intro */}
         <div className="mb-5">
-          <p className="text-sm" style={{ color: colors.creamMuted }}>
+          <p className="text-sm" style={{ color: theme.textMuted }}>
             A snapshot of your week to take into your next session.
           </p>
         </div>
@@ -154,17 +155,17 @@ export default function SessionPrepPage() {
         {/* Since last session — hero card */}
         <div
           className="rounded-2xl p-5 mb-4"
-          style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}25` }}
+          style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}25` }}
         >
           {postSession ? (
             <>
               <div className="flex items-center gap-2 mb-2">
-                <Calendar size={14} style={{ color: colors.cyan }} />
-                <p className="text-xs font-semibold" style={{ color: colors.cyan }}>
+                <Calendar size={14} style={{ color: theme.cyan }} />
+                <p className="text-xs font-semibold" style={{ color: theme.cyan }}>
                   Since your last session
                 </p>
               </div>
-              <p className="text-2xl font-bold mb-4" style={{ color: colors.cream }}>
+              <p className="text-2xl font-bold mb-4" style={{ color: theme.text }}>
                 {stats?.days_since_session === 0
                   ? 'Today'
                   : stats?.days_since_session === 1
@@ -172,38 +173,38 @@ export default function SessionPrepPage() {
                   : `${stats?.days_since_session} days ago`}
               </p>
               <div className="grid grid-cols-3 gap-2">
-                <div className="p-3 rounded-xl text-center" style={{ backgroundColor: colors.darkCardHover }}>
-                  <p className="text-xl font-bold" style={{ color: colors.cyan }}>
+                <div className="p-3 rounded-xl text-center" style={{ backgroundColor: theme.cardHover }}>
+                  <p className="text-xl font-bold" style={{ color: theme.cyan }}>
                     {stats?.checkins_count || 0}
                   </p>
-                  <p className="text-xs mt-1" style={{ color: colors.creamMuted }}>Check-ins</p>
+                  <p className="text-xs mt-1" style={{ color: theme.textMuted }}>Check-ins</p>
                 </div>
-                <div className="p-3 rounded-xl text-center" style={{ backgroundColor: colors.darkCardHover }}>
-                  <p className="text-xl font-bold" style={{ color: colors.cyan }}>
+                <div className="p-3 rounded-xl text-center" style={{ backgroundColor: theme.cardHover }}>
+                  <p className="text-xl font-bold" style={{ color: theme.cyan }}>
                     {stats?.exercises_completed || 0}
                   </p>
-                  <p className="text-xs mt-1" style={{ color: colors.creamMuted }}>Exercises</p>
+                  <p className="text-xs mt-1" style={{ color: theme.textMuted }}>Exercises</p>
                 </div>
-                <div className="p-3 rounded-xl text-center" style={{ backgroundColor: colors.darkCardHover }}>
-                  <p className="text-xl font-bold" style={{ color: colors.cyan }}>
+                <div className="p-3 rounded-xl text-center" style={{ backgroundColor: theme.cardHover }}>
+                  <p className="text-xl font-bold" style={{ color: theme.cyan }}>
                     {stats?.intentions_completed || 0}
-                    <span className="text-sm font-normal" style={{ color: colors.creamMuted }}>
+                    <span className="text-sm font-normal" style={{ color: theme.textMuted }}>
                       /{(stats?.intentions_active || 0) + (stats?.intentions_completed || 0)}
                     </span>
                   </p>
-                  <p className="text-xs mt-1" style={{ color: colors.creamMuted }}>Intentions</p>
+                  <p className="text-xs mt-1" style={{ color: theme.textMuted }}>Intentions</p>
                 </div>
               </div>
             </>
           ) : (
             <>
               <div className="flex items-center gap-2 mb-2">
-                <Calendar size={14} style={{ color: colors.cyan }} />
-                <p className="text-xs font-semibold" style={{ color: colors.cyan }}>
+                <Calendar size={14} style={{ color: theme.cyan }} />
+                <p className="text-xs font-semibold" style={{ color: theme.cyan }}>
                   Your recent practice
                 </p>
               </div>
-              <p className="text-sm" style={{ color: colors.creamMuted }}>
+              <p className="text-sm" style={{ color: theme.textMuted }}>
                 Showing the last 14 days. After your next session, this view will be scoped to the time between sessions.
               </p>
             </>
@@ -214,24 +215,24 @@ export default function SessionPrepPage() {
         {postSession && (postSession.reflection_text || postSession.theme_name) && (
           <div
             className="rounded-2xl p-5 mb-4"
-            style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ backgroundColor: theme.card, border: '1px solid rgba(255,255,255,0.08)' }}
           >
             <div className="flex items-center gap-2 mb-3">
-              <MessageCircle size={14} style={{ color: colors.cream, opacity: 0.5 }} />
-              <p className="text-xs font-semibold" style={{ color: colors.cream, opacity: 0.5 }}>
+              <MessageCircle size={14} style={{ color: theme.text, opacity: 0.5 }} />
+              <p className="text-xs font-semibold" style={{ color: theme.text, opacity: 0.5 }}>
                 What came up last time
               </p>
             </div>
             {postSession.theme_name && (
               <span
                 className="inline-block px-3 py-1 rounded-full text-xs font-medium mb-3"
-                style={{ backgroundColor: `${colors.cyan}20`, color: colors.cyan }}
+                style={{ backgroundColor: `${theme.cyan}20`, color: theme.cyan }}
               >
                 {postSession.theme_name}
               </span>
             )}
             {postSession.reflection_text && (
-              <p className="text-sm leading-relaxed" style={{ color: colors.cream }}>
+              <p className="text-sm leading-relaxed" style={{ color: theme.text }}>
                 {postSession.reflection_text}
               </p>
             )}
@@ -242,11 +243,11 @@ export default function SessionPrepPage() {
         {(activeIntentions.length > 0 || completedIntentions.length > 0) && (
           <div
             className="rounded-2xl p-5 mb-4"
-            style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ backgroundColor: theme.card, border: '1px solid rgba(255,255,255,0.08)' }}
           >
             <div className="flex items-center gap-2 mb-3">
-              <Target size={14} style={{ color: colors.cyan }} />
-              <p className="text-xs font-semibold" style={{ color: colors.cyan }}>
+              <Target size={14} style={{ color: theme.cyan }} />
+              <p className="text-xs font-semibold" style={{ color: theme.cyan }}>
                 Practice intentions
               </p>
             </div>
@@ -255,17 +256,17 @@ export default function SessionPrepPage() {
                 <div
                   key={i.id}
                   className="flex items-start gap-3 p-3 rounded-xl"
-                  style={{ backgroundColor: colors.darkCardHover }}
+                  style={{ backgroundColor: theme.cardHover }}
                 >
                   <div
                     className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
-                    style={{ backgroundColor: colors.cyan }}
+                    style={{ backgroundColor: theme.cyan }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm" style={{ color: colors.cream }}>
+                    <p className="text-sm" style={{ color: theme.text }}>
                       {i.intention_text}
                     </p>
-                    <p className="text-xs mt-1" style={{ color: colors.creamMuted }}>
+                    <p className="text-xs mt-1" style={{ color: theme.textMuted }}>
                       Active
                     </p>
                   </div>
@@ -275,17 +276,17 @@ export default function SessionPrepPage() {
                 <div
                   key={i.id}
                   className="flex items-start gap-3 p-3 rounded-xl"
-                  style={{ backgroundColor: colors.darkCardHover, opacity: 0.7 }}
+                  style={{ backgroundColor: theme.cardHover, opacity: 0.7 }}
                 >
                   <div
                     className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
-                    style={{ backgroundColor: colors.cyan, opacity: 0.5 }}
+                    style={{ backgroundColor: theme.cyan, opacity: 0.5 }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm line-through" style={{ color: colors.cream, opacity: 0.7 }}>
+                    <p className="text-sm line-through" style={{ color: theme.text, opacity: 0.7 }}>
                       {i.intention_text}
                     </p>
-                    <p className="text-xs mt-1" style={{ color: colors.creamMuted }}>
+                    <p className="text-xs mt-1" style={{ color: theme.textMuted }}>
                       Completed
                     </p>
                   </div>
@@ -299,19 +300,19 @@ export default function SessionPrepPage() {
         {completions.length > 0 && (
           <div
             className="rounded-2xl p-5 mb-4"
-            style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ backgroundColor: theme.card, border: '1px solid rgba(255,255,255,0.08)' }}
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <BookOpen size={14} style={{ color: colors.cyan }} />
-                <p className="text-xs font-semibold" style={{ color: colors.cyan }}>
+                <BookOpen size={14} style={{ color: theme.cyan }} />
+                <p className="text-xs font-semibold" style={{ color: theme.cyan }}>
                   What you practiced
                 </p>
               </div>
               {stats?.avg_self_rating != null && (
                 <div className="flex items-center gap-1">
-                  <StarLucide size={12} style={{ color: colors.gold }} fill={colors.gold} />
-                  <span className="text-xs font-semibold" style={{ color: colors.cream }}>
+                  <StarLucide size={12} style={{ color: theme.gold }} fill={theme.gold} />
+                  <span className="text-xs font-semibold" style={{ color: theme.text }}>
                     {stats.avg_self_rating} avg
                   </span>
                 </div>
@@ -322,14 +323,14 @@ export default function SessionPrepPage() {
                 <div
                   key={c.id}
                   className="p-3 rounded-xl"
-                  style={{ backgroundColor: colors.darkCardHover }}
+                  style={{ backgroundColor: theme.cardHover }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium" style={{ color: colors.cream }}>
+                      <p className="text-sm font-medium" style={{ color: theme.text }}>
                         {c.exercise_title}
                       </p>
-                      <p className="text-xs mt-0.5" style={{ color: colors.creamMuted }}>
+                      <p className="text-xs mt-0.5" style={{ color: theme.textMuted }}>
                         {new Date(c.completed_at).toLocaleDateString('en-US', {
                           weekday: 'short',
                           month: 'short',
@@ -343,15 +344,15 @@ export default function SessionPrepPage() {
                           <StarLucide
                             key={n}
                             size={10}
-                            style={{ color: n <= c.self_rating! ? colors.gold : colors.creamMuted }}
-                            fill={n <= c.self_rating! ? colors.gold : 'none'}
+                            style={{ color: n <= c.self_rating! ? theme.gold : theme.textMuted }}
+                            fill={n <= c.self_rating! ? theme.gold : 'none'}
                           />
                         ))}
                       </div>
                     )}
                   </div>
                   {c.reflection_text && (
-                    <p className="text-xs mt-2 pl-0 italic" style={{ color: colors.creamMuted }}>
+                    <p className="text-xs mt-2 pl-0 italic" style={{ color: theme.textMuted }}>
                       &ldquo;{c.reflection_text}&rdquo;
                     </p>
                   )}
@@ -365,13 +366,13 @@ export default function SessionPrepPage() {
         {completions.length === 0 && activeIntentions.length === 0 && completedIntentions.length === 0 && (
           <div
             className="rounded-2xl p-5 mb-4 text-center"
-            style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ backgroundColor: theme.card, border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            <Heart size={20} style={{ color: colors.cyan, opacity: 0.5, margin: '0 auto 8px' }} />
-            <p className="text-sm" style={{ color: colors.cream }}>
+            <Heart size={20} style={{ color: theme.cyan, opacity: 0.5, margin: '0 auto 8px' }} />
+            <p className="text-sm" style={{ color: theme.text }}>
               Nothing to show here yet.
             </p>
-            <p className="text-xs mt-1" style={{ color: colors.creamMuted }}>
+            <p className="text-xs mt-1" style={{ color: theme.textMuted }}>
               Reflect after your sessions and schedule some practice to see this fill up.
             </p>
           </div>
@@ -380,15 +381,15 @@ export default function SessionPrepPage() {
         {/* Notes to bring up */}
         <div
           className="rounded-2xl p-5 mb-4"
-          style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}25` }}
+          style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}25` }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <Target size={14} style={{ color: colors.cyan }} />
-            <p className="text-xs font-semibold" style={{ color: colors.cyan }}>
+            <Target size={14} style={{ color: theme.cyan }} />
+            <p className="text-xs font-semibold" style={{ color: theme.cyan }}>
               Notes to bring up
             </p>
           </div>
-          <p className="text-xs mb-3" style={{ color: colors.creamMuted }}>
+          <p className="text-xs mb-3" style={{ color: theme.textMuted }}>
             Jot down things you want to discuss. Saved on your device only.
           </p>
           <textarea
@@ -398,9 +399,9 @@ export default function SessionPrepPage() {
             className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
             rows={5}
             style={{
-              backgroundColor: colors.dark,
+              backgroundColor: theme.bg,
               border: '1px solid rgba(255,255,255,0.08)',
-              color: colors.cream,
+              color: theme.text,
             }}
           />
         </div>
@@ -408,9 +409,9 @@ export default function SessionPrepPage() {
         {/* Clinical disclaimer */}
         <div
           className="rounded-2xl p-4 mt-2"
-          style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}15` }}
+          style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}15` }}
         >
-          <p className="text-xs leading-relaxed" style={{ color: colors.creamMuted }}>
+          <p className="text-xs leading-relaxed" style={{ color: theme.textMuted }}>
             This is a tool to help you prepare. Your therapist leads the session.
           </p>
         </div>
