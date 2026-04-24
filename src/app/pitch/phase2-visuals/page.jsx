@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import { toPng } from 'html-to-image';
 
 const ds = {
   bg: '#0f0f1a',
@@ -604,12 +605,38 @@ function SchedulingScreen() {
 
 // ============ GALLERY ============
 function Visual({ title, description, children }) {
+  const phoneRef = useRef(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!phoneRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(phoneRef.current, {
+        pixelRatio: 3,
+        backgroundColor: undefined,
+        cacheBust: true,
+        style: { transform: 'none' },
+      });
+      const link = document.createElement('a');
+      const filename = title.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase() + '.png';
+      link.download = `seen-${filename}`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Couldn\'t export this image. Try again or use a different browser.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div style={{
       backgroundColor: ds.surface,
       borderRadius: 24,
       padding: 32,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
     }}>
       <div style={{ textAlign: 'center', maxWidth: 320 }}>
         <p style={{ color: ds.cyan, fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px' }}>{title}</p>
@@ -617,7 +644,23 @@ function Visual({ title, description, children }) {
           <p style={{ color: ds.muted, fontSize: '0.85rem', lineHeight: 1.5, margin: 0 }}>{description}</p>
         )}
       </div>
-      <Phone>{children}</Phone>
+      {/* Wrapper with padding so the shadow is captured in the export */}
+      <div ref={phoneRef} style={{ padding: '30px 30px 50px' }}>
+        <Phone>{children}</Phone>
+      </div>
+      <button
+        onClick={handleDownload}
+        disabled={downloading}
+        style={{
+          padding: '10px 20px', borderRadius: 10,
+          backgroundColor: ds.cyan, color: ds.cream,
+          fontSize: '0.85rem', fontWeight: 600,
+          border: 'none', cursor: downloading ? 'default' : 'pointer',
+          opacity: downloading ? 0.6 : 1,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+        {downloading ? 'Preparing...' : 'Download PNG'}
+      </button>
     </div>
   );
 }
@@ -717,7 +760,7 @@ export default function Phase2Visuals() {
           <span style={{ color: ds.cyan, fontSize: '0.9rem', fontWeight: 600 }}>UI Gallery</span>
         </div>
         <p style={{ color: ds.muted, fontSize: '0.95rem', margin: '0 auto', maxWidth: 600, lineHeight: 1.5 }}>
-          Each screen ready to screenshot individually. Right-click and save, or use your screenshot tool. Designed to drop into other presentations.
+          Tap Download PNG on any screen to save it. High-resolution, transparent background, ready to drop into any presentation.
         </p>
       </div>
 
@@ -737,7 +780,7 @@ export default function Phase2Visuals() {
 
       <div style={{ maxWidth: 600, margin: '60px auto 0', padding: 20, borderRadius: 16, backgroundColor: ds.surface, textAlign: 'center' }}>
         <p style={{ color: ds.muted, fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
-          Tip: on a Mac, press <strong style={{ color: ds.cream }}>Cmd + Shift + 4</strong>, then Space, then click the phone you want to capture. The shadow and background come along with it.
+          Each PNG is exported at 3x resolution with a transparent background. The phone frame and its soft shadow are included so it looks finished on any slide background.
         </p>
       </div>
     </div>

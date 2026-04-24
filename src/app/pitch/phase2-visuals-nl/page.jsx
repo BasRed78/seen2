@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import { toPng } from 'html-to-image';
 
 const ds = {
   bg: '#0f0f1a',
@@ -604,12 +605,38 @@ function SchedulingScreen() {
 
 // ============ GALLERY ============
 function Visual({ title, description, children }) {
+  const phoneRef = useRef(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!phoneRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(phoneRef.current, {
+        pixelRatio: 3,
+        backgroundColor: undefined,
+        cacheBust: true,
+        style: { transform: 'none' },
+      });
+      const link = document.createElement('a');
+      const filename = title.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase() + '.png';
+      link.download = `seen-${filename}`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Kon deze afbeelding niet exporteren. Probeer opnieuw of gebruik een andere browser.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div style={{
       backgroundColor: ds.surface,
       borderRadius: 24,
       padding: 32,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
     }}>
       <div style={{ textAlign: 'center', maxWidth: 320 }}>
         <p style={{ color: ds.cyan, fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px' }}>{title}</p>
@@ -617,7 +644,22 @@ function Visual({ title, description, children }) {
           <p style={{ color: ds.muted, fontSize: '0.85rem', lineHeight: 1.5, margin: 0 }}>{description}</p>
         )}
       </div>
-      <Phone>{children}</Phone>
+      <div ref={phoneRef} style={{ padding: '30px 30px 50px' }}>
+        <Phone>{children}</Phone>
+      </div>
+      <button
+        onClick={handleDownload}
+        disabled={downloading}
+        style={{
+          padding: '10px 20px', borderRadius: 10,
+          backgroundColor: ds.cyan, color: ds.cream,
+          fontSize: '0.85rem', fontWeight: 600,
+          border: 'none', cursor: downloading ? 'default' : 'pointer',
+          opacity: downloading ? 0.6 : 1,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+        {downloading ? 'Even geduld...' : 'Download PNG'}
+      </button>
     </div>
   );
 }
@@ -717,7 +759,7 @@ export default function Phase2Visuals() {
           <span style={{ color: ds.cyan, fontSize: '0.9rem', fontWeight: 600 }}>UI Galerij</span>
         </div>
         <p style={{ color: ds.muted, fontSize: '0.95rem', margin: '0 auto', maxWidth: 600, lineHeight: 1.5 }}>
-          Elk scherm is klaar om afzonderlijk te screenshotten. Rechtsklik en bewaar, of gebruik je screenshot-tool. Ontworpen om in andere presentaties te plaatsen.
+          Tik op Download PNG onder elk scherm om het op te slaan. Hoge resolutie, transparante achtergrond, klaar om in een presentatie te plakken.
         </p>
       </div>
 
@@ -737,7 +779,7 @@ export default function Phase2Visuals() {
 
       <div style={{ maxWidth: 600, margin: '60px auto 0', padding: 20, borderRadius: 16, backgroundColor: ds.surface, textAlign: 'center' }}>
         <p style={{ color: ds.muted, fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
-          Tip: op een Mac druk je op <strong style={{ color: ds.cream }}>Cmd + Shift + 4</strong>, dan Spatie, en klik je op het scherm dat je wilt vastleggen. De schaduw en achtergrond gaan mee.
+          Elke PNG wordt geëxporteerd op 3x resolutie met een transparante achtergrond. De telefoonrand en zachte schaduw worden meegenomen, zodat het op elke dia-achtergrond afgemaakt oogt.
         </p>
       </div>
     </div>
