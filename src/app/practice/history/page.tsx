@@ -16,7 +16,7 @@ import {
   ChevronUp,
   ArrowRight,
 } from 'lucide-react'
-import { colors } from '@/lib/constants/colors'
+import { useTheme } from '@/lib/theme'
 import { StarIcon } from '@/components/StarIcon'
 import { BottomNav } from '@/components/BottomNav'
 
@@ -88,6 +88,7 @@ function formatRelativeDate(dateStr: string): string {
 }
 
 function RatingStars({ rating }: { rating: number }) {
+  const theme = useTheme()
   return (
     <div className="flex gap-0.5">
       {Array.from({ length: 5 }, (_, i) => (
@@ -95,8 +96,8 @@ function RatingStars({ rating }: { rating: number }) {
           key={i}
           size={12}
           style={{
-            color: i < rating ? colors.gold : colors.darkCardHover,
-            fill: i < rating ? colors.gold : 'none',
+            color: i < rating ? theme.gold : theme.cardHover,
+            fill: i < rating ? theme.gold : 'none',
           }}
         />
       ))}
@@ -105,6 +106,7 @@ function RatingStars({ rating }: { rating: number }) {
 }
 
 export default function PracticeHistoryPage() {
+  const theme = useTheme()
   const [user, setUser] = useState<{ id: string; name: string; current_phase?: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [checkins, setCheckins] = useState<Checkin[]>([])
@@ -207,19 +209,19 @@ export default function PracticeHistoryPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
-        <StarIcon size={40} style={{ color: colors.cyan, animation: 'pulse 2s infinite' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <StarIcon size={40} style={{ color: theme.cyan, animation: 'pulse 2s infinite' }} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen pb-24" style={{ backgroundColor: colors.dark }}>
+    <div className="min-h-screen pb-24" style={{ backgroundColor: theme.bg }}>
       {/* Background gradient */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 30% 10%, ${colors.cyan}12 0%, transparent 40%)`,
+          background: `radial-gradient(circle at 30% 10%, ${theme.cyan}12 0%, transparent 40%)`,
         }}
       />
 
@@ -229,13 +231,13 @@ export default function PracticeHistoryPage() {
           <button
             onClick={() => router.push('/practice')}
             className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: colors.darkCard }}
+            style={{ backgroundColor: theme.card }}
           >
-            <ArrowLeft size={18} style={{ color: colors.cream }} />
+            <ArrowLeft size={18} style={{ color: theme.text }} />
           </button>
           <div className="flex items-center gap-2">
-            <Clock size={16} style={{ color: colors.cyan }} />
-            <span className="font-bold" style={{ color: colors.cream }}>Practice History</span>
+            <Clock size={16} style={{ color: theme.cyan }} />
+            <span className="font-bold" style={{ color: theme.text }}>Practice History</span>
           </div>
         </div>
 
@@ -247,9 +249,9 @@ export default function PracticeHistoryPage() {
               onClick={() => setPeriod(p)}
               className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
               style={{
-                backgroundColor: period === p ? colors.cyan + '25' : colors.darkCard,
-                color: period === p ? colors.cyan : colors.creamMuted,
-                border: `1px solid ${period === p ? colors.cyan + '50' : 'rgba(255,255,255,0.08)'}`,
+                backgroundColor: period === p ? theme.cyan + '25' : theme.card,
+                color: period === p ? theme.cyan : theme.textMuted,
+                border: `1px solid ${period === p ? theme.cyan + '50' : 'rgba(255,255,255,0.08)'}`,
               }}
             >
               {p === '7d' ? '7 days' : p === '30d' ? '30 days' : 'All time'}
@@ -259,30 +261,30 @@ export default function PracticeHistoryPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <StarIcon size={32} style={{ color: colors.cyan, animation: 'pulse 2s infinite' }} />
+            <StarIcon size={32} style={{ color: theme.cyan, animation: 'pulse 2s infinite' }} />
           </div>
         ) : timeline.length === 0 && activeIntentions.length === 0 ? (
           /* Empty state */
           <div className="text-center py-16">
-            <Clock size={48} style={{ color: colors.cyan, opacity: 0.3 }} className="mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2" style={{ color: colors.cream }}>
+            <Clock size={48} style={{ color: theme.cyan, opacity: 0.3 }} className="mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2" style={{ color: theme.text }}>
               No practice activity yet
             </h2>
-            <p className="text-sm mb-8" style={{ color: colors.creamMuted }}>
+            <p className="text-sm mb-8" style={{ color: theme.textMuted }}>
               Complete a post-session reflection or an exercise to start building your history.
             </p>
             <div className="flex flex-col gap-3">
               <Link
                 href="/practice/post-session"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm"
-                style={{ backgroundColor: colors.cyan, color: colors.cream }}
+                style={{ backgroundColor: theme.cyan, color: theme.text }}
               >
                 <MessageCircle size={16} /> Post-Session Reflection
               </Link>
               <Link
                 href="/practice/exercises"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm"
-                style={{ backgroundColor: colors.darkCard, color: colors.cream, border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ backgroundColor: theme.card, color: theme.text, border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <BookOpen size={16} /> Browse Exercises
               </Link>
@@ -293,35 +295,35 @@ export default function PracticeHistoryPage() {
             {/* Stats row */}
             {stats && (
               <div className="grid grid-cols-3 gap-3 mb-6">
-                <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: colors.darkCard }}>
-                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: colors.creamMuted }}>
+                <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: theme.card }}>
+                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: theme.textMuted }}>
                     Sessions
                   </p>
-                  <p className="text-2xl font-bold" style={{ color: colors.cream }}>
+                  <p className="text-2xl font-bold" style={{ color: theme.text }}>
                     {stats.total_checkins}
                   </p>
-                  <p className="text-xs" style={{ color: colors.creamMuted }}>reflected</p>
+                  <p className="text-xs" style={{ color: theme.textMuted }}>reflected</p>
                 </div>
-                <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: colors.darkCard }}>
-                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: colors.creamMuted }}>
+                <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: theme.card }}>
+                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: theme.textMuted }}>
                     Exercises
                   </p>
-                  <p className="text-2xl font-bold" style={{ color: colors.cream }}>
+                  <p className="text-2xl font-bold" style={{ color: theme.text }}>
                     {stats.total_exercises_completed}
                   </p>
-                  <p className="text-xs" style={{ color: colors.creamMuted }}>completed</p>
+                  <p className="text-xs" style={{ color: theme.textMuted }}>completed</p>
                 </div>
-                <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: colors.darkCard }}>
-                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: colors.creamMuted }}>
+                <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: theme.card }}>
+                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: theme.textMuted }}>
                     Intentions
                   </p>
-                  <p className="text-2xl font-bold" style={{ color: colors.cream }}>
+                  <p className="text-2xl font-bold" style={{ color: theme.text }}>
                     {stats.intentions_completed}
-                    <span className="text-sm font-normal" style={{ color: colors.creamMuted }}>
+                    <span className="text-sm font-normal" style={{ color: theme.textMuted }}>
                       /{stats.intentions_total}
                     </span>
                   </p>
-                  <p className="text-xs" style={{ color: colors.creamMuted }}>met</p>
+                  <p className="text-xs" style={{ color: theme.textMuted }}>met</p>
                 </div>
               </div>
             )}
@@ -330,11 +332,11 @@ export default function PracticeHistoryPage() {
             {activeIntentions.length > 0 && (
               <div
                 className="rounded-2xl p-5 mb-6"
-                style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}20` }}
+                style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}20` }}
               >
                 <div className="flex items-center gap-2 mb-3">
-                  <Target size={14} style={{ color: colors.cyan }} />
-                  <p className="text-xs font-semibold" style={{ color: colors.cyan }}>
+                  <Target size={14} style={{ color: theme.cyan }} />
+                  <p className="text-xs font-semibold" style={{ color: theme.cyan }}>
                     Active intentions ({activeIntentions.length})
                   </p>
                 </div>
@@ -346,17 +348,17 @@ export default function PracticeHistoryPage() {
                         key={intention.id}
                         className="rounded-xl p-3"
                         style={{
-                          backgroundColor: colors.darkCardHover,
-                          borderLeft: `3px solid ${isPastDue ? colors.coral : colors.cyan}`,
+                          backgroundColor: theme.cardHover,
+                          borderLeft: `3px solid ${isPastDue ? theme.coral : theme.cyan}`,
                         }}
                       >
-                        <p className="text-sm mb-1" style={{ color: colors.cream }}>
+                        <p className="text-sm mb-1" style={{ color: theme.text }}>
                           {intention.intention_text}
                         </p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {intention.target_date && (
-                              <span className="text-xs" style={{ color: isPastDue ? colors.coral : colors.creamMuted }}>
+                              <span className="text-xs" style={{ color: isPastDue ? theme.coral : theme.textMuted }}>
                                 {isPastDue ? 'Past due: ' : 'By '}
                                 {new Date(intention.target_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                               </span>
@@ -364,7 +366,7 @@ export default function PracticeHistoryPage() {
                             {intention.theme_name && (
                               <span
                                 className="text-xs px-2 py-0.5 rounded-full"
-                                style={{ backgroundColor: colors.cyan + '15', color: colors.cyan }}
+                                style={{ backgroundColor: theme.cyan + '15', color: theme.cyan }}
                               >
                                 {intention.theme_name}
                               </span>
@@ -375,11 +377,11 @@ export default function PracticeHistoryPage() {
                               onClick={() => updateIntention(intention.id, 'completed')}
                               className="p-1.5 rounded-lg transition-all"
                               style={{
-                                backgroundColor: colors.cyan + '20',
+                                backgroundColor: theme.cyan + '20',
                                 opacity: updatingIntention === intention.id ? 0.5 : 1,
                               }}
                             >
-                              <Check size={14} style={{ color: colors.cyan }} />
+                              <Check size={14} style={{ color: theme.cyan }} />
                             </button>
                             <button
                               onClick={() => updateIntention(intention.id, 'skipped')}
@@ -389,7 +391,7 @@ export default function PracticeHistoryPage() {
                                 opacity: updatingIntention === intention.id ? 0.5 : 1,
                               }}
                             >
-                              <X size={14} style={{ color: colors.creamMuted }} />
+                              <X size={14} style={{ color: theme.textMuted }} />
                             </button>
                           </div>
                         </div>
@@ -403,7 +405,7 @@ export default function PracticeHistoryPage() {
             {/* Timeline */}
             {timeline.length > 0 && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: colors.creamMuted }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: theme.textMuted }}>
                   Timeline
                 </p>
                 <div className="space-y-3">
@@ -417,18 +419,18 @@ export default function PracticeHistoryPage() {
                           key={`checkin-${c.id}`}
                           className="rounded-xl p-4"
                           style={{
-                            backgroundColor: colors.darkCard,
-                            borderLeft: `3px solid ${colors.cyan}`,
+                            backgroundColor: theme.card,
+                            borderLeft: `3px solid ${theme.cyan}`,
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <MessageCircle size={14} style={{ color: colors.cyan }} />
-                              <span className="text-xs font-medium" style={{ color: colors.cyan }}>
+                              <MessageCircle size={14} style={{ color: theme.cyan }} />
+                              <span className="text-xs font-medium" style={{ color: theme.cyan }}>
                                 Session reflection
                               </span>
                             </div>
-                            <span className="text-xs" style={{ color: colors.creamMuted }}>
+                            <span className="text-xs" style={{ color: theme.textMuted }}>
                               {formatRelativeDate(c.created_at)}
                             </span>
                           </div>
@@ -436,17 +438,17 @@ export default function PracticeHistoryPage() {
                           <div className="flex items-center gap-3 mb-2">
                             <div
                               className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-                              style={{ backgroundColor: colors.cyan + '20', color: colors.cyan }}
+                              style={{ backgroundColor: theme.cyan + '20', color: theme.cyan }}
                             >
                               {c.emotional_state}
                             </div>
-                            <span className="text-sm" style={{ color: colors.cream }}>
+                            <span className="text-sm" style={{ color: theme.text }}>
                               Feeling: {c.emotional_state}/10
                             </span>
                             {c.theme_name && (
                               <span
                                 className="text-xs px-2 py-0.5 rounded-full"
-                                style={{ backgroundColor: colors.cyan + '15', color: colors.cyan }}
+                                style={{ backgroundColor: theme.cyan + '15', color: theme.cyan }}
                               >
                                 {c.theme_name}
                               </span>
@@ -457,7 +459,7 @@ export default function PracticeHistoryPage() {
                             <div>
                               <p
                                 className={`text-sm leading-relaxed ${!isExpanded ? 'line-clamp-2' : ''}`}
-                                style={{ color: colors.cream, opacity: 0.8 }}
+                                style={{ color: theme.text, opacity: 0.8 }}
                               >
                                 {c.reflection_text}
                               </p>
@@ -465,7 +467,7 @@ export default function PracticeHistoryPage() {
                                 <button
                                   onClick={() => toggleExpanded(c.id)}
                                   className="text-xs mt-1 font-medium"
-                                  style={{ color: colors.cyan }}
+                                  style={{ color: theme.cyan }}
                                 >
                                   {isExpanded ? 'Show less' : 'Read more'}
                                 </button>
@@ -483,31 +485,31 @@ export default function PracticeHistoryPage() {
                           key={`exercise-${c.id}`}
                           className="rounded-xl p-4"
                           style={{
-                            backgroundColor: colors.darkCard,
-                            borderLeft: `3px solid ${colors.gold}`,
+                            backgroundColor: theme.card,
+                            borderLeft: `3px solid ${theme.gold}`,
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <BookOpen size={14} style={{ color: colors.gold }} />
-                              <span className="text-xs font-medium" style={{ color: colors.gold }}>
+                              <BookOpen size={14} style={{ color: theme.gold }} />
+                              <span className="text-xs font-medium" style={{ color: theme.gold }}>
                                 Exercise completed
                               </span>
                             </div>
-                            <span className="text-xs" style={{ color: colors.creamMuted }}>
+                            <span className="text-xs" style={{ color: theme.textMuted }}>
                               {formatRelativeDate(c.completed_at)}
                             </span>
                           </div>
 
-                          <p className="text-sm font-semibold mb-1" style={{ color: colors.cream }}>
+                          <p className="text-sm font-semibold mb-1" style={{ color: theme.text }}>
                             {c.exercise_title}
                           </p>
                           <div className="flex items-center gap-3">
-                            <span className="text-xs" style={{ color: colors.creamMuted }}>
+                            <span className="text-xs" style={{ color: theme.textMuted }}>
                               {categoryLabels[c.exercise_category] || c.exercise_category}
                             </span>
                             {c.duration_minutes != null && (
-                              <span className="text-xs" style={{ color: colors.creamMuted }}>
+                              <span className="text-xs" style={{ color: theme.textMuted }}>
                                 {c.duration_minutes} min
                               </span>
                             )}
@@ -520,10 +522,10 @@ export default function PracticeHistoryPage() {
                     if (entry.type === 'intention') {
                       const i = entry.data as Intention
                       const statusColors: Record<string, string> = {
-                        active: colors.cyan,
-                        completed: colors.cyan,
-                        skipped: colors.creamMuted,
-                        expired: colors.coral,
+                        active: theme.cyan,
+                        completed: theme.cyan,
+                        skipped: theme.textMuted,
+                        expired: theme.coral,
                       }
                       const statusLabels: Record<string, string> = {
                         active: 'Active',
@@ -536,23 +538,23 @@ export default function PracticeHistoryPage() {
                           key={`intention-${i.id}`}
                           className="rounded-xl p-4"
                           style={{
-                            backgroundColor: colors.darkCard,
-                            borderLeft: `3px solid ${colors.cyanLight}`,
+                            backgroundColor: theme.card,
+                            borderLeft: `3px solid ${theme.cyanLight}`,
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <Target size={14} style={{ color: colors.cyanLight }} />
-                              <span className="text-xs font-medium" style={{ color: colors.cyanLight }}>
+                              <Target size={14} style={{ color: theme.cyanLight }} />
+                              <span className="text-xs font-medium" style={{ color: theme.cyanLight }}>
                                 Intention set
                               </span>
                             </div>
-                            <span className="text-xs" style={{ color: colors.creamMuted }}>
+                            <span className="text-xs" style={{ color: theme.textMuted }}>
                               {formatRelativeDate(i.created_at)}
                             </span>
                           </div>
 
-                          <p className="text-sm mb-2" style={{ color: colors.cream }}>
+                          <p className="text-sm mb-2" style={{ color: theme.text }}>
                             {i.intention_text}
                           </p>
                           <div className="flex items-center gap-2">
@@ -566,7 +568,7 @@ export default function PracticeHistoryPage() {
                               {statusLabels[i.status] || i.status}
                             </span>
                             {i.theme_name && (
-                              <span className="text-xs" style={{ color: colors.creamMuted }}>
+                              <span className="text-xs" style={{ color: theme.textMuted }}>
                                 {i.theme_name}
                               </span>
                             )}

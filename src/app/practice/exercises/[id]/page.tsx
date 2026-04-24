@@ -11,7 +11,7 @@ import {
   Check,
   Star,
 } from 'lucide-react'
-import { colors } from '@/lib/constants/colors'
+import { useTheme } from '@/lib/theme'
 import { StarIcon } from '@/components/StarIcon'
 import { VoiceMicButton } from '@/components/VoiceMicButton'
 import useVoiceInput from '@/hooks/useVoiceInput'
@@ -50,6 +50,7 @@ interface Exercise {
 type Phase = 'intro' | 'steps' | 'completion'
 
 export default function ExerciseDoPage() {
+  const theme = useTheme()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [exercise, setExercise] = useState<Exercise | null>(null)
@@ -185,20 +186,20 @@ export default function ExerciseDoPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
-        <StarIcon size={40} style={{ color: colors.cyan, animation: 'pulse 2s infinite' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <StarIcon size={40} style={{ color: theme.cyan, animation: 'pulse 2s infinite' }} />
       </div>
     )
   }
 
   if (!exercise) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: colors.dark }}>
-        <p style={{ color: colors.cream }}>Exercise not found</p>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: theme.bg }}>
+        <p style={{ color: theme.text }}>Exercise not found</p>
         <button
           onClick={() => router.push('/practice/exercises')}
           className="text-sm underline"
-          style={{ color: colors.cyan }}
+          style={{ color: theme.cyan }}
         >
           Back to exercises
         </button>
@@ -222,20 +223,20 @@ export default function ExerciseDoPage() {
 
   const getStepTypeColor = (type?: string) => {
     switch (type) {
-      case 'pause': return colors.cyanLight
-      case 'prompt': return colors.cyan
-      case 'reflection': return colors.cyanLight
-      default: return colors.cyan
+      case 'pause': return theme.cyanLight
+      case 'prompt': return theme.cyan
+      case 'reflection': return theme.cyanLight
+      default: return theme.cyan
     }
   }
 
   return (
-    <div className="min-h-screen pb-32" style={{ backgroundColor: colors.dark }}>
+    <div className="min-h-screen pb-32" style={{ backgroundColor: theme.bg }}>
       {/* Background gradient */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 30% 10%, ${colors.cyan}12 0%, transparent 40%)`,
+          background: `radial-gradient(circle at 30% 10%, ${theme.cyan}12 0%, transparent 40%)`,
         }}
       />
 
@@ -259,15 +260,15 @@ export default function ExerciseDoPage() {
               }
             }}
             className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: colors.darkCard }}
+            style={{ backgroundColor: theme.card }}
           >
-            <ArrowLeft size={18} style={{ color: colors.cream }} />
+            <ArrowLeft size={18} style={{ color: theme.text }} />
           </button>
-          <span className="font-bold text-sm flex-1" style={{ color: colors.cream }}>
+          <span className="font-bold text-sm flex-1" style={{ color: theme.text }}>
             {exercise.title}
           </span>
           {exercise.duration_minutes && (
-            <span className="flex items-center gap-1 text-xs" style={{ color: colors.creamMuted }}>
+            <span className="flex items-center gap-1 text-xs" style={{ color: theme.textMuted }}>
               <Clock size={12} />
               {exercise.duration_minutes} min
             </span>
@@ -282,7 +283,7 @@ export default function ExerciseDoPage() {
                 key={i}
                 className="h-1 rounded-full flex-1 transition-all"
                 style={{
-                  backgroundColor: i <= currentStepIndex ? colors.cyan : colors.darkCard,
+                  backgroundColor: i <= currentStepIndex ? theme.cyan : theme.card,
                 }}
               />
             ))}
@@ -293,7 +294,7 @@ export default function ExerciseDoPage() {
         {phase === 'intro' && (
           <div>
             {exercise.description && (
-              <p className="text-sm leading-relaxed mb-6" style={{ color: colors.creamMuted }}>
+              <p className="text-sm leading-relaxed mb-6" style={{ color: theme.textMuted }}>
                 {exercise.description}
               </p>
             )}
@@ -301,9 +302,9 @@ export default function ExerciseDoPage() {
             {instructions?.intro && (
               <div
                 className="rounded-2xl p-5 mb-6"
-                style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}20` }}
+                style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}20` }}
               >
-                <p className="text-sm leading-relaxed" style={{ color: colors.cream }}>
+                <p className="text-sm leading-relaxed" style={{ color: theme.text }}>
                   {instructions.intro}
                 </p>
               </div>
@@ -313,20 +314,20 @@ export default function ExerciseDoPage() {
             <div className="space-y-3 mb-6">
               {totalSteps > 0 && (
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.cyan + '15' }}>
-                    <ChevronRight size={16} style={{ color: colors.cyan }} />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.cyan + '15' }}>
+                    <ChevronRight size={16} style={{ color: theme.cyan }} />
                   </div>
-                  <p className="text-sm" style={{ color: colors.creamMuted }}>
+                  <p className="text-sm" style={{ color: theme.textMuted }}>
                     {totalSteps} step{totalSteps !== 1 ? 's' : ''}
                   </p>
                 </div>
               )}
               {exercise.duration_minutes && (
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.cyan + '15' }}>
-                    <Clock size={16} style={{ color: colors.cyan }} />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.cyan + '15' }}>
+                    <Clock size={16} style={{ color: theme.cyan }} />
                   </div>
-                  <p className="text-sm" style={{ color: colors.creamMuted }}>
+                  <p className="text-sm" style={{ color: theme.textMuted }}>
                     About {exercise.duration_minutes} minutes
                   </p>
                 </div>
@@ -345,7 +346,7 @@ export default function ExerciseDoPage() {
               return (
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-medium" style={{ color: colors.creamMuted }}>
+                    <p className="text-xs font-medium" style={{ color: theme.textMuted }}>
                       Step {currentStepIndex + 1} of {totalSteps}
                     </p>
                     {typeLabel && (
@@ -360,13 +361,13 @@ export default function ExerciseDoPage() {
 
                   <div
                     className="rounded-2xl p-6 mb-6"
-                    style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}20` }}
+                    style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}20` }}
                   >
-                    <p className="text-base leading-relaxed" style={{ color: colors.cream }}>
+                    <p className="text-base leading-relaxed" style={{ color: theme.text }}>
                       {step.text}
                     </p>
                     {step.duration_minutes && (
-                      <p className="text-xs mt-4 flex items-center gap-1" style={{ color: colors.creamMuted }}>
+                      <p className="text-xs mt-4 flex items-center gap-1" style={{ color: theme.textMuted }}>
                         <Clock size={12} />
                         Take about {step.duration_minutes} minute{step.duration_minutes !== 1 ? 's' : ''}
                       </p>
@@ -379,8 +380,8 @@ export default function ExerciseDoPage() {
                       placeholder="Write your thoughts here (optional)..."
                       className="w-full rounded-xl p-4 text-sm resize-none focus:outline-none"
                       style={{
-                        backgroundColor: colors.darkCard,
-                        color: colors.cream,
+                        backgroundColor: theme.card,
+                        color: theme.text,
                         border: `1px solid rgba(255,255,255,0.1)`,
                         minHeight: '100px',
                       }}
@@ -399,14 +400,14 @@ export default function ExerciseDoPage() {
               <div className="text-center py-12">
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: colors.cyan + '20' }}
+                  style={{ backgroundColor: theme.cyan + '20' }}
                 >
-                  <Check size={32} style={{ color: colors.cyan }} />
+                  <Check size={32} style={{ color: theme.cyan }} />
                 </div>
-                <p className="text-lg font-semibold mb-2" style={{ color: colors.cream }}>
+                <p className="text-lg font-semibold mb-2" style={{ color: theme.text }}>
                   Well done
                 </p>
-                <p className="text-sm" style={{ color: colors.creamMuted }}>
+                <p className="text-sm" style={{ color: theme.textMuted }}>
                   Your practice has been recorded.
                 </p>
               </div>
@@ -415,9 +416,9 @@ export default function ExerciseDoPage() {
                 {instructions?.closing && (
                   <div
                     className="rounded-2xl p-5 mb-6"
-                    style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}20` }}
+                    style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}20` }}
                   >
-                    <p className="text-sm leading-relaxed" style={{ color: colors.cream }}>
+                    <p className="text-sm leading-relaxed" style={{ color: theme.text }}>
                       {instructions.closing}
                     </p>
                   </div>
@@ -425,7 +426,7 @@ export default function ExerciseDoPage() {
 
                 {/* Self rating */}
                 <div className="mb-6">
-                  <p className="text-sm font-medium mb-3" style={{ color: colors.cream }}>
+                  <p className="text-sm font-medium mb-3" style={{ color: theme.text }}>
                     How helpful was this exercise?
                   </p>
                   <div className="flex gap-2">
@@ -435,14 +436,14 @@ export default function ExerciseDoPage() {
                         onClick={() => setSelfRating(n)}
                         className="w-12 h-12 rounded-xl flex items-center justify-center transition-all"
                         style={{
-                          backgroundColor: selfRating === n ? colors.cyan + '30' : colors.darkCard,
-                          border: `1px solid ${selfRating === n ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
+                          backgroundColor: selfRating === n ? theme.cyan + '30' : theme.card,
+                          border: `1px solid ${selfRating === n ? theme.cyan : 'rgba(255,255,255,0.08)'}`,
                         }}
                       >
                         <Star
                           size={20}
-                          style={{ color: selfRating !== null && n <= selfRating ? colors.cyan : colors.creamMuted }}
-                          fill={selfRating !== null && n <= selfRating ? colors.cyan : 'none'}
+                          style={{ color: selfRating !== null && n <= selfRating ? theme.cyan : theme.textMuted }}
+                          fill={selfRating !== null && n <= selfRating ? theme.cyan : 'none'}
                         />
                       </button>
                     ))}
@@ -452,7 +453,7 @@ export default function ExerciseDoPage() {
                 {/* Reflection */}
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm font-medium" style={{ color: colors.cream }}>
+                    <p className="text-sm font-medium" style={{ color: theme.text }}>
                       Any reflections? (optional)
                     </p>
                     {reflectionVoice.supported && (
@@ -475,9 +476,9 @@ export default function ExerciseDoPage() {
                     placeholder={reflectionVoice.listening ? 'Listening...' : 'What came up for you during this exercise...'}
                     className="w-full rounded-xl p-4 text-sm resize-none focus:outline-none"
                     style={{
-                      backgroundColor: colors.darkCard,
-                      color: colors.cream,
-                      border: `1px solid ${reflectionVoice.listening ? colors.cyan + '40' : 'rgba(255,255,255,0.1)'}`,
+                      backgroundColor: theme.card,
+                      color: theme.text,
+                      border: `1px solid ${reflectionVoice.listening ? theme.cyan + '40' : 'rgba(255,255,255,0.1)'}`,
                       minHeight: '100px',
                     }}
                   />
@@ -493,7 +494,7 @@ export default function ExerciseDoPage() {
         <div
           className="fixed bottom-0 left-0 right-0 px-6 py-4 z-20"
           style={{
-            backgroundColor: colors.darkCard,
+            backgroundColor: theme.card,
             borderTop: `1px solid rgba(255,255,255,0.05)`,
           }}
         >
@@ -502,7 +503,7 @@ export default function ExerciseDoPage() {
               <button
                 onClick={startExercise}
                 className="w-full py-3.5 rounded-xl font-semibold text-sm transition-all"
-                style={{ backgroundColor: colors.cyan, color: colors.cream }}
+                style={{ backgroundColor: theme.cyan, color: theme.text }}
               >
                 Begin Exercise
               </button>
@@ -513,14 +514,14 @@ export default function ExerciseDoPage() {
                 <button
                   onClick={prevStep}
                   className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: colors.darkCardHover }}
+                  style={{ backgroundColor: theme.cardHover }}
                 >
-                  <ChevronLeft size={20} style={{ color: colors.cream }} />
+                  <ChevronLeft size={20} style={{ color: theme.text }} />
                 </button>
                 <button
                   onClick={nextStep}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-sm transition-all"
-                  style={{ backgroundColor: colors.cyan, color: colors.cream }}
+                  style={{ backgroundColor: theme.cyan, color: theme.text }}
                 >
                   {currentStepIndex < totalSteps - 1 ? 'Next' : 'Finish'}
                 </button>
@@ -535,8 +536,8 @@ export default function ExerciseDoPage() {
                 }}
                 className="w-full py-3.5 rounded-xl font-semibold text-sm transition-all"
                 style={{
-                  backgroundColor: saving ? colors.darkCardHover : colors.cyan,
-                  color: colors.cream,
+                  backgroundColor: saving ? theme.cardHover : theme.cyan,
+                  color: theme.text,
                   opacity: saving ? 0.7 : 1,
                 }}
               >

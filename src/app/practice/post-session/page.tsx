@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ChevronRight, Check, Calendar, Plus, Clock, ChevronDown } from 'lucide-react'
-import { colors } from '@/lib/constants/colors'
+import { useTheme } from '@/lib/theme'
 import { StarIcon } from '@/components/StarIcon'
 import { VoiceMicButton } from '@/components/VoiceMicButton'
 import useVoiceInput from '@/hooks/useVoiceInput'
 import { downloadICS } from '@/lib/calendar/ics'
 
-interface Theme {
+interface PracticeTheme {
   id: string
   name: string
   description: string | null
@@ -39,6 +39,7 @@ interface ScheduleEntry {
 const TOTAL_STEPS = 6
 
 export default function PostSessionPage() {
+  const theme = useTheme()
   const [user, setUser] = useState<{ id: string; name: string; current_phase?: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [step, setStep] = useState(1)
@@ -48,7 +49,7 @@ export default function PostSessionPage() {
 
   // Form state
   const [emotionalState, setEmotionalState] = useState<number | null>(null)
-  const [themes, setThemes] = useState<Theme[]>([])
+  const [themes, setThemes] = useState<PracticeTheme[]>([])
   const [selectedThemeIds, setSelectedThemeIds] = useState<string[]>([])
   const [reflectionText, setReflectionText] = useState('')
   const [intentionText, setIntentionText] = useState('')
@@ -318,36 +319,36 @@ export default function PostSessionPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.dark }}>
-        <StarIcon size={40} style={{ color: colors.cyan, animation: 'pulse 2s infinite' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <StarIcon size={40} style={{ color: theme.cyan, animation: 'pulse 2s infinite' }} />
       </div>
     )
   }
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ backgroundColor: colors.dark }}>
+      <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ backgroundColor: theme.bg }}>
         <div className="text-center">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: colors.cyan + '20' }}
+            style={{ backgroundColor: theme.cyan + '20' }}
           >
-            <Check size={32} style={{ color: colors.cyan }} />
+            <Check size={32} style={{ color: theme.cyan }} />
           </div>
-          <p className="text-xl font-bold mb-2" style={{ color: colors.cream }}>Reflection saved</p>
-          <p className="text-sm" style={{ color: colors.creamMuted }}>Returning to your practice space...</p>
+          <p className="text-xl font-bold mb-2" style={{ color: theme.text }}>Reflection saved</p>
+          <p className="text-sm" style={{ color: theme.textMuted }}>Returning to your practice space...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: colors.dark }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.bg }}>
       {/* Background gradient */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 50% 30%, ${colors.cyan}10 0%, transparent 50%)`,
+          background: `radial-gradient(circle at 50% 30%, ${theme.cyan}10 0%, transparent 50%)`,
         }}
       />
 
@@ -355,9 +356,9 @@ export default function PostSessionPage() {
       <div className="relative z-10 px-6 pt-6 pb-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <button onClick={handleBack} className="p-2 -ml-2">
-            <ArrowLeft size={22} style={{ color: colors.cream }} />
+            <ArrowLeft size={22} style={{ color: theme.text }} />
           </button>
-          <span className="text-sm font-medium" style={{ color: colors.creamMuted }}>
+          <span className="text-sm font-medium" style={{ color: theme.textMuted }}>
             Post-Session Reflection
           </span>
           <div className="w-8" />
@@ -372,7 +373,7 @@ export default function PostSessionPage() {
               style={{
                 width: i + 1 === step ? 24 : 8,
                 height: 8,
-                backgroundColor: i + 1 <= step ? colors.cyan : colors.darkCardHover,
+                backgroundColor: i + 1 <= step ? theme.cyan : theme.cardHover,
               }}
             />
           ))}
@@ -386,10 +387,10 @@ export default function PostSessionPage() {
           {/* Step 1: Emotional check-in */}
           {step === 1 && (
             <div className="pt-8">
-              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
+              <p className="text-2xl font-bold mb-2" style={{ color: theme.text }}>
                 How are you feeling right now?
               </p>
-              <p className="text-sm mb-8" style={{ color: colors.creamMuted }}>
+              <p className="text-sm mb-8" style={{ color: theme.textMuted }}>
                 After your session today
               </p>
 
@@ -400,9 +401,9 @@ export default function PostSessionPage() {
                     onClick={() => setEmotionalState(num)}
                     className="w-12 h-12 rounded-full font-semibold text-lg transition-all"
                     style={{
-                      backgroundColor: emotionalState === num ? colors.cyan : colors.darkCard,
-                      color: emotionalState === num ? colors.cream : colors.creamMuted,
-                      border: `2px solid ${emotionalState === num ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
+                      backgroundColor: emotionalState === num ? theme.cyan : theme.card,
+                      color: emotionalState === num ? theme.text : theme.textMuted,
+                      border: `2px solid ${emotionalState === num ? theme.cyan : 'rgba(255,255,255,0.08)'}`,
                       transform: emotionalState === num ? 'scale(1.1)' : 'scale(1)',
                     }}
                   >
@@ -412,8 +413,8 @@ export default function PostSessionPage() {
               </div>
 
               <div className="flex justify-between mt-4 px-2">
-                <span className="text-xs" style={{ color: colors.creamMuted }}>Low</span>
-                <span className="text-xs" style={{ color: colors.creamMuted }}>High</span>
+                <span className="text-xs" style={{ color: theme.textMuted }}>Low</span>
+                <span className="text-xs" style={{ color: theme.textMuted }}>High</span>
               </div>
             </div>
           )}
@@ -421,37 +422,37 @@ export default function PostSessionPage() {
           {/* Step 2: Topics + Reflection (combined) */}
           {step === 2 && (
             <div className="pt-8">
-              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
+              <p className="text-2xl font-bold mb-2" style={{ color: theme.text }}>
                 What came up in your session?
               </p>
-              <p className="text-sm mb-5" style={{ color: colors.creamMuted }}>
+              <p className="text-sm mb-5" style={{ color: theme.textMuted }}>
                 Select any topics that came up
               </p>
 
               {/* Theme chips */}
               {themesLoading ? (
                 <div className="flex items-center justify-center py-6">
-                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" style={{ color: colors.cyan }}>
+                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" style={{ color: theme.cyan }}>
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-2 mb-6">
-                  {themes.map(theme => {
-                    const isSelected = selectedThemeIds.includes(theme.id)
+                  {themes.map(t => {
+                    const isSelected = selectedThemeIds.includes(t.id)
                     return (
                       <button
-                        key={theme.id}
-                        onClick={() => toggleTheme(theme.id)}
+                        key={t.id}
+                        onClick={() => toggleTheme(t.id)}
                         className="px-3 py-3 rounded-xl text-sm font-medium transition-all text-left"
                         style={{
-                          backgroundColor: isSelected ? colors.cyan + '20' : colors.darkCard,
-                          color: isSelected ? colors.cyan : colors.creamMuted,
-                          border: `1.5px solid ${isSelected ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
+                          backgroundColor: isSelected ? theme.cyan + '20' : theme.card,
+                          color: isSelected ? theme.cyan : theme.textMuted,
+                          border: `1.5px solid ${isSelected ? theme.cyan : theme.border}`,
                         }}
                       >
-                        {theme.name}
+                        {t.name}
                       </button>
                     )
                   })}
@@ -460,7 +461,7 @@ export default function PostSessionPage() {
 
               {/* Reflection textarea */}
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm" style={{ color: colors.creamMuted }}>
+                <p className="text-sm" style={{ color: theme.textMuted }}>
                   Capture any thoughts, insights, or ideas
                 </p>
                 {reflectionVoice.supported && (
@@ -484,9 +485,9 @@ export default function PostSessionPage() {
                 rows={5}
                 className="w-full px-4 py-4 rounded-xl text-sm leading-relaxed resize-none focus:outline-none transition-all"
                 style={{
-                  backgroundColor: colors.darkCard,
-                  border: `1px solid ${reflectionVoice.listening ? colors.cyan + '40' : 'rgba(255,255,255,0.08)'}`,
-                  color: colors.cream,
+                  backgroundColor: theme.card,
+                  border: `1px solid ${reflectionVoice.listening ? theme.cyan + '40' : 'rgba(255,255,255,0.08)'}`,
+                  color: theme.text,
                 }}
               />
             </div>
@@ -495,11 +496,11 @@ export default function PostSessionPage() {
           {/* Step 3: Practice intention (optional) */}
           {step === 3 && (
             <div className="pt-8">
-              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
+              <p className="text-2xl font-bold mb-2" style={{ color: theme.text }}>
                 Set a practice intention
               </p>
               <div className="flex items-center justify-between mb-6">
-                <p className="text-sm" style={{ color: colors.creamMuted }}>
+                <p className="text-sm" style={{ color: theme.textMuted }}>
                   Is there something you'd like to practice before your next session?
                 </p>
                 {intentionVoice.supported && (
@@ -524,24 +525,24 @@ export default function PostSessionPage() {
                 rows={3}
                 className="w-full px-4 py-4 rounded-xl text-sm leading-relaxed resize-none focus:outline-none transition-all mb-4"
                 style={{
-                  backgroundColor: colors.darkCard,
-                  border: `1px solid ${intentionVoice.listening ? colors.cyan + '40' : 'rgba(255,255,255,0.08)'}`,
-                  color: colors.cream,
+                  backgroundColor: theme.card,
+                  border: `1px solid ${intentionVoice.listening ? theme.cyan + '40' : 'rgba(255,255,255,0.08)'}`,
+                  color: theme.text,
                 }}
                 autoFocus
               />
 
               <div className="flex items-center gap-3 mb-6">
-                <Calendar size={18} style={{ color: colors.creamMuted }} />
+                <Calendar size={18} style={{ color: theme.textMuted }} />
                 <input
                   type="date"
                   value={targetDate}
                   onChange={(e) => setTargetDate(e.target.value)}
                   className="flex-1 px-3 py-2 rounded-lg text-sm focus:outline-none"
                   style={{
-                    backgroundColor: colors.darkCard,
+                    backgroundColor: theme.card,
                     border: '1px solid rgba(255,255,255,0.08)',
-                    color: colors.cream,
+                    color: theme.text,
                     colorScheme: 'dark',
                   }}
                 />
@@ -550,7 +551,7 @@ export default function PostSessionPage() {
               <button
                 onClick={handleSkipIntention}
                 className="w-full text-sm py-2"
-                style={{ color: colors.creamMuted }}
+                style={{ color: theme.textMuted }}
               >
                 Skip for now
               </button>
@@ -560,16 +561,16 @@ export default function PostSessionPage() {
           {/* Step 4: Exercise selection */}
           {step === 4 && (
             <div className="pt-8">
-              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
+              <p className="text-2xl font-bold mb-2" style={{ color: theme.text }}>
                 Plan your practice
               </p>
-              <p className="text-sm mb-6" style={{ color: colors.creamMuted }}>
+              <p className="text-sm mb-6" style={{ color: theme.textMuted }}>
                 Choose exercises to do before your next session
               </p>
 
               {exercisesLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" style={{ color: colors.cyan }}>
+                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" style={{ color: theme.cyan }}>
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
@@ -579,7 +580,7 @@ export default function PostSessionPage() {
                   {/* Matched exercises */}
                   {matchedExercises.length > 0 && (
                     <div className="mb-4">
-                      <p className="text-xs font-medium mb-3" style={{ color: colors.cyan }}>
+                      <p className="text-xs font-medium mb-3" style={{ color: theme.cyan }}>
                         Based on your session
                       </p>
                       <div className="space-y-2">
@@ -591,27 +592,27 @@ export default function PostSessionPage() {
                               onClick={() => toggleExercise(ex)}
                               className="w-full rounded-xl p-4 text-left transition-all"
                               style={{
-                                backgroundColor: isSelected ? colors.cyan + '15' : colors.darkCard,
-                                border: `1.5px solid ${isSelected ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
+                                backgroundColor: isSelected ? theme.cyan + '15' : theme.card,
+                                border: `1.5px solid ${isSelected ? theme.cyan : 'rgba(255,255,255,0.08)'}`,
                               }}
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                  <p className="text-sm font-medium" style={{ color: colors.cream }}>{ex.title}</p>
+                                  <p className="text-sm font-medium" style={{ color: theme.text }}>{ex.title}</p>
                                   {ex.description && (
-                                    <p className="text-xs mt-1 line-clamp-2" style={{ color: colors.creamMuted }}>{ex.description}</p>
+                                    <p className="text-xs mt-1 line-clamp-2" style={{ color: theme.textMuted }}>{ex.description}</p>
                                   )}
                                   {ex.duration_minutes && (
                                     <div className="flex items-center gap-1 mt-2">
-                                      <Clock size={12} style={{ color: colors.creamMuted }} />
-                                      <span className="text-xs" style={{ color: colors.creamMuted }}>{ex.duration_minutes} min</span>
+                                      <Clock size={12} style={{ color: theme.textMuted }} />
+                                      <span className="text-xs" style={{ color: theme.textMuted }}>{ex.duration_minutes} min</span>
                                     </div>
                                   )}
                                 </div>
                                 {isSelected && (
                                   <div className="w-6 h-6 rounded-full flex items-center justify-center ml-3 flex-shrink-0"
-                                    style={{ backgroundColor: colors.cyan }}>
-                                    <Check size={14} style={{ color: colors.cream }} />
+                                    style={{ backgroundColor: theme.cyan }}>
+                                    <Check size={14} style={{ color: theme.text }} />
                                   </div>
                                 )}
                               </div>
@@ -628,8 +629,8 @@ export default function PostSessionPage() {
                       onClick={() => setShowAllExercises(true)}
                       className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 mb-4"
                       style={{
-                        backgroundColor: colors.darkCard,
-                        color: colors.creamMuted,
+                        backgroundColor: theme.card,
+                        color: theme.textMuted,
                         border: '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
@@ -637,7 +638,7 @@ export default function PostSessionPage() {
                     </button>
                   ) : (
                     <div className="mb-4">
-                      <p className="text-xs font-medium mb-3" style={{ color: colors.creamMuted }}>
+                      <p className="text-xs font-medium mb-3" style={{ color: theme.textMuted }}>
                         All exercises
                       </p>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -651,19 +652,19 @@ export default function PostSessionPage() {
                                 onClick={() => toggleExercise(ex)}
                                 className="w-full rounded-xl p-3 text-left transition-all"
                                 style={{
-                                  backgroundColor: isSelected ? colors.cyan + '15' : colors.darkCard,
-                                  border: `1.5px solid ${isSelected ? colors.cyan : 'rgba(255,255,255,0.08)'}`,
+                                  backgroundColor: isSelected ? theme.cyan + '15' : theme.card,
+                                  border: `1.5px solid ${isSelected ? theme.cyan : 'rgba(255,255,255,0.08)'}`,
                                 }}
                               >
                                 <div className="flex items-center justify-between">
                                   <div>
-                                    <p className="text-sm font-medium" style={{ color: colors.cream }}>{ex.title}</p>
-                                    <p className="text-xs" style={{ color: colors.creamMuted }}>{ex.category.replace(/_/g, ' ')}</p>
+                                    <p className="text-sm font-medium" style={{ color: theme.text }}>{ex.title}</p>
+                                    <p className="text-xs" style={{ color: theme.textMuted }}>{ex.category.replace(/_/g, ' ')}</p>
                                   </div>
                                   {isSelected && (
                                     <div className="w-5 h-5 rounded-full flex items-center justify-center"
-                                      style={{ backgroundColor: colors.cyan }}>
-                                      <Check size={12} style={{ color: colors.cream }} />
+                                      style={{ backgroundColor: theme.cyan }}>
+                                      <Check size={12} style={{ color: theme.text }} />
                                     </div>
                                   )}
                                 </div>
@@ -684,17 +685,17 @@ export default function PostSessionPage() {
                       placeholder="Add your own activity..."
                       className="flex-1 px-4 py-3 rounded-xl text-sm focus:outline-none"
                       style={{
-                        backgroundColor: colors.darkCard,
+                        backgroundColor: theme.card,
                         border: '1px solid rgba(255,255,255,0.08)',
-                        color: colors.cream,
+                        color: theme.text,
                       }}
                     />
                     <button
                       onClick={addCustomActivity}
                       className="p-3 rounded-xl transition-all"
                       style={{
-                        backgroundColor: customActivityText.trim() ? colors.cyan : colors.darkCard,
-                        color: colors.cream,
+                        backgroundColor: customActivityText.trim() ? theme.cyan : theme.card,
+                        color: theme.text,
                       }}
                     >
                       <Plus size={18} />
@@ -703,7 +704,7 @@ export default function PostSessionPage() {
 
                   {/* Selected count */}
                   {selectedExercises.length > 0 && (
-                    <p className="text-xs text-center mb-2" style={{ color: colors.cyan }}>
+                    <p className="text-xs text-center mb-2" style={{ color: theme.cyan }}>
                       {selectedExercises.length} exercise{selectedExercises.length !== 1 ? 's' : ''} selected
                     </p>
                   )}
@@ -713,7 +714,7 @@ export default function PostSessionPage() {
               <button
                 onClick={handleSkipExercises}
                 className="w-full text-sm py-2 mt-2"
-                style={{ color: colors.creamMuted }}
+                style={{ color: theme.textMuted }}
               >
                 Skip for now
               </button>
@@ -723,10 +724,10 @@ export default function PostSessionPage() {
           {/* Step 5: Scheduling */}
           {step === 5 && (
             <div className="pt-8">
-              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
+              <p className="text-2xl font-bold mb-2" style={{ color: theme.text }}>
                 Schedule your exercises
               </p>
-              <p className="text-sm mb-6" style={{ color: colors.creamMuted }}>
+              <p className="text-sm mb-6" style={{ color: theme.textMuted }}>
                 Pick a day and time for each one
               </p>
 
@@ -735,20 +736,20 @@ export default function PostSessionPage() {
                   <div
                     key={i}
                     className="rounded-xl p-4"
-                    style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+                    style={{ backgroundColor: theme.card, border: '1px solid rgba(255,255,255,0.08)' }}
                   >
-                    <p className="text-sm font-medium mb-3" style={{ color: colors.cream }}>{ex.title}</p>
+                    <p className="text-sm font-medium mb-3" style={{ color: theme.text }}>{ex.title}</p>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2 flex-1">
-                        <Calendar size={16} style={{ color: colors.creamMuted }} />
+                        <Calendar size={16} style={{ color: theme.textMuted }} />
                         <select
                           value={scheduleEntries[i]?.date || ''}
                           onChange={(e) => updateSchedule(i, 'date', e.target.value)}
                           className="flex-1 px-3 py-2 rounded-lg text-sm focus:outline-none"
                           style={{
-                            backgroundColor: colors.dark,
+                            backgroundColor: theme.bg,
                             border: '1px solid rgba(255,255,255,0.08)',
-                            color: colors.cream,
+                            color: theme.text,
                             colorScheme: 'dark',
                           }}
                         >
@@ -761,16 +762,16 @@ export default function PostSessionPage() {
                         </select>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Clock size={16} style={{ color: colors.creamMuted }} />
+                        <Clock size={16} style={{ color: theme.textMuted }} />
                         <input
                           type="time"
                           value={scheduleEntries[i]?.time || '09:00'}
                           onChange={(e) => updateSchedule(i, 'time', e.target.value)}
                           className="px-3 py-2 rounded-lg text-sm focus:outline-none"
                           style={{
-                            backgroundColor: colors.dark,
+                            backgroundColor: theme.bg,
                             border: '1px solid rgba(255,255,255,0.08)',
-                            color: colors.cream,
+                            color: theme.text,
                             colorScheme: 'dark',
                           }}
                         />
@@ -783,9 +784,9 @@ export default function PostSessionPage() {
               {/* Add to calendar */}
               <div
                 className="rounded-xl p-4 mb-4"
-                style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}30` }}
+                style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}30` }}
               >
-                <p className="text-xs font-medium mb-3" style={{ color: colors.cyan }}>
+                <p className="text-xs font-medium mb-3" style={{ color: theme.cyan }}>
                   Add to your calendar
                 </p>
                 <button
@@ -804,12 +805,12 @@ export default function PostSessionPage() {
                     downloadICS(events, 'seen-exercises.ics')
                   }}
                   className="w-full py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2"
-                  style={{ backgroundColor: colors.cyan, color: colors.cream }}
+                  style={{ backgroundColor: theme.cyan, color: theme.text }}
                 >
                   <Calendar size={16} />
                   Add to calendar
                 </button>
-                <p className="text-xs text-center mt-2" style={{ color: colors.creamMuted }}>
+                <p className="text-xs text-center mt-2" style={{ color: theme.textMuted }}>
                   Downloads a .ics file — works with Google, Apple, and Outlook
                 </p>
               </div>
@@ -817,7 +818,7 @@ export default function PostSessionPage() {
               <button
                 onClick={handleSkipScheduling}
                 className="w-full text-sm py-2"
-                style={{ color: colors.creamMuted }}
+                style={{ color: theme.textMuted }}
               >
                 Skip — just remind me in the app
               </button>
@@ -827,10 +828,10 @@ export default function PostSessionPage() {
           {/* Step 6: Confirmation */}
           {step === 6 && (
             <div className="pt-8">
-              <p className="text-2xl font-bold mb-2" style={{ color: colors.cream }}>
+              <p className="text-2xl font-bold mb-2" style={{ color: theme.text }}>
                 Your reflection
               </p>
-              <p className="text-sm mb-6" style={{ color: colors.creamMuted }}>
+              <p className="text-sm mb-6" style={{ color: theme.textMuted }}>
                 Review before saving
               </p>
 
@@ -838,17 +839,17 @@ export default function PostSessionPage() {
                 {/* Emotional state */}
                 <div
                   className="rounded-xl p-4"
-                  style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+                  style={{ backgroundColor: theme.card, border: '1px solid rgba(255,255,255,0.08)' }}
                 >
-                  <p className="text-xs mb-1" style={{ color: colors.creamMuted }}>How you're feeling</p>
+                  <p className="text-xs mb-1" style={{ color: theme.textMuted }}>How you're feeling</p>
                   <div className="flex items-center gap-2">
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm"
-                      style={{ backgroundColor: colors.cyan, color: colors.cream }}
+                      style={{ backgroundColor: theme.cyan, color: theme.text }}
                     >
                       {emotionalState}
                     </div>
-                    <span className="text-sm" style={{ color: colors.cream }}>
+                    <span className="text-sm" style={{ color: theme.text }}>
                       out of 10
                     </span>
                   </div>
@@ -858,17 +859,17 @@ export default function PostSessionPage() {
                 {selectedThemeNames.length > 0 && (
                   <div
                     className="rounded-xl p-4"
-                    style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+                    style={{ backgroundColor: theme.card, border: '1px solid rgba(255,255,255,0.08)' }}
                   >
-                    <p className="text-xs mb-2" style={{ color: colors.creamMuted }}>Topics</p>
+                    <p className="text-xs mb-2" style={{ color: theme.textMuted }}>Topics</p>
                     <div className="flex flex-wrap gap-2">
                       {selectedThemeNames.map(name => (
                         <span
                           key={name}
                           className="px-3 py-1 rounded-full text-xs font-medium"
                           style={{
-                            backgroundColor: colors.cyan + '20',
-                            color: colors.cyan,
+                            backgroundColor: theme.cyan + '20',
+                            color: theme.cyan,
                           }}
                         >
                           {name}
@@ -882,10 +883,10 @@ export default function PostSessionPage() {
                 {reflectionText.trim() && (
                   <div
                     className="rounded-xl p-4"
-                    style={{ backgroundColor: colors.darkCard, border: '1px solid rgba(255,255,255,0.08)' }}
+                    style={{ backgroundColor: theme.card, border: '1px solid rgba(255,255,255,0.08)' }}
                   >
-                    <p className="text-xs mb-1" style={{ color: colors.creamMuted }}>Reflection</p>
-                    <p className="text-sm leading-relaxed" style={{ color: colors.cream }}>
+                    <p className="text-xs mb-1" style={{ color: theme.textMuted }}>Reflection</p>
+                    <p className="text-sm leading-relaxed" style={{ color: theme.text }}>
                       {reflectionText.length > 200
                         ? reflectionText.slice(0, 200) + '...'
                         : reflectionText}
@@ -897,14 +898,14 @@ export default function PostSessionPage() {
                 {intentionText.trim() && (
                   <div
                     className="rounded-xl p-4"
-                    style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.cyan}30` }}
+                    style={{ backgroundColor: theme.card, border: `1px solid ${theme.cyan}30` }}
                   >
-                    <p className="text-xs mb-1" style={{ color: colors.creamMuted }}>Practice intention</p>
-                    <p className="text-sm leading-relaxed" style={{ color: colors.cream }}>
+                    <p className="text-xs mb-1" style={{ color: theme.textMuted }}>Practice intention</p>
+                    <p className="text-sm leading-relaxed" style={{ color: theme.text }}>
                       {intentionText}
                     </p>
                     {targetDate && (
-                      <p className="text-xs mt-2" style={{ color: colors.cyan }}>
+                      <p className="text-xs mt-2" style={{ color: theme.cyan }}>
                         Target: {new Date(targetDate + 'T00:00:00').toLocaleDateString('en-US', {
                           weekday: 'short',
                           month: 'short',
@@ -919,17 +920,17 @@ export default function PostSessionPage() {
                 {selectedExercises.length > 0 && (
                   <div
                     className="rounded-xl p-4"
-                    style={{ backgroundColor: colors.darkCard, border: `1px solid ${colors.gold}30` }}
+                    style={{ backgroundColor: theme.card, border: `1px solid ${theme.gold}30` }}
                   >
-                    <p className="text-xs mb-2" style={{ color: colors.creamMuted }}>Scheduled exercises</p>
+                    <p className="text-xs mb-2" style={{ color: theme.textMuted }}>Scheduled exercises</p>
                     <div className="space-y-2">
                       {selectedExercises.map((ex, i) => {
                         const schedule = scheduleEntries[i]
                         return (
                           <div key={i} className="flex items-center justify-between">
-                            <span className="text-sm" style={{ color: colors.cream }}>{ex.title}</span>
+                            <span className="text-sm" style={{ color: theme.text }}>{ex.title}</span>
                             {schedule?.date && (
-                              <span className="text-xs" style={{ color: colors.gold }}>
+                              <span className="text-xs" style={{ color: theme.gold }}>
                                 {new Date(schedule.date + 'T00:00:00').toLocaleDateString('en-US', {
                                   weekday: 'short',
                                   month: 'short',
@@ -942,7 +943,7 @@ export default function PostSessionPage() {
                         )
                       })}
                     </div>
-                    <p className="text-xs mt-2" style={{ color: colors.creamMuted }}>
+                    <p className="text-xs mt-2" style={{ color: theme.textMuted }}>
                       Added to your calendar
                     </p>
                   </div>
@@ -957,7 +958,7 @@ export default function PostSessionPage() {
       <div
         className="fixed bottom-0 left-0 right-0 px-6 py-4 z-20"
         style={{
-          backgroundColor: colors.dark,
+          backgroundColor: theme.bg,
           borderTop: '1px solid rgba(255,255,255,0.05)',
         }}
       >
@@ -967,8 +968,8 @@ export default function PostSessionPage() {
               onClick={handleNext}
               className="w-full py-4 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-2"
               style={{
-                backgroundColor: canProceed() ? colors.cyan : colors.darkCard,
-                color: canProceed() ? colors.cream : colors.creamMuted,
+                backgroundColor: canProceed() ? theme.cyan : theme.card,
+                color: canProceed() ? theme.text : theme.textMuted,
                 opacity: canProceed() ? 1 : 0.5,
                 cursor: canProceed() ? 'pointer' : 'default',
               }}
@@ -984,8 +985,8 @@ export default function PostSessionPage() {
               onClick={handleSubmit}
               className="w-full py-4 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-2"
               style={{
-                backgroundColor: colors.cyan,
-                color: colors.cream,
+                backgroundColor: theme.cyan,
+                color: theme.text,
                 opacity: submitting ? 0.7 : 1,
                 cursor: submitting ? 'default' : 'pointer',
               }}

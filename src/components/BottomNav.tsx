@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { Home, MessageCircle, Heart, BarChart3 } from 'lucide-react'
-import { colors, phaseAccent } from '@/lib/constants/colors'
+import { phaseAccent } from '@/lib/constants/colors'
 import { StarIcon } from '@/components/StarIcon'
+import { useTheme, darkTheme } from '@/lib/theme'
 
 interface BottomNavProps {
   currentPage: 'home' | 'checkin' | 'practice' | 'insights'
@@ -13,6 +14,8 @@ interface BottomNavProps {
 export function BottomNav({ currentPage, phase }: BottomNavProps) {
   const accent = phaseAccent(phase)
   const isPhase2 = phase === 'phase2'
+  const themed = useTheme()
+  const theme = isPhase2 ? themed : darkTheme
 
   const items = [
     { id: 'home' as const, href: '/home', icon: Home, label: 'Home' },
@@ -27,14 +30,14 @@ export function BottomNav({ currentPage, phase }: BottomNavProps) {
     <nav
       className="fixed bottom-0 left-0 right-0 px-6 py-3 z-20"
       style={{
-        backgroundColor: colors.darkCard,
-        borderTop: '1px solid rgba(255,255,255,0.05)',
+        backgroundColor: theme.card,
+        borderTop: `1px solid ${theme.border}`,
       }}
     >
       <div className="max-w-lg mx-auto flex justify-around">
         {items.map((item) => {
           const isActive = currentPage === item.id
-          const itemColor = isActive ? accent : colors.creamMuted
+          const itemColor = isActive ? accent : theme.textMuted
           const Icon = item.icon
           return (
             <Link
