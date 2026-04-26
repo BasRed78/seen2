@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // Public routes that bypass tester basic-auth (gated by their own per-recipient tokens)
+  const { pathname } = request.nextUrl;
+  if (pathname.startsWith('/voor-chris') || pathname.startsWith('/letter/')) {
+    return NextResponse.next();
+  }
+
   const authHeader = request.headers.get('authorization');
   
   if (!authHeader) {
