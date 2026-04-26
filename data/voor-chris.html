@@ -890,7 +890,6 @@
   <section id="intro">
     <div class="eyebrow">Voor Chris · april 2026</div>
     <h1 class="hero">Chris,<br /><em>dit is wat ik heb gebouwd.</em></h1>
-    <p class="body">Bedankt dat je hierin met me meeloopt.</p>
     <p class="body">Toen we elkaar in december spraken, liet ik je Fase 1 zien: de patroontest, het werk voorafgaand aan therapie. De volgorde was toen helder: eerst Fase 1, daarna Fase 2.</p>
     <p class="body">Sinds december is er iets veranderd. Fase 2, alles wat tussen therapiesessies gebeurt, is bijna klaar. Ik denk dat dit het stuk is dat als eerste naar buiten moet. Niet omdat ik Fase 1 heb geschrapt, die komt erna. Maar iemand die al bij jou zit, weet al dat er iets schuurt. Hij hoeft niet overtuigd te worden van wat het probleem is. Hij wil weten wat hij maandagavond na zijn sessie kan doen, en waar hij woensdagochtend mee kan oefenen. Daar gaat Fase 2 over.</p>
     <p class="body">Net als in december: lees het, laat het landen, en geef me daarna je feedback, alsjeblieft.</p>
@@ -1284,47 +1283,45 @@
       }
     }
 
-    // Tap anywhere on the phone advances to next step (loops at end)
+    var startX = null;
+    var moved = false;
+    var lastTouchTime = 0;
+
     if (screen) {
-      screen.addEventListener('click', function() { update(current + 1); });
-    }
-
-    // Dots jump to a specific step
-    dots.forEach(function(dot, i) {
-      dot.addEventListener('click', function() { update(i); });
-    });
-
-    // Arrow keys when focused inside the carousel
-    root.addEventListener('keydown', function(e) {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); update(current - 1); }
-      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); update(current + 1); }
-    });
-
-    // Swipe on the phone screen
-    if (screen) {
-      var startX = null;
-      var moved = false;
       screen.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
         moved = false;
       }, { passive: true });
-      screen.addEventListener('touchmove', function() {
-        moved = true;
-      }, { passive: true });
+
+      screen.addEventListener('touchmove', function() { moved = true; }, { passive: true });
+
       screen.addEventListener('touchend', function(e) {
+        lastTouchTime = Date.now();
         if (startX == null) return;
         var dx = e.changedTouches[0].clientX - startX;
         if (Math.abs(dx) > 35) {
-          // Swipe handled; suppress the tap that would follow
           update(dx < 0 ? current + 1 : current - 1);
-          // Prevent the subsequent click from double-advancing
-          var blockClick = function(ev) { ev.stopPropagation(); ev.preventDefault(); screen.removeEventListener('click', blockClick, true); };
-          screen.addEventListener('click', blockClick, true);
-          setTimeout(function() { screen.removeEventListener('click', blockClick, true); }, 350);
+        } else if (!moved) {
+          update(current + 1);
         }
         startX = null;
       }, { passive: true });
+
+      screen.addEventListener('click', function() {
+        // Ignore synthetic click that follows a touchend (mobile already handled it)
+        if (Date.now() - lastTouchTime < 500) return;
+        update(current + 1);
+      });
     }
+
+    dots.forEach(function(dot, i) {
+      dot.addEventListener('click', function(e) { e.stopPropagation(); update(i); });
+    });
+
+    root.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); update(current - 1); }
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); update(current + 1); }
+    });
   });
 })();
 </script>
