@@ -25,3 +25,9 @@ CREATE TABLE IF NOT EXISTS letter_access_log (
 );
 
 CREATE INDEX IF NOT EXISTS idx_letter_access_log_token ON letter_access_log(token_id, occurred_at DESC);
+
+-- Lock the tables: only the service role (used by our /api/* routes) can read/write.
+-- The public anon key, which is exposed in the frontend, gets nothing.
+-- (Service role bypasses RLS, so our route handlers continue to work normally.)
+ALTER TABLE letter_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE letter_access_log ENABLE ROW LEVEL SECURITY;
