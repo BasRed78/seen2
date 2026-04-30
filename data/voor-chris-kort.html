@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#faf8f5" />
+<title>Seen · Voor Chris · Kort</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter+Tight:wght@300..600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #faf8f5;
+    --surface: #ffffff;
+    --text: #1a1a2e;
+    --muted: rgba(26, 26, 46, 0.65);
+    --dim: rgba(26, 26, 46, 0.45);
+    --line: rgba(26, 26, 46, 0.08);
+    --accent: #4ECDC4;
+    --accent-deep: #2BA39B;
+    --shadow-soft: 0 2px 8px rgba(26, 26, 46, 0.04);
+    --shadow-card: 0 4px 14px rgba(78, 205, 196, 0.18);
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter Tight', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.55;
+    text-rendering: optimizeLegibility;
+  }
+
+  body, html { overscroll-behavior-y: none; }
+
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    text-decoration: none;
+    color: var(--text);
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+
+  .wordmark svg { display: block; }
+
+  .container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    margin: 0 0 1rem;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    margin: 0 0 1.5rem;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(1.45rem, 4vw, 1.85rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.85rem;
+  }
+
+  p { margin: 0 0 1rem; }
+
+  .lead {
+    font-size: 1.15rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .lead strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  section {
+    margin: 4rem 0;
+  }
+
+  .three-things {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .three-things li {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .num {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 1.6rem;
+    color: var(--accent-deep);
+    line-height: 1;
+    width: 1.6rem;
+    flex-shrink: 0;
+  }
+
+  .three-things h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .three-things p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .not {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 1.25rem 1.4rem;
+  }
+
+  .not p {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+
+  .not p + p {
+    margin-top: 0.5rem;
+    color: var(--muted);
+  }
+
+  .cta {
+    margin-top: 2.5rem;
+    text-align: center;
+  }
+
+  .cta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.6rem;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .cta a:hover { background: var(--accent-deep); transform: translateY(-1px); }
+
+  .cta-note {
+    margin: 1rem 0 0;
+    color: var(--dim);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .signoff {
+    margin-top: 5rem;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  .signoff strong { color: var(--text); font-weight: 500; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 4rem 0;
+  }
+
+  .footer {
+    margin-top: 5rem;
+    color: var(--dim);
+    font-size: 0.78rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <main class="container">
+
+    <!-- Wordmark -->
+    <a href="#" class="wordmark" aria-label="Seen">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#4ECDC4" aria-hidden="true">
+        <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" />
+      </svg>
+      <span>Seen</span>
+    </a>
+
+    <!-- 01 — Intro -->
+    <section style="margin-top: 3rem;">
+      <p class="eyebrow">Voor Chris · de korte versie</p>
+      <h1>Hé Chris.</h1>
+      <p class="lead">
+        Ik wilde je iets laten zien dat ik aan het bouwen ben.
+        Niet alles in één keer. Hier is gewoon de kern.
+      </p>
+    </section>
+
+    <!-- 02 — Wat het is -->
+    <section>
+      <h2>Wat het is.</h2>
+      <p class="lead">
+        Een app voor mensen die in therapie zitten.
+        Hij helpt ze op de momenten dat jij er niet bent.
+      </p>
+    </section>
+
+    <hr />
+
+    <!-- 03 — Waarom -->
+    <section>
+      <h2>Waarom.</h2>
+      <p class="lead">
+        Therapie is <strong>één uur per week</strong>.
+        De andere <strong>167 uur</strong> zijn ze alleen.
+      </p>
+      <p class="lead">
+        Daar gebeurt het echte werk. Of het gebeurt niet.
+      </p>
+    </section>
+
+    <hr />
+
+    <!-- 04 — Wat het doet -->
+    <section>
+      <h2>Wat het doet.</h2>
+      <p class="lead" style="margin-bottom: 1.75rem;">
+        Drie momenten, elke week opnieuw.
+      </p>
+
+      <ul class="three-things">
+        <li>
+          <span class="num">1</span>
+          <div>
+            <h3>Na de sessie</h3>
+            <p>Even stilstaan bij wat er kwam. Een gevoel, een thema, één ding om mee te oefenen.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <div>
+            <h3>Tussen de sessies</h3>
+            <p>Korte check-ins. Oefeningen die je samen kunt kiezen en in zijn agenda staan.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <div>
+            <h3>Voor de volgende sessie</h3>
+            <p>Een overzicht van zijn week. Klaar om mee te nemen naar jou.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <hr />
+
+    <!-- 05 — Wat het niet is -->
+    <section>
+      <h2>Wat het niet is.</h2>
+      <div class="not">
+        <p><strong>Geen therapie. Geen vervanging voor jou.</strong></p>
+        <p>Een rustige hand die meeloopt tussen de sessies door. Jouw werk blijft jouw werk.</p>
+      </div>
+    </section>
+
+    <!-- CTA — Read more -->
+    <section class="cta">
+      <a href="/letter/voor-chris">
+        Lees het hele verhaal
+        <span aria-hidden="true">→</span>
+      </a>
+      <p class="cta-note">Iets uitgebreider. Met voorbeelden en een paar schermen.</p>
+    </section>
+
+    <!-- Sign-off -->
+    <div class="signoff">
+      <p>Geen haast. Lees het wanneer het uitkomt.</p>
+      <p>En als je vragen hebt, of dingen die niet kloppen — laat het me weten.</p>
+      <p style="margin-top: 1.5rem;"><strong>— Bas</strong></p>
+    </div>
+
+    <p class="footer">
+      Vertrouwelijk · alleen voor jou.
+    </p>
+
+  </main>
+</body>
+</html>
