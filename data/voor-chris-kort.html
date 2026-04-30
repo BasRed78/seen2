@@ -12,12 +12,14 @@
   :root {
     --bg: #faf8f5;
     --surface: #ffffff;
+    --surface-light: #f3ede4;
     --text: #1a1a2e;
     --muted: rgba(26, 26, 46, 0.65);
     --dim: rgba(26, 26, 46, 0.45);
     --line: rgba(26, 26, 46, 0.08);
     --accent: #4ECDC4;
     --accent-deep: #2BA39B;
+    --gold: #F2B800;
     --shadow-soft: 0 2px 8px rgba(26, 26, 46, 0.04);
     --shadow-card: 0 4px 14px rgba(78, 205, 196, 0.18);
     --serif: 'Fraunces', Georgia, serif;
@@ -89,7 +91,7 @@
   p { margin: 0 0 1rem; }
 
   .lead {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     color: var(--muted);
     line-height: 1.6;
   }
@@ -100,76 +102,362 @@
   }
 
   section {
-    margin: 4rem 0;
+    margin: 3.5rem 0;
   }
 
-  .three-things {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 1rem;
+  /* Moment cards */
+  .moment {
+    margin: 2rem 0;
   }
 
-  .three-things li {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 1.25rem 1.4rem;
-    box-shadow: var(--shadow-soft);
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-
-  .num {
+  .moment .when {
     font-family: var(--serif);
-    font-weight: 300;
-    font-size: 1.6rem;
+    font-style: italic;
+    font-size: 0.95rem;
     color: var(--accent-deep);
-    line-height: 1;
-    width: 1.6rem;
-    flex-shrink: 0;
+    margin: 0 0 0.4rem;
   }
 
-  .three-things h3 {
-    margin: 0 0 0.25rem;
-    font-size: 1.05rem;
-    font-weight: 600;
+  .moment h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.4rem;
+    margin: 0 0 0.5rem;
     color: var(--text);
   }
 
-  .three-things p {
+  .moment p {
     margin: 0;
     color: var(--muted);
-    font-size: 0.95rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
   }
 
+  hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 3.5rem 0;
+  }
+
+  /* Phone mockup */
+  .phone-wrap {
+    margin: 2.5rem auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .phone-shell {
+    background: #1c1c1e;
+    border-radius: 44px;
+    padding: 11px;
+    box-shadow: 0 25px 50px -15px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.08);
+  }
+
+  .phone-screen {
+    background: var(--bg);
+    border-radius: 32px;
+    width: 280px;
+    height: 568px;
+    overflow: hidden;
+    position: relative;
+    font-family: var(--sans);
+  }
+
+  .phone-screen .island {
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    width: 88px;
+    height: 25px;
+    border-radius: 18px;
+    z-index: 5;
+  }
+
+  .phone-screen .home-indicator {
+    position: absolute;
+    bottom: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.3);
+    width: 96px;
+    height: 4px;
+    border-radius: 2px;
+    z-index: 5;
+  }
+
+  .phone-screen .scroll {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding-top: 44px;
+  }
+
+  /* Home screen content */
+  .home-greeting {
+    padding: 0 18px 14px;
+  }
+  .home-greeting .hi {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+  .home-greeting .sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin: 2px 0 0;
+  }
+  .home-card {
+    margin: 0 18px 10px;
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .home-card .label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+  }
+  .home-card .desc {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin: 2px 0 0;
+  }
+  .home-card .pill {
+    padding: 5px 12px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .home-card .chev {
+    color: var(--dim);
+    font-size: 0.9rem;
+  }
+  .home-card .icon {
+    color: var(--accent-deep);
+    font-size: 0.95rem;
+    margin-right: 4px;
+  }
+  .home-cta {
+    margin: 0 18px 10px;
+    padding: 14px;
+    border-radius: 14px;
+    background: var(--accent);
+    box-shadow: 0 4px 14px rgba(78,205,196,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .home-cta .label {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+  .home-cta .desc {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.9);
+    margin: 2px 0 0;
+  }
+  .home-cta .arrow { color: #fff; font-size: 0.95rem; }
+  .home-section {
+    margin: 0 18px 10px;
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
+  }
+  .home-section .heading {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .home-section .heading .label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--accent-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .home-section.gold .heading .label { color: #c89400; }
+  .home-section .body {
+    font-size: 0.78rem;
+    color: var(--text);
+    line-height: 1.4;
+    margin: 0;
+  }
+  .home-section .by {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin: 5px 0 0;
+  }
+  .home-soon {
+    padding: 9px;
+    border-radius: 11px;
+    background: rgba(242,184,0,0.08);
+    border: 1px solid rgba(242,184,0,0.35);
+    margin-top: 4px;
+  }
+  .home-soon .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .home-soon .row .title {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+  }
+  .home-soon .row .when {
+    font-size: 0.62rem;
+    color: var(--muted);
+    margin: 2px 0 0;
+  }
+  .home-soon .badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.55rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .home-soon .start-btn {
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* Session prep screen */
+  .prep-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 18px 12px;
+  }
+  .prep-header .back { color: var(--text); font-size: 1rem; }
+  .prep-header .title { font-size: 0.88rem; font-weight: 700; color: var(--text); margin: 0; }
+  .prep-intro {
+    padding: 0 18px 12px;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin: 0;
+  }
+  .prep-card {
+    margin: 0 18px 10px;
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid rgba(78,205,196,0.25);
+    box-shadow: var(--shadow-soft);
+  }
+  .prep-card.plain { border-color: var(--line); }
+  .prep-card .eyebrow-mini {
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: var(--accent-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .prep-card .big {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 12px;
+  }
+  .prep-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+  }
+  .prep-stat {
+    padding: 9px;
+    border-radius: 9px;
+    background: var(--surface-light);
+    text-align: center;
+  }
+  .prep-stat .n {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent-deep);
+    margin: 0;
+  }
+  .prep-stat .l {
+    font-size: 0.55rem;
+    color: var(--muted);
+    margin: 1px 0 0;
+  }
+  .prep-themes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  .prep-theme {
+    padding: 2px 9px;
+    border-radius: 9px;
+    background: rgba(78,205,196,0.13);
+    color: var(--accent-deep);
+    font-size: 0.62rem;
+    font-weight: 600;
+  }
+  .prep-card .quote {
+    font-size: 0.72rem;
+    color: var(--text);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Not section */
   .not {
     background: var(--surface);
     border: 1px solid var(--line);
     border-left: 3px solid var(--accent);
     border-radius: 12px;
     padding: 1.25rem 1.4rem;
+    box-shadow: var(--shadow-soft);
   }
-
   .not p {
     margin: 0;
     color: var(--text);
     font-size: 1.05rem;
     line-height: 1.55;
   }
-
   .not p + p {
-    margin-top: 0.5rem;
+    margin-top: 0.6rem;
     color: var(--muted);
   }
 
+  /* CTA */
   .cta {
     margin-top: 2.5rem;
     text-align: center;
   }
-
   .cta a {
     display: inline-flex;
     align-items: center;
@@ -184,9 +472,7 @@
     box-shadow: var(--shadow-card);
     transition: transform 0.15s ease, background 0.15s ease;
   }
-
   .cta a:hover { background: var(--accent-deep); transform: translateY(-1px); }
-
   .cta-note {
     margin: 1rem 0 0;
     color: var(--dim);
@@ -200,14 +486,7 @@
     font-size: 1.05rem;
     line-height: 1.6;
   }
-
   .signoff strong { color: var(--text); font-weight: 500; }
-
-  hr {
-    border: none;
-    border-top: 1px solid var(--line);
-    margin: 4rem 0;
-  }
 
   .footer {
     margin-top: 5rem;
@@ -233,8 +512,8 @@
       <p class="eyebrow">Voor Chris · de korte versie</p>
       <h1>Hé Chris.</h1>
       <p class="lead">
-        Ik wilde je iets laten zien dat ik aan het bouwen ben.
-        Niet alles in één keer. Hier is gewoon de kern.
+        Ik wilde je iets laten zien dat ik aan het bouwen ben. Niet alles in één keer.
+        Hier is gewoon de kern, met één voorbeeld erbij. Als je meer wil weten, staat het hele verhaal onderaan klaar.
       </p>
     </section>
 
@@ -242,67 +521,160 @@
     <section>
       <h2>Wat het is.</h2>
       <p class="lead">
-        Een app voor mensen die in therapie zitten.
-        Hij helpt ze op de momenten dat jij er niet bent.
-      </p>
-    </section>
-
-    <hr />
-
-    <!-- 03 — Waarom -->
-    <section>
-      <h2>Waarom.</h2>
-      <p class="lead">
-        Therapie is <strong>één uur per week</strong>.
-        De andere <strong>167 uur</strong> zijn ze alleen.
+        Een app voor mensen die in therapie zitten. Hij helpt op de momenten dat jij er niet bent.
       </p>
       <p class="lead">
-        Daar gebeurt het echte werk. Of het gebeurt niet.
+        Therapie is <strong>één uur per week</strong>. De andere <strong>167 uur</strong> zijn waar het echte werk gebeurt. Of waar het niet gebeurt.
       </p>
     </section>
 
     <hr />
 
-    <!-- 04 — Wat het doet -->
+    <!-- 03 — Daan's week -->
     <section>
-      <h2>Wat het doet.</h2>
-      <p class="lead" style="margin-bottom: 1.75rem;">
-        Drie momenten, elke week opnieuw.
+      <h2>Een week. Drie momenten.</h2>
+      <p class="lead">
+        Stel je iemand voor. Ik noem hem Daan. Hij zit bij jou in therapie.
       </p>
 
-      <ul class="three-things">
-        <li>
-          <span class="num">1</span>
-          <div>
-            <h3>Na de sessie</h3>
-            <p>Even stilstaan bij wat er kwam. Een gevoel, een thema, één ding om mee te oefenen.</p>
+      <!-- Phone screen 1: Home -->
+      <div class="phone-wrap">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <div class="island"></div>
+            <div class="scroll">
+              <div class="home-greeting">
+                <p class="hi">Goedemorgen, Daan</p>
+                <p class="sub">Jouw oefenruimte</p>
+              </div>
+              <div class="home-card">
+                <div>
+                  <p class="label">Dagelijkse check-in</p>
+                  <p class="desc">Een paar minuten reflectie</p>
+                </div>
+                <div class="pill">Starten</div>
+              </div>
+              <div class="home-card">
+                <div>
+                  <p class="label">Bereid je sessie voor</p>
+                  <p class="desc">Bekijk je week voor je therapie</p>
+                </div>
+                <span class="chev">›</span>
+              </div>
+              <div class="home-cta">
+                <div>
+                  <p class="label">Ik had een sessie</p>
+                  <p class="desc">Reflecteer op je therapiesessie</p>
+                </div>
+                <span class="arrow">→</span>
+              </div>
+              <div class="home-section">
+                <div class="heading">
+                  <span style="color: var(--accent-deep); font-size: 0.7rem;">◎</span>
+                  <span class="label">Actieve intentie</span>
+                </div>
+                <p class="body">Zeg deze week nee tegen één verzoek zonder uit te leggen waarom</p>
+                <p class="by">Voor vr 18 apr</p>
+              </div>
+              <div class="home-section gold">
+                <div class="heading">
+                  <span style="color: #c89400; font-size: 0.7rem;">▣</span>
+                  <span class="label">Deze week op de planning</span>
+                </div>
+                <div class="home-soon">
+                  <div class="row">
+                    <div>
+                      <p class="title">Een grens stellen</p>
+                      <p class="when">Vandaag om 9:00</p>
+                    </div>
+                    <span class="badge">STRAKS</span>
+                  </div>
+                  <div class="start-btn">Nu starten</div>
+                </div>
+              </div>
+            </div>
+            <div class="home-indicator"></div>
           </div>
-        </li>
-        <li>
-          <span class="num">2</span>
-          <div>
-            <h3>Tussen de sessies</h3>
-            <p>Korte check-ins. Oefeningen die je samen kunt kiezen en in zijn agenda staan.</p>
+        </div>
+      </div>
+
+      <!-- Moment 1 -->
+      <div class="moment">
+        <p class="when">Maandagavond, vlak na zijn sessie.</p>
+        <h3>Hij reflecteert.</h3>
+        <p>
+          Twee minuten op zijn telefoon. Hoe voel je je nu? Welke thema's kwamen op?
+          Wat wil je deze week oefenen? Hij kiest één klein ding.
+          In het voorbeeld hierboven: <em>"Zeg deze week nee tegen één verzoek zonder uit te leggen waarom."</em>
+        </p>
+      </div>
+
+      <!-- Moment 2 -->
+      <div class="moment">
+        <p class="when">Woensdagochtend, 9:00 uur.</p>
+        <h3>Hij oefent.</h3>
+        <p>
+          Een ingeplande oefening verschijnt op zijn telefoon. Vijf, tien minuten.
+          De korte check-ins die hij die week doet, weten waar hij mee bezig is.
+          Niet generiek. Als hij iets aanraakt dat groter is, stelt de AI voor om het mee te nemen naar jou.
+        </p>
+      </div>
+
+      <!-- Moment 3 -->
+      <div class="moment">
+        <p class="when">Zondagavond, voor jullie volgende sessie.</p>
+        <h3>Hij bereidt zich voor.</h3>
+        <p>
+          Eén pagina. Wat er deze week speelde. Hoe zijn oefendoel ging.
+          Wat hij wil meebrengen naar de kamer. Hij loopt voorbereid binnen, niet op het laatste moment.
+        </p>
+      </div>
+
+      <!-- Phone screen 2: Session prep -->
+      <div class="phone-wrap">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <div class="island"></div>
+            <div class="scroll">
+              <div class="prep-header">
+                <span class="back">←</span>
+                <p class="title">Sessievoorbereiding</p>
+              </div>
+              <p class="prep-intro">Een overzicht van je week om mee te nemen naar je volgende sessie.</p>
+              <div class="prep-card">
+                <p class="eyebrow-mini">▣ Sinds je laatste sessie</p>
+                <p class="big">5 dagen geleden</p>
+                <div class="prep-stats">
+                  <div class="prep-stat"><p class="n">4</p><p class="l">CHECK-INS</p></div>
+                  <div class="prep-stat"><p class="n">3</p><p class="l">OEFENINGEN</p></div>
+                  <div class="prep-stat"><p class="n">1/2</p><p class="l">INTENTIES</p></div>
+                </div>
+              </div>
+              <div class="prep-card plain">
+                <p class="eyebrow-mini">WAT KWAM ER VORIGE KEER NAAR BOVEN</p>
+                <div class="prep-themes">
+                  <span class="prep-theme">Grenzen</span>
+                  <span class="prep-theme">Eigenwaarde</span>
+                </div>
+                <p class="quote">Ik realiseerde me dat ik steeds ja blijf zeggen tegen dingen die me uitputten, omdat ik bang ben om als lastig gezien te worden.</p>
+              </div>
+            </div>
+            <div class="home-indicator"></div>
           </div>
-        </li>
-        <li>
-          <span class="num">3</span>
-          <div>
-            <h3>Voor de volgende sessie</h3>
-            <p>Een overzicht van zijn week. Klaar om mee te nemen naar jou.</p>
-          </div>
-        </li>
-      </ul>
+        </div>
+      </div>
     </section>
 
     <hr />
 
-    <!-- 05 — Wat het niet is -->
+    <!-- 04 — Wat het niet is -->
     <section>
       <h2>Wat het niet is.</h2>
       <div class="not">
         <p><strong>Geen therapie. Geen vervanging voor jou.</strong></p>
-        <p>Een rustige hand die meeloopt tussen de sessies door. Jouw werk blijft jouw werk.</p>
+        <p>
+          De AI in de app benoemt geen patronen, geeft geen interpretaties, neemt geen rol aan die niet aan haar is. Ze stelt vragen, helpt met reflectie, en stuurt hem zo nodig terug naar jou. Jouw werk blijft jouw werk.
+        </p>
       </div>
     </section>
 
@@ -312,13 +684,13 @@
         Lees het hele verhaal
         <span aria-hidden="true">→</span>
       </a>
-      <p class="cta-note">Iets uitgebreider. Met voorbeelden en een paar schermen.</p>
+      <p class="cta-note">Iets uitgebreider. Met meer schermen, het volledige weekritme, en de zeventien oefeningen die ik graag met je wil bespreken.</p>
     </section>
 
     <!-- Sign-off -->
     <div class="signoff">
       <p>Geen haast. Lees het wanneer het uitkomt.</p>
-      <p>En als je vragen hebt, of dingen die niet kloppen — laat het me weten.</p>
+      <p>Als er iets niet klopt of je hebt vragen — laat het me weten.</p>
       <p style="margin-top: 1.5rem;"><strong>— Bas</strong></p>
     </div>
 
