@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   }
 
   const tokenRow = await findToken(token)
-  // Accept tokens issued for either the long or short letter
+  // Accept tokens issued for either the long letter or the short version
   if (!tokenRow || !tokenRow.letter_id.startsWith('voor-chris')) {
     return NextResponse.redirect(new URL('/voor-chris/expired', request.url))
   }
@@ -25,9 +25,9 @@ export async function GET(request: NextRequest) {
 
   let html: string
   try {
-    html = readFileSync(join(process.cwd(), 'data', 'voor-chris.html'), 'utf8')
+    html = readFileSync(join(process.cwd(), 'data', 'voor-chris-kort.html'), 'utf8')
   } catch (err) {
-    console.error('[LETTER] Failed to read letter file:', err)
+    console.error('[LETTER] Failed to read short letter file:', err)
     return new NextResponse('Letter unavailable', { status: 500 })
   }
 

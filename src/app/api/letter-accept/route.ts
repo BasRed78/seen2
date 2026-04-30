@@ -22,7 +22,13 @@ export async function POST(request: NextRequest) {
       request.headers.get('user-agent')
     )
 
-    const response = NextResponse.json({ success: true, redirect: `/letter/${tokenRow.letter_id}` })
+    // Land on the short version first for any voor-chris token, so
+    // digitally-anxious recipients get the gentle intro. They can click
+    // through to the long letter from there.
+    const landing = tokenRow.letter_id.startsWith('voor-chris')
+      ? '/letter/voor-chris-kort'
+      : `/letter/${tokenRow.letter_id}`
+    const response = NextResponse.json({ success: true, redirect: landing })
     response.cookies.set('letter_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
