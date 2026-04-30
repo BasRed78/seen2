@@ -433,6 +433,44 @@
     margin: 0;
   }
 
+  /* Smart list */
+  .smart-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .smart-list li {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .smart-list .label {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.02rem;
+    color: var(--text);
+    margin: 0;
+  }
+  .smart-list .label::before {
+    content: "·";
+    color: var(--accent);
+    margin-right: 0.45rem;
+    font-weight: 700;
+  }
+  .smart-list .body {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
   /* Not section */
   .not {
     background: var(--surface);
@@ -667,7 +705,44 @@
 
     <hr />
 
-    <!-- 04 — Wat het niet is -->
+    <!-- 04 — Wat het slim maakt -->
+    <section>
+      <h2>Het is geen los gesprek.</h2>
+      <p class="lead">
+        Alles wat de app doet, weet van elkaar. Dat is het verschil met een willekeurige AI.
+      </p>
+
+      <ul class="smart-list">
+        <li>
+          <p class="label">Therapie-bewust.</p>
+          <p class="body">De app kent jullie laatste sessie, Daan's oefendoel, en welke oefeningen ingepland staan.</p>
+        </li>
+        <li>
+          <p class="label">Doorlopend.</p>
+          <p class="body">Een check-in op woensdag bouwt op wat hij maandag zei. Hij hoeft niet steeds opnieuw uit te leggen waar hij zit.</p>
+        </li>
+        <li>
+          <p class="label">Terugverwijzend naar jou.</p>
+          <p class="body">Als iets groter wordt dan een check-in, stelt de app voor om het mee te nemen naar de sessie. Niet om het zelf op te lossen.</p>
+        </li>
+        <li>
+          <p class="label">Begrensd per ontwerp.</p>
+          <p class="body">Geen diagnoses, geen interpretaties, geen rollen die niet aan haar zijn. Dat is een bewuste keuze, geen toeval.</p>
+        </li>
+        <li>
+          <p class="label">Geworteld in methoden.</p>
+          <p class="body">De zeventien oefeningen komen uit CBT, ACT, DBT en mindfulness. Niet uit de lucht gegrepen.</p>
+        </li>
+        <li>
+          <p class="label">In zijn echte leven.</p>
+          <p class="body">Geplande oefeningen staan in Daan's eigen agenda. Wat hij doet en hoe hij het waardeert, voedt terug in wat de app daarna weet.</p>
+        </li>
+      </ul>
+    </section>
+
+    <hr />
+
+    <!-- 05 — Wat het niet is -->
     <section>
       <h2>Wat het niet is.</h2>
       <div class="not">
