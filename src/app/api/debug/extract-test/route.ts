@@ -1,26 +1,10 @@
-import { NextResponse } from 'next/server';
-import { extractFromCheckin } from '@/lib/extraction-handler';
+// DIAGNOSTIC KILL SWITCH ENABLED
+// Public endpoint with no auth that invokes Anthropic via extractFromCheckin.
+// Short-circuited so unknown callers can be identified via Vercel logs.
+// See git history for the original implementation.
 
-export const dynamic = 'force-dynamic';
+import { diagnosticKillSwitchResponse } from '@/lib/diagnostic-kill-switch'
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const checkinId = searchParams.get('id');
-
-  if (!checkinId) {
-    return NextResponse.json({ error: 'Provide ?id=checkin-uuid' }, { status: 400 });
-  }
-
-  try {
-    console.log('[DEBUG] Starting extraction for:', checkinId);
-    const result = await extractFromCheckin(checkinId);
-    console.log('[DEBUG] Extraction result:', result);
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('[DEBUG] Extraction error:', error);
-    return NextResponse.json({ 
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
-    }, { status: 500 });
-  }
+  return diagnosticKillSwitchResponse(request, 'debug/extract-test')
 }

@@ -1,25 +1,10 @@
-// Generates weekly reflections for all users
-// Trigger: Every Sunday at 9:00 AM via Vercel cron
+// DIAGNOSTIC KILL SWITCH ENABLED
+// Not listed in vercel.json but route comment claims a Sunday 9 AM schedule.
+// Short-circuited so unknown callers can be identified via Vercel logs.
+// See git history for the original implementation.
 
-import { NextResponse } from 'next/server';
-import { generateAllWeeklySummaries } from '@/lib/weekly-aggregation';
+import { diagnosticKillSwitchResponse } from '@/lib/diagnostic-kill-switch'
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
-    const result = await generateAllWeeklySummaries();
-    
-    return NextResponse.json({
-      message: 'Weekly reflections generated',
-      ...result
-    });
-
-  } catch (error) {
-    console.error('[CRON:WEEKLY] Error:', error);
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
-  }
+  return diagnosticKillSwitchResponse(request, 'cron/weekly-reflections')
 }
