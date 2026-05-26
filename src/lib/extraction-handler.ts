@@ -83,9 +83,10 @@ export async function extractFromCheckin(checkinId: string): Promise<{
       .map(m => `${m.role === 'assistant' ? 'Seen' : 'User'}: ${m.content}`)
       .join('\n\n');
 
-    // 3. Call Claude for extraction
+    // 3. Call Claude for extraction.
+    // Haiku handles structured JSON extraction well at ~4x lower cost than Sonnet.
     const extractionResponse = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 2000,
       system: EXTRACTION_SYSTEM_PROMPT,
       messages: [{
@@ -374,16 +375,43 @@ export async function extractFromCheckin(checkinId: string): Promise<{
       }
     }
 
-    // 8. Mark check-in as extracted
-    await supabase
-      .from('checkins')
-      .update({ 
-        extracted: true, 
-        extracted_at: new Date().toISOString(),
-        extraction_version: EXTRACTION_VERSION,
-        insights: extraction.insight_summary || null
-      })
-      .eq('id', checkinId);
+    // 8. Mark check-in as extracted.
+    // stress_level is also mirrored onto the checkin row when the extraction
+    // produced a numeric value, so dashboards reading checkins.stress_level
+    // stay populated without a separate Sonnet call in the chat route.
+    const checkinUpdate: Record<string, unknown> = {
+      extracted: true,
+      extracted_at: new Date().toISOString(),
+      extraction_version: EXTRACTION_VERSION,
+      insights: extraction.insight_summary || null,
+    };
+    const stressNum = typeof extraction.stress_level?.value === 'number'
+      ? extraction.stress_level.value
+      : null;
+    if (stressNum !== null && stressNum >= 1 && stressNum <= 10) {
+      checkinUpdate.stress_level = stressNum;
+    }
+    await supabase.from('checkins').update(checkinUpdate).eq('id', checkinId);
+
+    // 9. Backfill the user's pattern_description if it was never set.
+    // Previously handled by the chat route's (now-removed) insight call.
+    if (extraction.insight_summary) {
+      const { data: userRow } = await supabase
+        .from('users')
+        .select('pattern_description')
+        .eq('id', userId)
+        .single();
+
+      if (
+        !userRow?.pattern_description ||
+        userRow.pattern_description === 'Still being explored'
+      ) {
+        await supabase
+          .from('users')
+          .update({ pattern_description: extraction.insight_summary })
+          .eq('id', userId);
+      }
+    }
 
     console.log(`[EXTRACTION] Completed for check-in ${checkinId}: ${extractions.length} extractions`);
     

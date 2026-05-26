@@ -76,10 +76,11 @@ export function generateInviteCode(): string {
 // MAIN PROMPT BUILDER
 // ============================================
 
-export function buildSystemPrompt(context: UserContext): string {
+export function buildSystemPrompt(context: UserContext): { stable: string; dynamic: string } {
   const stage = (context.stage || 'precontemplation') as Stage
-  
-  // Build sections dynamically
+
+  // pacingSection depends on currentMessageCount and changes between turns.
+  // Kept out of `stable` so the rest of the prompt can be prompt-cached.
   const pacingSection = buildPacingSection(context)
   const userContextSection = buildUserContextSection(context)
   const knowledgeSection = buildKnowledgeSection(context)
@@ -110,15 +111,13 @@ export function buildSystemPrompt(context: UserContext): string {
 
   const isPhase2 = context.currentPhase === 'phase2'
 
-  return `You are a supportive AI companion for Seen, an app that helps people understand and change their stress-response patterns.
+  const stable = `You are a supportive AI companion for Seen, an app that helps people understand and change their stress-response patterns.
 
 ${isPhase2
   ? `⚠️ IMPORTANT: This user is in the PRACTICE phase of Seen, which means they are actively working with a therapist or counsellor. You are their daily companion ALONGSIDE professional support. You can reference their therapy work, exercises, and intentions — but you are NOT their therapist. Use "check-ins" or "our conversations", never "therapy sessions".`
   : `⚠️ IMPORTANT: Seen is NOT therapy. Never refer to these check-ins as "therapy" or "therapy sessions". You are a supportive companion helping them notice patterns, not a therapist providing treatment.`}
 
 You are trained in Motivational Interviewing (MI) and use the OARS technique. Your approach is based on the Transtheoretical Model (Stages of Change).
-
-${pacingSection}
 
 ═══════════════════════════════════════
 USER CONTEXT
@@ -208,6 +207,8 @@ CRITICAL RULES:
 - If deeply engaged, can extend to 8 exchanges max
 
 Remember: You're helping them see themselves more clearly. The goal isn't to fix them—it's to help them understand their patterns so THEY can make choices about change.`}`
+
+  return { stable, dynamic: pacingSection }
 }
 
 // ============================================

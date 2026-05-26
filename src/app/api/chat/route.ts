@@ -223,8 +223,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Build system prompt with user context
-    const systemPrompt = buildSystemPrompt({
+    // Build system prompt with user context.
+    // Returns { stable, dynamic } so the stable portion can be prompt-cached
+    // across messages within the same check-in.
+    const { stable: stableSystemPrompt, dynamic: dynamicSystemPrompt } = buildSystemPrompt({
       name: user.name,
       patternType: user.pattern_type,
       patternDescription: user.pattern_description,
@@ -413,11 +415,17 @@ Write the closing now:`
       }
     } else {
       console.log('[FLOW] Entering NORMAL RESPONSE branch (not forced close)')
-      // Normal response
+      // Normal response.
+      // System split into [stable, dynamic] blocks with cache_control on the
+      // stable block. Within a check-in (≈5min), subsequent turns hit the cache
+      // at ~10% input cost for that block.
       const response = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 500,
-        system: systemPrompt,
+        system: [
+          { type: 'text', text: stableSystemPrompt, cache_control: { type: 'ephemeral' } },
+          { type: 'text', text: dynamicSystemPrompt },
+        ],
         messages: conversationHistory,
       })
 
@@ -523,71 +531,10 @@ Write the closing now:`
         .map(m => `${m.role === 'assistant' ? 'Seen' : 'User'}: ${m.content}`)
         .join('\n\n')
 
-      // Generate and save insights from this conversation
-      try {
-        const isPhase2User = user.current_phase === 'phase2'
-        const insightPrompt = isPhase2User
-          ? `You are a note-taker. Analyze the following check-in conversation and extract KEY LEARNINGS about this Practice phase user.
-
-Write 2-3 factual sentences (plain text, no markdown/formatting) summarizing what was learned about:
-- How their therapy work is connecting to daily life
-- Progress on exercises or intentions
-- Emotional patterns or shifts they're noticing
-- Their triggers and coping strategies
-
-Only include things actually discussed. Be concise and specific. Do not use bullet points or bold text.
-
-Example: "User reflected on boundary-setting exercise from therapy, finding it difficult at work. Noticed a pattern of people-pleasing under stress. Feeling more aware but not yet acting differently."`
-          : `You are a note-taker. Analyze the following check-in conversation and extract KEY LEARNINGS about the user's stress-response pattern.
-
-Write 2-3 factual sentences (plain text, no markdown/formatting) summarizing what was learned about:
-- Their triggers (what causes the behavior)
-- The behavior itself (what they do, how long, etc.)
-- The function (what need it meets)
-- The aftermath (how they feel after)
-
-Only include things actually discussed. Be concise and specific. Do not use bullet points or bold text.
-
-Example: "Work and family pressure trigger smoking breaks. User smokes to get a moment to detach and breathe when feeling overwhelmed. Duration and aftermath not yet explored."`
-
-        const insightResponse = await anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 200,
-          system: insightPrompt,
-          messages: [{
-            role: 'user',
-            content: `Analyze this conversation:\n\n${conversationText}`
-          }],
-        })
-
-        let insight = insightResponse.content[0].type === 'text' 
-          ? insightResponse.content[0].text 
-          : ''
-        
-        // Strip markdown formatting (bold, headers, etc.)
-        insight = insight
-          .replace(/\*\*/g, '')  // Remove bold
-          .replace(/\*/g, '')    // Remove italic
-          .replace(/^#+\s*/gm, '') // Remove headers
-          .replace(/^-\s*/gm, '')  // Remove list markers
-          .trim()
-
-        // Save insight to check-in
-        await supabase
-          .from('checkins')
-          .update({ insights: insight })
-          .eq('id', currentCheckinId)
-
-        // Also update the user's pattern_description if we learned something new
-        if (insight && (!user.pattern_description || user.pattern_description === 'Still being explored')) {
-          await supabase
-            .from('users')
-            .update({ pattern_description: insight })
-            .eq('id', userId)
-        }
-      } catch (insightError) {
-        console.error('Failed to generate insight:', insightError)
-      }
+      // NOTE: The dedicated "insight" Sonnet call that used to live here was
+      // removed. The extraction handler already produces `insight_summary`
+      // (second-person, fixes the third-person bug) and writes it to
+      // checkins.insights. pattern_description fallback is also handled there.
 
       // Extract stress level and detect stage progression
       try {
@@ -615,7 +562,7 @@ NEW_STAGE: [next stage name OR "none" if no change]
 STAGE_REASON: [brief reason OR "n/a" if no change]`
 
         const analysisResponse = await anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-haiku-4-5-20251001',
           max_tokens: 150,
           system: analysisPrompt,
           messages: [{

@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build the system prompt so we can show what Claude sees
-    const systemPrompt = buildSystemPrompt({
+    const { stable, dynamic } = buildSystemPrompt({
       name: user.name,
       patternType: user.pattern_type,
       patternDescription: user.pattern_description,
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       checkins: checkinsWithMessages,
-      systemPrompt,
+      systemPrompt: `${stable}\n\n${dynamic}`,
       userContext: {
         name: user.name,
         stage: user.stage,
