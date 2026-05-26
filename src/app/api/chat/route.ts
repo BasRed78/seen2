@@ -423,6 +423,9 @@ Write the closing now:`
         model: 'claude-sonnet-4-20250514',
         max_tokens: 500,
         system: [
+          // @ts-expect-error - cache_control is sent to the API at runtime but
+          // is not in @anthropic-ai/sdk 0.27's TextBlockParam types. Remove
+          // this when the SDK is bumped to a version that includes the field.
           { type: 'text', text: stableSystemPrompt, cache_control: { type: 'ephemeral' } },
           { type: 'text', text: dynamicSystemPrompt },
         ],
