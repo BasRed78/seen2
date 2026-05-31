@@ -16,6 +16,7 @@ import {
 import { useTheme } from '@/lib/theme'
 import { IntentionEditSheet, EditableIntention } from '@/components/practice/IntentionEditSheet'
 import { ExerciseNudgeBanner } from '@/components/practice/ExerciseNudgeBanner'
+import { PushSubscribePrompt } from '@/components/practice/PushSubscribePrompt'
 
 interface ScheduledExercise {
   id: string
@@ -72,6 +73,10 @@ export function PracticeHome({ userId, userName, summary, upcomingExercises, onM
   return (
     <>
       <ExerciseNudgeBanner upcomingExercises={upcomingExercises} />
+      <PushSubscribePrompt
+        userId={userId}
+        hasScheduled={(upcomingExercises?.length ?? 0) > 0}
+      />
 
       {/* Background gradient - cyan tinted */}
       <div
