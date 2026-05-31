@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useTheme } from '@/lib/theme'
 import { StarIcon } from '@/components/StarIcon'
+import { IntentionEditSheet, EditableIntention } from '@/components/practice/IntentionEditSheet'
 
 interface User {
   id: string
@@ -72,6 +73,7 @@ export default function SessionPrepPage() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<PrepData | null>(null)
   const [notes, setNotes] = useState('')
+  const [editingIntention, setEditingIntention] = useState<EditableIntention | null>(null)
 
   useEffect(() => {
     const stored = localStorage.getItem('seen_user')
@@ -253,10 +255,17 @@ export default function SessionPrepPage() {
             </div>
             <div className="space-y-2">
               {activeIntentions.map(i => (
-                <div
+                <button
                   key={i.id}
-                  className="flex items-start gap-3 p-3 rounded-xl"
-                  style={{ backgroundColor: theme.cardHover }}
+                  type="button"
+                  onClick={() => setEditingIntention({
+                    id: i.id,
+                    intention_text: i.intention_text,
+                    target_date: i.target_date,
+                    status: i.status,
+                  })}
+                  className="w-full flex items-start gap-3 p-3 rounded-xl text-left transition-all hover:scale-[1.01]"
+                  style={{ backgroundColor: theme.cardHover, border: 'none', cursor: 'pointer' }}
                 >
                   <div
                     className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
@@ -267,16 +276,23 @@ export default function SessionPrepPage() {
                       {i.intention_text}
                     </p>
                     <p className="text-xs mt-1" style={{ color: theme.textMuted }}>
-                      Active
+                      Active · tap to edit
                     </p>
                   </div>
-                </div>
+                </button>
               ))}
               {completedIntentions.map(i => (
-                <div
+                <button
                   key={i.id}
-                  className="flex items-start gap-3 p-3 rounded-xl"
-                  style={{ backgroundColor: theme.cardHover, opacity: 0.7 }}
+                  type="button"
+                  onClick={() => setEditingIntention({
+                    id: i.id,
+                    intention_text: i.intention_text,
+                    target_date: i.target_date,
+                    status: i.status,
+                  })}
+                  className="w-full flex items-start gap-3 p-3 rounded-xl text-left transition-all hover:scale-[1.01]"
+                  style={{ backgroundColor: theme.cardHover, opacity: 0.7, border: 'none', cursor: 'pointer' }}
                 >
                   <div
                     className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
@@ -287,10 +303,10 @@ export default function SessionPrepPage() {
                       {i.intention_text}
                     </p>
                     <p className="text-xs mt-1" style={{ color: theme.textMuted }}>
-                      Completed
+                      Completed · tap to edit
                     </p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -416,6 +432,32 @@ export default function SessionPrepPage() {
           </p>
         </div>
       </div>
+
+      <IntentionEditSheet
+        open={editingIntention !== null}
+        intention={editingIntention}
+        userId={user.id}
+        onClose={() => setEditingIntention(null)}
+        onSaved={(updated) => {
+          // Apply the change to local state so the list re-renders immediately
+          setData(prev => {
+            if (!prev) return prev
+            return {
+              ...prev,
+              intentions: prev.intentions.map(i =>
+                i.id === updated.id
+                  ? {
+                      ...i,
+                      intention_text: updated.intention_text,
+                      target_date: updated.target_date,
+                      status: updated.status,
+                    }
+                  : i
+              ),
+            }
+          })
+        }}
+      />
     </div>
   )
 }

@@ -130,10 +130,28 @@ export default function HomePage() {
 
       {phase === 'phase2' ? (
         <PracticeHome
+          userId={user.id}
           userName={firstName}
           summary={homeSummary}
           upcomingExercises={upcomingExercises}
           onMarkDone={handleMarkDone}
+          onIntentionUpdated={(updated) => {
+            setHomeSummary((prev: any) => {
+              if (!prev) return prev
+              const next = { ...prev }
+              // If still active, update in place. Otherwise remove from active list.
+              if (updated.status === 'active') {
+                next.activeIntentions = (prev.activeIntentions || []).map((i: any) =>
+                  i.id === updated.id
+                    ? { ...i, intention_text: updated.intention_text, target_date: updated.target_date }
+                    : i
+                )
+              } else {
+                next.activeIntentions = (prev.activeIntentions || []).filter((i: any) => i.id !== updated.id)
+              }
+              return next
+            })
+          }}
         />
       ) : (
         <AwarenessHome userName={firstName} insights={insights} />

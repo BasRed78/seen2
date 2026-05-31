@@ -8,33 +8,63 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { status, userId } = await request.json()
+    const body = await request.json()
+    const { status, userId, intention_text, target_date } = body
     const intentionId = params.id
 
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 })
     }
 
-    if (!['completed', 'skipped'].includes(status)) {
+    const updateData: Record<string, any> = {}
+
+    if (status !== undefined) {
+      if (!['active', 'completed', 'skipped'].includes(status)) {
+        return NextResponse.json(
+          { error: 'status must be "active", "completed", or "skipped"' },
+          { status: 400 }
+        )
+      }
+      updateData.status = status
+      if (status === 'completed') {
+        updateData.completed_at = new Date().toISOString()
+      } else if (status === 'active') {
+        // Reactivating clears any previous completion timestamp
+        updateData.completed_at = null
+      }
+    }
+
+    if (intention_text !== undefined) {
+      const trimmed = String(intention_text).trim()
+      if (!trimmed) {
+        return NextResponse.json(
+          { error: 'intention_text cannot be empty' },
+          { status: 400 }
+        )
+      }
+      updateData.intention_text = trimmed
+    }
+
+    if (target_date !== undefined) {
+      // Allow null to clear, or a YYYY-MM-DD string
+      updateData.target_date = target_date || null
+    }
+
+    if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
-        { error: 'status must be "completed" or "skipped"' },
+        { error: 'No updatable fields provided' },
         { status: 400 }
       )
     }
 
     const supabase = createServerClient()
 
-    const updateData: Record<string, any> = { status }
-    if (status === 'completed') {
-      updateData.completed_at = new Date().toISOString()
-    }
-
     const { data, error } = await supabase
       .from('practice_intentions')
       .update(updateData)
       .eq('id', intentionId)
       .eq('user_id', userId)
-      .select('id, status, completed_at')
+      .select('id, intention_text, target_date, status, completed_at')
       .single()
 
     if (error) {
