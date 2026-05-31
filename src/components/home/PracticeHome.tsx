@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -13,6 +14,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { useTheme } from '@/lib/theme'
+import { IntentionEditSheet, EditableIntention } from '@/components/practice/IntentionEditSheet'
 
 interface ScheduledExercise {
   id: string
@@ -52,16 +54,19 @@ interface HomeSummary {
 }
 
 interface PracticeHomeProps {
+  userId: string
   userName: string
   summary: HomeSummary | null
   upcomingExercises?: ScheduledExercise[]
   onMarkDone?: (id: string) => void
+  onIntentionUpdated?: (updated: EditableIntention) => void
 }
 
-export function PracticeHome({ userName, summary, upcomingExercises, onMarkDone }: PracticeHomeProps) {
+export function PracticeHome({ userId, userName, summary, upcomingExercises, onMarkDone, onIntentionUpdated }: PracticeHomeProps) {
   const theme = useTheme()
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  const [editingIntention, setEditingIntention] = useState<EditableIntention | null>(null)
 
   return (
     <>
@@ -189,10 +194,17 @@ export function PracticeHome({ userName, summary, upcomingExercises, onMarkDone 
             </div>
             <div className="space-y-2">
               {summary.activeIntentions.map((intention) => (
-                <div
+                <button
                   key={intention.id}
-                  className="flex items-start gap-3 p-3 rounded-xl"
-                  style={{ backgroundColor: theme.cardHover }}
+                  type="button"
+                  onClick={() => setEditingIntention({
+                    id: intention.id,
+                    intention_text: intention.intention_text,
+                    target_date: intention.target_date,
+                    status: intention.status,
+                  })}
+                  className="w-full flex items-start gap-3 p-3 rounded-xl text-left transition-all hover:scale-[1.01]"
+                  style={{ backgroundColor: theme.cardHover, border: 'none', cursor: 'pointer' }}
                 >
                   <div
                     className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
@@ -211,7 +223,7 @@ export function PracticeHome({ userName, summary, upcomingExercises, onMarkDone 
                       </div>
                     )}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -388,6 +400,16 @@ export function PracticeHome({ userName, summary, upcomingExercises, onMarkDone 
           </div>
         </div>
       </div>
+
+      <IntentionEditSheet
+        open={editingIntention !== null}
+        intention={editingIntention}
+        userId={userId}
+        onClose={() => setEditingIntention(null)}
+        onSaved={(updated) => {
+          onIntentionUpdated?.(updated)
+        }}
+      />
     </>
   )
 }
