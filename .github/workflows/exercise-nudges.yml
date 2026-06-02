@@ -27,9 +27,14 @@ jobs:
           BASE_URL: ${{ secrets.SEEN_BASE_URL }}
           SECRET: ${{ secrets.CRON_SECRET }}
         run: |
+          # Graceful skip when secrets are not yet configured. Exit 0 so the
+          # scheduled run does not register as a failure (and email Bas) just
+          # because Web Push setup is incomplete. Once both secrets are added
+          # in repo Settings → Secrets and variables → Actions, this branch
+          # is bypassed and the cron runs normally.
           if [ -z "$BASE_URL" ] || [ -z "$SECRET" ]; then
-            echo "SEEN_BASE_URL or CRON_SECRET is not set"
-            exit 1
+            echo "::warning::SEEN_BASE_URL or CRON_SECRET secret is not set. Skipping cron run. Configure both in repo Settings → Secrets and variables → Actions to enable."
+            exit 0
           fi
           response=$(curl -sS -w "\n%{http_code}" \
             -H "Authorization: Bearer $SECRET" \
